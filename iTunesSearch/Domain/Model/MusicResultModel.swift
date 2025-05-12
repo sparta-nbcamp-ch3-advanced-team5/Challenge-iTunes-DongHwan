@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct MusicResultModel {
+struct MusicResultModel: Hashable {
     /// 컨텐츠 종류
     let kind: String
     /// 아티스트 이름

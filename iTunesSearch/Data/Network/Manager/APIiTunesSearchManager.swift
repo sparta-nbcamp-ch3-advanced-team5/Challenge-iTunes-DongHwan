@@ -14,7 +14,7 @@ final class APIiTunesSearchManager {
     
     // MARK: - Type Methods
     
-    func getMusic(with musicRequstDTO: MusicRequestDTO) -> Single<[MusicResultModel]> {
+    func fetchMusicList(with musicRequstDTO: MusicRequestDTO) -> Single<[MusicResultModel]> {
         let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: APIiTunesSearchManager.self))
         
         return Single<[MusicResultModel]>.create { single in
@@ -59,7 +59,7 @@ final class APIiTunesSearchManager {
     }
     
     // TODO: Movies API 호출 코드 만들기
-//    func getMovies(with movieRequestDTO: MovieRequestDTO) -> Single<ResponseDTO> {
+//    func fetchMovieList(with movieRequestDTO: MovieRequestDTO) -> Single<ResponseDTO> {
 //    let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: APIiTunesSearchManager.self))
 //
 //    }

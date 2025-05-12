@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct PodcastResultModel {
+struct PodcastResultModel: Hashable {
     /// 컨텐츠 종류
     let kind: String
     /// 진행자 이름

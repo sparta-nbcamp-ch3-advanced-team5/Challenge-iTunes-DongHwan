@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct MovieResultModel {
+struct MovieResultModel: Hashable {
     /// 컨텐츠 종류
     let kind: String
     /// 감독 이름

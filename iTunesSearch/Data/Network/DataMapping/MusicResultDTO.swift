@@ -70,8 +70,6 @@ extension MusicResultDTO {
                                 collectionPrice: collectionPrice,
                                 trackPrice: trackPrice,
                                 releaseDate: releaseDate,
-                                collectionExplicitness: collectionExplicitness,
-                                trackExplicitness: trackExplicitness,
                                 discCount: discCount,
                                 discNumber: discNumber,
                                 trackCount: trackCount,
@@ -79,6 +77,6 @@ extension MusicResultDTO {
                                 trackTimeMillis: trackTimeMillis,
                                 primaryGenreName: primaryGenreName,
                                 collectionArtistName: collectionArtistName,
-                                collectionArtistViewURL: collectionArtistViewURL)
+                                collectionArtistViewURL: collectionViewURL)
     }
 }

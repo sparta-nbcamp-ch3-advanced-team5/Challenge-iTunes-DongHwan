@@ -11,43 +11,51 @@ import RxSwift
 import SnapKit
 import Then
 
+typealias DataSource = UICollectionViewDiffableDataSource<HomeSection, HomeItem>
+typealias Snapshot = NSDiffableDataSourceSnapshot<HomeSection, HomeItem>
+
+enum HomeSection: Int, CaseIterable {
+    case springBest
+    case summer
+    case fall
+    case winter
+}
+
+enum HomeItem: Hashable {
+    case best(MusicResultModel)
+    case season(MusicResultModel)
+}
+
 final class HomeViewController: UIViewController {
     
     // MARK: - Properties
     
-    private let homeViewModel = HomeViewModel()
-//    private let viewModel: HomeViewModel
-    
+    private var homeViewModel: ViewModelable
     private let disposeBag = DisposeBag()
-    
-//    typealias Item =
-//    var datasource: UICollectionViewDiffableDataSource<Section, Item>!
-//    enum Section {
-//        case main
-//    }
     
     // MARK: - UI Components
     
+    // 홈 화면 View
     private let homeView = HomeView()
     
     // MARK: - Initializer
     
-//    init(viewModel: HomeViewModel) {
-//        self.viewModel = viewModel
-//        super.init(nibName: nil, bundle: nil)
-//    }
-//    
-//    required init?(coder: NSCoder) {
-//        fatalError("init(coder:) has not been implemented")
-//    }
+    init(homeViewModel: HomeViewModel) {
+        self.homeViewModel = homeViewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: - Lifecycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view.backgroundColor = .systemBackground
         
         setupUI()
+        configureDataSource()
         bind()
     }
 }
@@ -56,8 +64,15 @@ final class HomeViewController: UIViewController {
 
 private extension HomeViewController {
     func setupUI() {
+        setAppearance()
         setViewHierarchy()
         setConstraints()
+    }
+    
+    func setAppearance() {
+        self.view.backgroundColor = .systemBackground
+        self.navigationController?.navigationBar.topItem?.title = "Music"
+        self.navigationController?.navigationBar.prefersLargeTitles = true
     }
     
     func setViewHierarchy() {
@@ -71,15 +86,48 @@ private extension HomeViewController {
     }
     
     func bind() {
-        // Input ➡️ ViewModel
-        let input = HomeViewModel.Input(viewDidLoad: Observable.just(()))
+        // ViewModel ➡️ State
         
-        // ViewModel ➡️ Output
-        let output = homeViewModel.transform(input: input)
+        // Action ➡️ ViewModel
+        // viewDidLoad 알림
+        homeViewModel.action.onNext(.viewDidLoad)
+    }
+}
+
+// MARK: - UICollectionView Methods
+
+private extension HomeViewController {
+    /// DiffableDataSource 설정
+    func configureDataSource() {
+        let bestCellRegistration = UICollectionView.CellRegistration<BestCell, MusicResultModel> { cell, indexPath, item in
+            // TODO: thumbnailImage 수정
+            cell.configure(albumImage: nil,
+                           thumbnailImage: UIImage(),
+                           title: item.trackName,
+                           artist: item.artistName)
+        }
         
-        output.top5MusicData
-            .subscribe { response in
-                print(response)
-            }.disposed(by: disposeBag)
+        let seasonCellRegistration = UICollectionView.CellRegistration<SeasonCell, MusicResultModel> { cell, indexPath, item in
+            // TODO: thumbnailImage 수정
+            cell.configure(thumbnailImage: UIImage(),
+                           title: item.trackName,
+                           artist: item.artistName,
+                           collection: item.collectionName ?? "")
+        }
+        
+        homeViewModel.dataSource = DataSource(collectionView: homeView.getCollectionView, cellProvider: { collectionView, indexPath, itemList in
+            switch itemList {
+            case .best(let top5Music):
+                let cell = collectionView.dequeueConfiguredReusableCell(using: bestCellRegistration,
+                                                                        for: indexPath,
+                                                                        item: top5Music)
+                return cell
+            case .season(let music):
+                let cell = collectionView.dequeueConfiguredReusableCell(using: seasonCellRegistration,
+                                                                        for: indexPath,
+                                                                        item: music)
+                return cell
+            }
+        })
     }
 }
