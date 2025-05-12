@@ -15,7 +15,8 @@ final class BestCell: UICollectionViewCell {
     
     // MARK: - UI Components
     
-    private let albumImageView = UIImageView().then {
+    /// 가수 사진 UIImageView
+    private let artistImageView = UIImageView().then {
         let config = UIImage.SymbolConfiguration(pointSize: 50)
         $0.image = UIImage(systemName: "music.note", withConfiguration: config)?.withRenderingMode(.alwaysOriginal).withTintColor(.white)
         $0.contentMode = .center
@@ -23,12 +24,14 @@ final class BestCell: UICollectionViewCell {
         $0.layer.cornerRadius = 10
     }
     
+    /// 앨범 썸네일 UIImageView
     private let thumbnailImageView = UIImageView().then {
         $0.contentMode = .scaleAspectFill
         $0.backgroundColor = .white
         $0.layer.cornerRadius = 10
     }
     
+    /// 노래 제목 UILabel
     private let titleLabel = UILabel().then {
         $0.text = "봄 (feat. Sandara Park)"
         $0.font = .systemFont(ofSize: 14, weight: .bold)
@@ -36,6 +39,7 @@ final class BestCell: UICollectionViewCell {
         $0.numberOfLines = 1
     }
     
+    /// 가수 이름 UILabel
     private let artistLabel = UILabel().then {
         $0.text = "Park Bom"
         $0.font = .systemFont(ofSize: 14)
@@ -56,9 +60,9 @@ final class BestCell: UICollectionViewCell {
     
     // MARK: - Methods
     
-    func configure(albumImage: UIImage?, thumbnailImage: UIImage, title: String, artist: String) {
-        if let albumImage {
-            albumImageView.image = albumImage
+    func configure(artistImage: UIImage?, thumbnailImage: UIImage, title: String, artist: String) {
+        if let artistImage {
+            artistImageView.image = artistImage
         }
         thumbnailImageView.image = thumbnailImage
         titleLabel.text = title
@@ -75,13 +79,13 @@ private extension BestCell {
     }
     
     func setViewHierarchy() {
-        self.addSubviews(albumImageView,
+        self.addSubviews(artistImageView,
                          thumbnailImageView, titleLabel,
                          artistLabel)
     }
     
     func setConstraints() {
-        albumImageView.snp.makeConstraints {
+        artistImageView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
         

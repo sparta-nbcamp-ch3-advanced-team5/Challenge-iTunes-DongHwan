@@ -29,6 +29,7 @@ final class HomeViewModel: ViewModelable {
     // State (ViewModel ➡️ ViewController)
     var state = State()
     
+    // Diffable DataSource
     var dataSource: DataSource!
     private var snapshot = Snapshot()
     

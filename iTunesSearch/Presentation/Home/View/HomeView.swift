@@ -19,6 +19,7 @@ final class HomeView: UIView {
     
     // MARK: - Getter
     
+    /// 홈 화면 CollectionView 반환
     var getCollectionView: UICollectionView {
         return collectionView
     }

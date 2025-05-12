@@ -15,14 +15,20 @@ typealias DataSource = UICollectionViewDiffableDataSource<HomeSection, HomeItem>
 typealias Snapshot = NSDiffableDataSourceSnapshot<HomeSection, HomeItem>
 
 enum HomeSection: Int, CaseIterable {
+    /// 봄 Best
     case springBest
+    /// 여름
     case summer
+    /// 가을
     case fall
+    /// 겨울
     case winter
 }
 
 enum HomeItem: Hashable {
+    /// 봄 Best Item
     case best(MusicResultModel)
+    /// 여름, 가을, 겨울 Item
     case season(MusicResultModel)
 }
 
@@ -101,7 +107,7 @@ private extension HomeViewController {
     func configureDataSource() {
         let bestCellRegistration = UICollectionView.CellRegistration<BestCell, MusicResultModel> { cell, indexPath, item in
             // TODO: thumbnailImage 수정
-            cell.configure(albumImage: nil,
+            cell.configure(artistImage: nil,
                            thumbnailImage: UIImage(),
                            title: item.trackName,
                            artist: item.artistName)
@@ -112,7 +118,8 @@ private extension HomeViewController {
             cell.configure(thumbnailImage: UIImage(),
                            title: item.trackName,
                            artist: item.artistName,
-                           collection: item.collectionName ?? "")
+                           collection: item.collectionName ?? "",
+                           isBottom: (indexPath.item + 1) % 3 == 0)
         }
         
         homeViewModel.dataSource = DataSource(collectionView: homeView.getCollectionView, cellProvider: { collectionView, indexPath, itemList in

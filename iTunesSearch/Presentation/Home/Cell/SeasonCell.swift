@@ -14,12 +14,14 @@ final class SeasonCell: UICollectionViewCell {
     
     // MARK: - UI Componenets
     
+    /// 앨범 썸네일 UIImageView
     private let thumbnailImageView = UIImageView().then {
         $0.contentMode = .scaleAspectFill
         $0.backgroundColor = .placeholderText
         $0.layer.cornerRadius = 15
     }
     
+    /// 노래 제목 UILabel
     private let titleLabel = UILabel().then {
         $0.text = "Save Me, Save You"
         $0.font = .systemFont(ofSize: 17, weight: .bold)
@@ -27,6 +29,7 @@ final class SeasonCell: UICollectionViewCell {
         $0.numberOfLines = 1
     }
     
+    /// 가수 이름 UILabel
     private let artistLabel = UILabel().then {
         $0.text = "WJSN"
         $0.font = .systemFont(ofSize: 17)
@@ -34,11 +37,16 @@ final class SeasonCell: UICollectionViewCell {
         $0.numberOfLines = 1
     }
     
+    /// 앨범 이름 UILabel
     private let collectionLabel = UILabel().then {
         $0.text = "WJ Please? - EP"
         $0.font = .systemFont(ofSize: 14)
         $0.textColor = .secondaryLabel
         $0.numberOfLines = 1
+    }
+    
+    private let separatorView = UIView().then {
+        $0.backgroundColor = .separator
     }
     
     // MARK: - Initializer
@@ -54,11 +62,12 @@ final class SeasonCell: UICollectionViewCell {
     
     // MARK: - Methods
     
-    func configure(thumbnailImage: UIImage, title: String, artist: String, collection: String) {
+    func configure(thumbnailImage: UIImage, title: String, artist: String, collection: String, isBottom: Bool) {
         thumbnailImageView.image = thumbnailImage
         titleLabel.text = title
         artistLabel.text = artist
         collectionLabel.text = collection
+        separatorView.isHidden = isBottom
     }
 }
 
@@ -73,13 +82,14 @@ private extension SeasonCell {
     func setViewHierarchy() {
         self.addSubviews(thumbnailImageView, titleLabel,
                          artistLabel,
-                         collectionLabel)
+                         collectionLabel,
+                         separatorView)
     }
     
     func setConstraints() {
         thumbnailImageView.snp.makeConstraints {
             $0.leading.equalToSuperview()
-            $0.bottom.equalToSuperview()
+            $0.centerY.equalToSuperview()
             $0.width.height.equalTo(70)
         }
         
@@ -99,6 +109,13 @@ private extension SeasonCell {
             $0.top.equalTo(artistLabel.snp.bottom).offset(2)
             $0.leading.equalTo(artistLabel)
             $0.trailing.equalToSuperview().inset(15)
+        }
+        
+        separatorView.snp.makeConstraints {
+            $0.leading.equalTo(artistLabel)
+            $0.trailing.equalToSuperview()
+            $0.bottom.equalToSuperview()
+            $0.height.equalTo(0.5)
         }
     }
 }
