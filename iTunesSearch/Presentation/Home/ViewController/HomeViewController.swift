@@ -46,7 +46,7 @@ final class HomeViewController: UIViewController {
     }
     
     // MARK: - Lifecycle
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -94,7 +94,7 @@ private extension HomeViewController {
         // ViewModel ➡️ Output
         let output = homeViewModel.transform(input: input)
         
-        output.musicListChunks
+        output.musicListChunksRelay
             .asDriver(onErrorJustReturn: ([], [], [], []))
             .drive(with: self) { owner, element in
                 let (top5MusicList, summerMusicList, fallMusicList, winterMusicList) = element
@@ -113,16 +113,15 @@ private extension HomeViewController {
     /// Diffable DataSource 설정
     func configureDataSource() {
         let bestCellRegistration = UICollectionView.CellRegistration<BestCell, MusicResultModel> { cell, indexPath, item in
-            // TODO: thumbnailImage 수정
-            cell.configure(artistImageColorIndex: item.artistImageColorIndex,
-                           thumbnailImage: UIImage(),
+            let artistImageColor = UIColor.artistImageColors[item.artistImageColorIndex]
+            cell.configure(thumbnailImageURL: item.artworkUrl100,
+                           artistImageColor: artistImageColor,
                            title: item.trackName,
                            artist: item.artistName)
         }
         
         let seasonCellRegistration = UICollectionView.CellRegistration<SeasonCell, MusicResultModel> { cell, indexPath, item in
-            // TODO: thumbnailImage 수정
-            cell.configure(thumbnailImage: UIImage(),
+            cell.configure(thumbnailImageURL: item.artworkUrl100,
                            title: item.trackName,
                            artist: item.artistName,
                            collection: item.collectionName ?? "",

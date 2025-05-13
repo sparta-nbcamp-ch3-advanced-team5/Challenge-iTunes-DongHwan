@@ -8,8 +8,6 @@
 import UIKit
 
 extension UIColor {
-    static let artistImageColors: [UIColor] = [.systemRed, .systemGreen, .systemBlue,
-                                               .systemCyan, .systemYellow, .systemBrown,
-                                               .systemPurple, .systemPink, .systemOrange,
-                                               .systemIndigo, .systemTeal, .systemMint]
+    static let artistImageColors: [UIColor] = [systemGreen, .systemCyan, .systemYellow,
+                                               .systemBrown, .systemOrange, .systemTeal, .systemMint]
 }

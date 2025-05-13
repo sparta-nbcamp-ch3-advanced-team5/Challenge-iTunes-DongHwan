@@ -7,11 +7,16 @@
 
 import UIKit
 
+import RxSwift
 import SnapKit
 import Then
 
 /// 홈 화면 CollectionView 여름, 가을, 겨울 셀
 final class SeasonCell: UICollectionViewCell {
+    
+    // MARK: - Properties
+    
+    private let disposeBag = DisposeBag()
     
     // MARK: - UI Componenets
     
@@ -19,6 +24,7 @@ final class SeasonCell: UICollectionViewCell {
     private let thumbnailImageView = UIImageView().then {
         $0.contentMode = .scaleAspectFill
         $0.backgroundColor = .placeholderText
+        $0.layer.masksToBounds = true
         $0.layer.cornerRadius = 15
     }
     
@@ -63,8 +69,13 @@ final class SeasonCell: UICollectionViewCell {
     
     // MARK: - Methods
     
-    func configure(thumbnailImage: UIImage, title: String, artist: String, collection: String, isBottom: Bool) {
-        thumbnailImageView.image = thumbnailImage
+    func configure(thumbnailImageURL: String, title: String, artist: String, collection: String, isBottom: Bool) {
+        ImageCacheManager.shared.loadImage(from: thumbnailImageURL)
+            .observe(on: MainScheduler.instance)
+            .subscribe(with: self) { owner, imageData in
+                owner.thumbnailImageView.image = UIImage(data: imageData)
+            }.disposed(by: disposeBag)
+        
         titleLabel.text = title
         artistLabel.text = artist
         collectionLabel.text = collection

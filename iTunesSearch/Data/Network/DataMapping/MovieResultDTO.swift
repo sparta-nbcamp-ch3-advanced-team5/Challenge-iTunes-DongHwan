@@ -20,24 +20,22 @@ struct MovieResultDTO: Decodable {
     let collectionArtistID: Int?
     let collectionArtistViewURL, collectionViewURL: String?
     let trackViewURL: String
-    let previewURL: String?
-    let artworkUrl30, artworkUrl60, artworkUrl100: String?
-    let collectionPrice, trackPrice, collectionHDPrice, trackHDPrice: Double?
+    let previewURL: String
+    let artworkUrl30, artworkUrl60, artworkUrl100: String
+    let collectionPrice, trackPrice, trackRentalPrice, collectionHDPrice: Double
+    let trackHDPrice, trackHDRentalPrice: Double
     let releaseDate: String
     let collectionExplicitness, trackExplicitness: String
     let discCount, discNumber, trackCount, trackNumber: Int?
-    let trackTimeMillis: Int?
+    let trackTimeMillis: Int
     let country: String
     let currency: String
     let primaryGenreName: String
     let contentAdvisoryRating: String
+    let shortDescription: String?
     let longDescription: String
     let hasITunesExtras: Bool?
-    let trackRentalPrice, trackHDRentalPrice: Double?
-    let shortDescription: String?
-    let artistID: Int?
-    let artistViewURL: String?
-
+    
     enum CodingKeys: String, CodingKey {
         case wrapperType, kind
         case collectionID = "collectionId"
@@ -48,46 +46,33 @@ struct MovieResultDTO: Decodable {
         case collectionViewURL = "collectionViewUrl"
         case trackViewURL = "trackViewUrl"
         case previewURL = "previewUrl"
-        case artworkUrl30, artworkUrl60, artworkUrl100, collectionPrice, trackPrice
+        case artworkUrl30, artworkUrl60, artworkUrl100, collectionPrice, trackPrice, trackRentalPrice
         case collectionHDPrice = "collectionHdPrice"
         case trackHDPrice = "trackHdPrice"
-        case releaseDate, collectionExplicitness, trackExplicitness, discCount, discNumber, trackCount, trackNumber, trackTimeMillis, country, currency, primaryGenreName, contentAdvisoryRating, longDescription, hasITunesExtras, trackRentalPrice
         case trackHDRentalPrice = "trackHdRentalPrice"
-        case shortDescription
-        case artistID = "artistId"
-        case artistViewURL = "artistViewUrl"
+        case releaseDate, collectionExplicitness, trackExplicitness, discCount, discNumber, trackCount, trackNumber, trackTimeMillis, country, currency, primaryGenreName, contentAdvisoryRating, shortDescription, longDescription, hasITunesExtras
     }
 }
 
 extension MovieResultDTO {
     func toModel() -> MovieResultModel {
-        return MovieResultModel(kind: kind,
-                         artistName: artistName,
-                         collectionName: collectionName,
-                         trackName: trackName,
-                         collectionArtistViewURL: collectionArtistViewURL,
-                         collectionViewURL: collectionViewURL,
-                         trackViewURL: trackViewURL,
-                         previewURL: previewURL,
-                         artworkUrl30: artworkUrl30,
-                         artworkUrl60: artworkUrl60,
-                         artworkUrl100: artworkUrl100,
-                         collectionPrice: collectionPrice,
-                         trackPrice: trackPrice,
-                         collectionHDPrice: collectionHDPrice,
-                         trackHDPrice: trackHDPrice,
-                         releaseDate: releaseDate,
-                         discCount: discCount,
-                         discNumber: discNumber,
-                         trackCount: trackCount,
-                         trackNumber: trackNumber,
-                         trackTimeMillis: trackTimeMillis,
-                         primaryGenreName: primaryGenreName,
-                         longDescription: longDescription,
-                         hasITunesExtras: hasITunesExtras,
-                         trackRentalPrice: trackRentalPrice,
-                         trackHDRentalPrice: trackHDRentalPrice,
-                         shortDescription: shortDescription,
-                         artistViewURL: artistViewURL)
+        return MovieResultModel(artistName: artistName,
+                                collectionName: collectionName,
+                                trackName: trackName,
+                                collectionArtistViewURL: collectionArtistViewURL,
+                                collectionViewURL: collectionViewURL,
+                                trackViewURL: trackViewURL,
+                                previewURL: previewURL,
+                                artworkUrl100: artworkUrl100,
+                                releaseDate: releaseDate,
+                                discCount: discCount,
+                                discNumber: discNumber,
+                                trackCount: trackCount,
+                                trackNumber: trackNumber,
+                                trackTimeMillis: trackTimeMillis,
+                                primaryGenreName: primaryGenreName,
+                                shortDescription: shortDescription,
+                                longDescription: longDescription,
+                                hasITunesExtras: hasITunesExtras)
     }
 }

@@ -7,11 +7,16 @@
 
 import UIKit
 
+import RxSwift
 import SnapKit
 import Then
 
 /// 홈 화면 CollectionView 봄 Best 셀
 final class BestCell: UICollectionViewCell {
+    
+    // MARK: - Properties
+    
+    private let disposeBag = DisposeBag()
     
     // MARK: - UI Components
     
@@ -21,6 +26,7 @@ final class BestCell: UICollectionViewCell {
         $0.image = UIImage(systemName: "music.note", withConfiguration: config)?.withRenderingMode(.alwaysOriginal).withTintColor(.white)
         $0.contentMode = .center
         $0.backgroundColor = .placeholderText
+        $0.layer.masksToBounds = true
         $0.layer.cornerRadius = 10
     }
     
@@ -28,6 +34,7 @@ final class BestCell: UICollectionViewCell {
     private let thumbnailImageView = UIImageView().then {
         $0.contentMode = .scaleAspectFill
         $0.backgroundColor = .white
+        $0.layer.masksToBounds = true
         $0.layer.cornerRadius = 10
     }
     
@@ -60,9 +67,14 @@ final class BestCell: UICollectionViewCell {
     
     // MARK: - Methods
     
-    func configure(artistImageColorIndex: Int, thumbnailImage: UIImage, title: String, artist: String) {
-        artistImageView.backgroundColor = .artistImageColors[artistImageColorIndex]
-        thumbnailImageView.image = thumbnailImage
+    func configure(thumbnailImageURL: String, artistImageColor: UIColor, title: String, artist: String) {
+        ImageCacheManager.shared.loadImage(from: thumbnailImageURL)
+            .observe(on: MainScheduler.instance)
+            .subscribe(with: self) { owner, imageData in
+                owner.thumbnailImageView.image = UIImage(data: imageData)
+            }.disposed(by: disposeBag)
+        
+        artistImageView.backgroundColor = artistImageColor
         titleLabel.text = title
         artistLabel.text = artist
     }

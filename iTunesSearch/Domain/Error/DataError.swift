@@ -7,7 +7,7 @@
 
 import Foundation
 
-/// iTunes Search API 응답 파싱 중 발생할 수 있는 에러 메세지
+/// JSON 파싱 중 발생할 수 있는 에러 메세지
 enum DataError: Error {
     case fileNotFound
     case parsingFailed

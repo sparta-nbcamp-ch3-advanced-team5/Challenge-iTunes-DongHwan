@@ -7,7 +7,7 @@
 
 import Foundation
 
-/// iTunes Search API 호출 중 발생할 수 있는 에러 메세지
+/// 네트워크 통신 중 발생할 수 있는 에러 메세지
 enum NetworkError: Error {
     case invalidURL
     case noData

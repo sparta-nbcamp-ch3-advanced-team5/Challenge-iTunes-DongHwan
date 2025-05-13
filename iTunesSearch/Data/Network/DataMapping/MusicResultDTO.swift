@@ -23,8 +23,8 @@ struct MusicResultDTO: Decodable {
     let collectionViewURL: String?
     let trackViewURL: String
     let previewURL: String
-    let artworkUrl30, artworkUrl60, artworkUrl100: String?
-    let collectionPrice, trackPrice: Double?
+    let artworkUrl30, artworkUrl60, artworkUrl100: String
+    let collectionPrice, trackPrice: Double
     let releaseDate: String
     let collectionExplicitness, trackExplicitness: String
     let discCount, discNumber, trackCount, trackNumber: Int?
@@ -36,7 +36,7 @@ struct MusicResultDTO: Decodable {
     let collectionArtistID: Int?
     let collectionArtistName: String?
     let collectionArtistViewURL: String?
-
+    
     enum CodingKeys: String, CodingKey {
         case wrapperType, kind
         case artistID = "artistId"
@@ -56,19 +56,14 @@ struct MusicResultDTO: Decodable {
 
 extension MusicResultDTO {
     func toMusicModel() -> MusicResultModel {
-        return MusicResultModel(kind: kind,
-                                artistName: artistName,
+        return MusicResultModel(artistName: artistName,
                                 collectionName: collectionName,
                                 trackName: trackName,
                                 artistViewURL: artistViewURL,
                                 collectionViewURL: collectionViewURL,
                                 trackViewURL: trackViewURL,
                                 previewURL: previewURL,
-                                artworkUrl30: artworkUrl30,
-                                artworkUrl60: artworkUrl60,
                                 artworkUrl100: artworkUrl100,
-                                collectionPrice: collectionPrice,
-                                trackPrice: trackPrice,
                                 releaseDate: releaseDate,
                                 discCount: discCount,
                                 discNumber: discNumber,
@@ -78,6 +73,6 @@ extension MusicResultDTO {
                                 primaryGenreName: primaryGenreName,
                                 collectionArtistName: collectionArtistName,
                                 collectionArtistViewURL: collectionViewURL,
-                                artistImageColorIndex: .random(in: 0...9))
+                                artistImageColorIndex: .random(in: 0...6))
     }
 }

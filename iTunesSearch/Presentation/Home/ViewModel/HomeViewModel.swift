@@ -27,21 +27,23 @@ final class HomeViewModel {
     struct Input {
         let viewDidLoad: Observable<Void>
     }
-
+    
     // MARK: - Output (ViewModel ➡️ ViewController)
+    // top5, summer, fall, winter
     typealias MusicListChunks = ([MusicResultModel], [MusicResultModel], [MusicResultModel], [MusicResultModel])
     struct Output {
-        let musicListChunks: PublishRelay<MusicListChunks>
+        let musicListChunksRelay: PublishRelay<MusicListChunks>
     }
     
     // MARK: - Transform (Input ➡️ Output)
     
     func transform(input: Input) -> Output {
-        let musicListChunks = PublishRelay<MusicListChunks>()
+        let musicListChunksRelay = PublishRelay<MusicListChunks>()
         
         input.viewDidLoad
             .withUnretained(self)
             .flatMapLatest { owner, _ in
+                // TODO: Repository 구현할 때 삭제해야 함
                 let top5MusicRequestDTO = MusicRequestDTO(term: .spring, limit: 5)
                 let summerMusicRequestDTO = MusicRequestDTO(term: .summer, limit: 15)
                 let fallMusicRequestDTO = MusicRequestDTO(term: .fall, limit: 15)
@@ -52,15 +54,15 @@ final class HomeViewModel {
                                       owner.apiiTunesSearchUseCase.fetchMusicList(with: fallMusicRequestDTO).asObservable(),
                                       owner.apiiTunesSearchUseCase.fetchMusicList(with: winterMusicRequestDTO).asObservable())
             }.subscribe(with: self) { owner, element in
-                musicListChunks.accept(element)
+                musicListChunksRelay.accept(element)
             } onError: { owner, error in
                 // TODO: - 에러 Alert 표시
                 os_log(.error, log: owner.log, "\(error.localizedDescription)")
             }.disposed(by: disposeBag)
         
-        return Output(musicListChunks: musicListChunks)
+        return Output(musicListChunksRelay: musicListChunksRelay)
     }
-
+    
     
     // MARK: - Initializer
     

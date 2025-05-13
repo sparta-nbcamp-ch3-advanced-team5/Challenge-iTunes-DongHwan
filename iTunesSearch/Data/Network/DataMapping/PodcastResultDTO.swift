@@ -11,14 +11,16 @@ import Foundation
 struct PodcastResultDTO: Decodable {
     let wrapperType: String
     let kind: String
+    let artistID: Int?
     let collectionID, trackID: Int
     let artistName, collectionName, trackName, collectionCensoredName: String
     let trackCensoredName: String
+    let artistViewURL: String?
     let collectionViewURL: String
-    let feedURL: String
+    let feedURL: String?
     let trackViewURL: String
-    let artworkUrl30, artworkUrl60, artworkUrl100: String?
-    let collectionPrice, trackPrice, collectionHDPrice: Double
+    let artworkUrl30, artworkUrl60, artworkUrl100: String
+    let collectionPrice, trackPrice, collectionHDPrice: Int
     let releaseDate: String
     let collectionExplicitness, trackExplicitness: String
     let trackCount: Int
@@ -29,14 +31,14 @@ struct PodcastResultDTO: Decodable {
     let contentAdvisoryRating: String?
     let artworkUrl600: String
     let genreIDS, genres: [String]
-    let artistID: Int?
-    let artistViewURL: String?
-
+    
     enum CodingKeys: String, CodingKey {
         case wrapperType, kind
+        case artistID = "artistId"
         case collectionID = "collectionId"
         case trackID = "trackId"
         case artistName, collectionName, trackName, collectionCensoredName, trackCensoredName
+        case artistViewURL = "artistViewUrl"
         case collectionViewURL = "collectionViewUrl"
         case feedURL = "feedUrl"
         case trackViewURL = "trackViewUrl"
@@ -45,7 +47,5 @@ struct PodcastResultDTO: Decodable {
         case releaseDate, collectionExplicitness, trackExplicitness, trackCount, trackTimeMillis, country, currency, primaryGenreName, contentAdvisoryRating, artworkUrl600
         case genreIDS = "genreIds"
         case genres
-        case artistID = "artistId"
-        case artistViewURL = "artistViewUrl"
     }
 }

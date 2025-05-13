@@ -8,8 +8,6 @@
 import Foundation
 
 struct MusicResultModel: Hashable {
-    /// 컨텐츠 종류
-    let kind: String
     /// 아티스트 이름
     let artistName: String
     /// 앨범 이름
@@ -24,16 +22,8 @@ struct MusicResultModel: Hashable {
     let trackViewURL: String
     /// 30초 프리뷰를 재생할 수 있는 URL
     let previewURL: String
-    /// 30x30 픽셀의 썸네일
-    let artworkUrl30: String?
-    /// 60x60 픽셀의 썸네일
-    let artworkUrl60: String?
-    /// 100x100 픽셀의 썸네일
-    let artworkUrl100: String?
-    /// 앨범 가격
-    let collectionPrice: Double?
-    /// 노래 가격
-    let trackPrice: Double?
+    /// 100x100 픽셀의 썸네일 URL
+    let artworkUrl100: String
     /// 출시일
     let releaseDate: String
     /// 디스크 개수
