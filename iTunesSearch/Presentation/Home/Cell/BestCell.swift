@@ -15,7 +15,7 @@ final class BestCell: UICollectionViewCell {
     
     // MARK: - UI Components
     
-    /// 가수 사진 UIImageView
+    /// 가수 사진 UIImageView(API에 가수 사진이 없으므로 배경색만 변경)
     private let artistImageView = UIImageView().then {
         let config = UIImage.SymbolConfiguration(pointSize: 50)
         $0.image = UIImage(systemName: "music.note", withConfiguration: config)?.withRenderingMode(.alwaysOriginal).withTintColor(.white)
@@ -60,10 +60,8 @@ final class BestCell: UICollectionViewCell {
     
     // MARK: - Methods
     
-    func configure(artistImage: UIImage?, thumbnailImage: UIImage, title: String, artist: String) {
-        if let artistImage {
-            artistImageView.image = artistImage
-        }
+    func configure(artistImageColorIndex: Int, thumbnailImage: UIImage, title: String, artist: String) {
+        artistImageView.backgroundColor = .artistImageColors[artistImageColorIndex]
         thumbnailImageView.image = thumbnailImage
         titleLabel.text = title
         artistLabel.text = artist

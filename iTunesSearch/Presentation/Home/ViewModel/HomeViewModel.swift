@@ -15,7 +15,7 @@ final class HomeViewModel: ViewModelable {
 
     // MARK: - Properties
     
-    private let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: HomeViewModel.self))
+    private lazy var log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
     private let disposeBag = DisposeBag()
     
 //    private let apiiTunesSearchUseCase: APIiTunesSearchUseCase

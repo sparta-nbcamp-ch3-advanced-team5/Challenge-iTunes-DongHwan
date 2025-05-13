@@ -14,7 +14,7 @@ import RxSwift
 final class APIiTunesSearchManager {
     /// iTunes Search API에 음악 데이터 요청
     func fetchMusicList(with musicRequstDTO: MusicRequestDTO) -> Single<[MusicResultModel]> {
-        let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: APIiTunesSearchManager.self))
+        let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
         
         return Single<[MusicResultModel]>.create { single in
             guard let urlRequest: URLRequest = NetworkEndpoints.urlRequest(.baseURL, term: musicRequstDTO.term.rawValue, mediaType: .music, limit: musicRequstDTO.limit) else {
@@ -22,7 +22,7 @@ final class APIiTunesSearchManager {
                 return Disposables.create()
             }
             
-            os_log(.debug, log: log, "%@", "\(urlRequest)")
+            os_log(.debug, log: log, "\(urlRequest)")
             
             let task = URLSession.shared.dataTask(with: urlRequest) { data, response, error in
                 let successRange: Range = (200..<300)
@@ -33,17 +33,17 @@ final class APIiTunesSearchManager {
                 }
                 
                 if let response: HTTPURLResponse = response as? HTTPURLResponse {
-                    os_log(.debug, log: log, "%d", response.statusCode)
+                    os_log(.debug, log: log, "statusCode: \(response.statusCode)")
                     
                     if successRange.contains(response.statusCode) {
-                        os_log(.debug, log: log, "data: %@", "\(data)")
+                        os_log(.debug, log: log, "data: \(data)")
                         do {
                             let responseDTO = try JSONDecoder().decode(ResponseDTO<MusicResultDTO>.self, from: data)
-//                            os_log(.debug, log: log, "responseDTO: %@", "\(responseDTO)")
+//                            os_log(.debug, log: log, "responseDTO: \(responseDTO)")
                             let musicModelList = responseDTO.results.map { $0.toMusicModel() }
                             single(.success(musicModelList))
                         } catch {
-                            os_log(.error, log: log, "%@", "\(error)")
+                            os_log(.error, log: log, "\(error)")
                             single(.failure(DataError.parsingFailed))
                         }
                     } else {
@@ -60,7 +60,7 @@ final class APIiTunesSearchManager {
     // TODO: Movies API 호출 코드 만들기
     /// iTunes Search API에 영화 데이터 요청
 //    func fetchMovieList(with movieRequestDTO: MovieRequestDTO) -> Single<ResponseDTO> {
-//    let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: APIiTunesSearchManager.self))
+//    let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
 //
 //    }
     

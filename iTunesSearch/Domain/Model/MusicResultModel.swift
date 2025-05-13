@@ -52,4 +52,6 @@ struct MusicResultModel: Hashable {
     let collectionArtistName: String?
     /// iTunes Store의 앨범 아티스트로 연결되는 URL
     let collectionArtistViewURL: String?
+    /// 가수 사진 UIImageView 배경색 인덱스
+    let artistImageColorIndex: Int
 }

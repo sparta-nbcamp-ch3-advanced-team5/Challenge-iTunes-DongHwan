@@ -86,7 +86,7 @@ private extension HomeViewController {
     func configureDataSource() {
         let bestCellRegistration = UICollectionView.CellRegistration<BestCell, MusicResultModel> { cell, indexPath, item in
             // TODO: thumbnailImage 수정
-            cell.configure(artistImage: nil,
+            cell.configure(artistImageColorIndex: item.artistImageColorIndex,
                            thumbnailImage: UIImage(),
                            title: item.trackName,
                            artist: item.artistName)

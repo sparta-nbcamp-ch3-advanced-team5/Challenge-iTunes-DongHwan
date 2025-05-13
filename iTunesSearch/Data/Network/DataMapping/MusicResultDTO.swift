@@ -77,6 +77,7 @@ extension MusicResultDTO {
                                 trackTimeMillis: trackTimeMillis,
                                 primaryGenreName: primaryGenreName,
                                 collectionArtistName: collectionArtistName,
-                                collectionArtistViewURL: collectionViewURL)
+                                collectionArtistViewURL: collectionViewURL,
+                                artistImageColorIndex: .random(in: 0...9))
     }
 }
