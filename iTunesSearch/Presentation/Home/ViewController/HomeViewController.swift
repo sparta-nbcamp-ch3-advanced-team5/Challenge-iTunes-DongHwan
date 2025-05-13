@@ -66,8 +66,9 @@ private extension HomeViewController {
         self.navigationItem.hidesSearchBarWhenScrolling = false
         self.navigationController?.navigationBar.prefersLargeTitles = true
         
-        searchController.hidesNavigationBarDuringPresentation = true
         searchController.searchBar.placeholder = "영화, 팟캐스트"
+        searchController.hidesNavigationBarDuringPresentation = true
+        searchController.obscuresBackgroundDuringPresentation = true
     }
     
     func setViewHierarchy() {
