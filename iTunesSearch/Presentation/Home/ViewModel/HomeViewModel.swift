@@ -11,21 +11,22 @@ import OSLog
 import RxSwift
 import RxRelay
 
+/// 홈 화면 ViewModel
 final class HomeViewModel: ViewModelable {
-
+    
     // MARK: - Properties
     
     private lazy var log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
     private let disposeBag = DisposeBag()
     
-//    private let apiiTunesSearchUseCase: APIiTunesSearchUseCase
+    //    private let apiiTunesSearchUseCase: APIiTunesSearchUseCase
     private let apiiTunesSearchUseCase = APIiTunesSearchManager()
     
     // Action (ViewController ➡️ ViewModel)
     var action: AnyObserver<Action> {
         state.actionSubject.asObserver()
     }
-
+    
     // State (ViewModel ➡️ ViewController)
     var state = State()
     
@@ -35,9 +36,9 @@ final class HomeViewModel: ViewModelable {
     
     // MARK: - Initializer
     
-//    init(apiiTunesSearchUseCase: APIiTunesSearchUseCase) {
-//        self.apiiTunesSearchUseCase = apiiTunesSearchUseCase
-//    }
+    //    init(apiiTunesSearchUseCase: APIiTunesSearchUseCase) {
+    //        self.apiiTunesSearchUseCase = apiiTunesSearchUseCase
+    //    }
     
     init() {
         state.actionSubject
@@ -60,17 +61,17 @@ private extension HomeViewModel {
         let fallMusicRequestDTO = MusicRequestDTO(term: .fall, limit: 15)
         let winterMusicRequestDTO = MusicRequestDTO(term: .winter, limit: 15)
         
-        Observable.combineLatest(apiiTunesSearchUseCase.fetchMusicList(with: top5MusicRequestDTO).asObservable(),
-                                 apiiTunesSearchUseCase.fetchMusicList(with: summerMusicRequestDTO).asObservable(),
-                                 apiiTunesSearchUseCase.fetchMusicList(with: fallMusicRequestDTO).asObservable(),
-                                 apiiTunesSearchUseCase.fetchMusicList(with: winterMusicRequestDTO).asObservable())
+        Observable.zip(apiiTunesSearchUseCase.fetchMusicList(with: top5MusicRequestDTO).asObservable(),
+                       apiiTunesSearchUseCase.fetchMusicList(with: summerMusicRequestDTO).asObservable(),
+                       apiiTunesSearchUseCase.fetchMusicList(with: fallMusicRequestDTO).asObservable(),
+                       apiiTunesSearchUseCase.fetchMusicList(with: winterMusicRequestDTO).asObservable())
         .subscribe(with: self) { owner, element in
             let (top5MusicList, summerMusicList, fallMusicList, winterMusicList) = element
             owner.configureSnapshot(top5MusicList: top5MusicList,
-                                      summerMusicList: summerMusicList,
-                                      fallMusicList: fallMusicList,
-                                      winterMusicList: winterMusicList,
-                                      animatingDifferences: false)
+                                    summerMusicList: summerMusicList,
+                                    fallMusicList: fallMusicList,
+                                    winterMusicList: winterMusicList,
+                                    animatingDifferences: false)
         } onError: { owner, error in
             os_log(.error, log: owner.log, "\(error.localizedDescription)")
         }.disposed(by: disposeBag)
@@ -82,10 +83,10 @@ private extension HomeViewModel {
 private extension HomeViewModel {
     /// DiffableDataSourceSnapshot 설정
     func configureSnapshot(top5MusicList: [MusicResultModel],
-                             summerMusicList: [MusicResultModel],
-                             fallMusicList: [MusicResultModel],
-                             winterMusicList: [MusicResultModel],
-                             animatingDifferences: Bool) {
+                           summerMusicList: [MusicResultModel],
+                           fallMusicList: [MusicResultModel],
+                           winterMusicList: [MusicResultModel],
+                           animatingDifferences: Bool) {
         snapshot.deleteAllItems()
         snapshot.appendSections(HomeSection.allCases)
         

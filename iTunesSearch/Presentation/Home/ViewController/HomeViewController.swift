@@ -11,6 +11,7 @@ import RxSwift
 import SnapKit
 import Then
 
+/// 홈 화면 ViewController
 final class HomeViewController: UIViewController {
     
     // MARK: - Properties
@@ -20,7 +21,10 @@ final class HomeViewController: UIViewController {
     
     // MARK: - UI Components
     
-    // 홈 화면 View
+    /// 홈 화면 네비게이션 바 SearchController
+    private let searchController = UISearchController(searchResultsController: SearchResultViewController())
+    
+    /// 홈 화면 View
     private let homeView = HomeView()
     
     // MARK: - Initializer
@@ -56,8 +60,14 @@ private extension HomeViewController {
     
     func setAppearance() {
         self.view.backgroundColor = .systemBackground
-        self.navigationController?.navigationBar.topItem?.title = "Music"
+        
+        self.navigationItem.title = "Music"
+        self.navigationItem.searchController = searchController
+        self.navigationItem.hidesSearchBarWhenScrolling = false
         self.navigationController?.navigationBar.prefersLargeTitles = true
+        
+        searchController.hidesNavigationBarDuringPresentation = true
+        searchController.searchBar.placeholder = "영화, 팟캐스트"
     }
     
     func setViewHierarchy() {

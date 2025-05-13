@@ -10,6 +10,7 @@ import UIKit
 import SnapKit
 import Then
 
+/// 홈 화면 View
 final class HomeView: UIView {
     
     // MARK: - Properties

@@ -10,7 +10,7 @@ import UIKit
 import SnapKit
 import Then
 
-/// 홈 화면 Music 봄 Best 셀
+/// 홈 화면 CollectionView 봄 Best 셀
 final class BestCell: UICollectionViewCell {
     
     // MARK: - UI Components

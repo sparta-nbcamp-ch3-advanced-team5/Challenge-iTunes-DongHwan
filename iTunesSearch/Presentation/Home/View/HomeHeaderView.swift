@@ -10,6 +10,7 @@ import UIKit
 import SnapKit
 import Then
 
+/// 홈 화면 CollectionView Header
 final class HomeHeaderView: UICollectionReusableView {
     
     // MARK: - Properties

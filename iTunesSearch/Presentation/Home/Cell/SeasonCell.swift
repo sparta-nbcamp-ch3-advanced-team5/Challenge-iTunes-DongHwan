@@ -10,6 +10,7 @@ import UIKit
 import SnapKit
 import Then
 
+/// 홈 화면 CollectionView 여름, 가을, 겨울 셀
 final class SeasonCell: UICollectionViewCell {
     
     // MARK: - UI Componenets

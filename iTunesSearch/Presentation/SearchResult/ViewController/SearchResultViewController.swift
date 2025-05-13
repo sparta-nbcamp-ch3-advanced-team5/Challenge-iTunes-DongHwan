@@ -1,0 +1,46 @@
+//
+//  SearchResultViewController.swift
+//  iTunesSearch
+//
+//  Created by 서동환 on 5/13/25.
+//
+
+import UIKit
+
+import RxSwift
+import SnapKit
+import Then
+
+/// 검색 결과 ViewController
+final class SearchResultViewController: UIViewController {
+    
+    // MARK: - Lifecycle
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        setupUI()
+    }
+}
+
+// MARK: - UI Methods
+
+private extension SearchResultViewController {
+    func setupUI() {
+        setAppearance()
+        setViewHierarchy()
+        setConstraints()
+    }
+    
+    func setAppearance() {
+        self.view.backgroundColor = .systemBackground
+    }
+    
+    func setViewHierarchy() {
+        
+    }
+    
+    func setConstraints() {
+        
+    }
+}
