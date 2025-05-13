@@ -12,6 +12,11 @@ import Then
 
 final class HomeView: UIView {
     
+    // MARK: - Properties
+    
+    private let groupFractionalWidth: CGFloat = 0.92
+    private let itemContentInsets = NSDirectionalEdgeInsets(top: 0, leading: 5, bottom: 0, trailing: 5)
+    
     // MARK: - UI Components
     
     /// 홈 화면 CollectionView
@@ -55,7 +60,7 @@ private extension HomeView {
     }
 }
 
-// MARK: - CollectionView Methods
+// MARK: - CompositionalLayout Methods
 
 private extension HomeView {
     func createLayout() -> UICollectionViewCompositionalLayout {
@@ -66,44 +71,61 @@ private extension HomeView {
             guard let self , let section = HomeSection(rawValue: sectionIndex) else { return nil }
             switch section {
             case .springBest:
-                return self.carouselBannerSection()
+                return self.createCarouselBannerSection()
             default:
-                return self.listPagingSection()
+                return self.createThreeRowPagingSection()
             }
         }, configuration: config)
         
         return layout
     }
     
-    func carouselBannerSection() -> NSCollectionLayoutSection {
+    func createCarouselBannerSection() -> NSCollectionLayoutSection {
         let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
                                               heightDimension: .fractionalHeight(1.0))
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 5, bottom: 0, trailing: 5)
+        item.contentInsets = itemContentInsets
         
-        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.92),
-                                               heightDimension: .absolute(280))
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(groupFractionalWidth),
+                                               heightDimension: .absolute(240))
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
         
         let section = NSCollectionLayoutSection(group: group)
         section.orthogonalScrollingBehavior = .groupPagingCentered
         
+        let headerView = createHeader()
+        section.boundarySupplementaryItems = [headerView]
+        
         return section
     }
     
-    func listPagingSection() -> NSCollectionLayoutSection {
+    func createThreeRowPagingSection() -> NSCollectionLayoutSection {
         let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
                                               heightDimension: .fractionalHeight(0.33))
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 5, bottom: 0, trailing: 5)
+        item.contentInsets = itemContentInsets
         
-        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.92),
-                                               heightDimension: .absolute(280))
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(groupFractionalWidth),
+                                               heightDimension: .absolute(270))
         let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
         
         let section = NSCollectionLayoutSection(group: group)
         section.orthogonalScrollingBehavior = .groupPagingCentered
         
+        let headerView = createHeader()
+        section.boundarySupplementaryItems = [headerView]
+        
         return section
+    }
+    
+    
+    func createHeader() -> NSCollectionLayoutBoundarySupplementaryItem {
+        let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(groupFractionalWidth), heightDimension: .absolute(60))
+        let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerSize,
+                                                                            elementKind: UICollectionView.elementKindSectionHeader,
+                                                                            alignment: .top)
+        sectionHeader.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 5, bottom: 5, trailing: 5)
+        
+        return sectionHeader
     }
 }

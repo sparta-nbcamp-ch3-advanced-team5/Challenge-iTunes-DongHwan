@@ -11,27 +11,6 @@ import RxSwift
 import SnapKit
 import Then
 
-typealias DataSource = UICollectionViewDiffableDataSource<HomeSection, HomeItem>
-typealias Snapshot = NSDiffableDataSourceSnapshot<HomeSection, HomeItem>
-
-enum HomeSection: Int, CaseIterable {
-    /// 봄 Best
-    case springBest
-    /// 여름
-    case summer
-    /// 가을
-    case fall
-    /// 겨울
-    case winter
-}
-
-enum HomeItem: Hashable {
-    /// 봄 Best Item
-    case best(MusicResultModel)
-    /// 여름, 가을, 겨울 Item
-    case season(MusicResultModel)
-}
-
 final class HomeViewController: UIViewController {
     
     // MARK: - Properties
@@ -122,6 +101,12 @@ private extension HomeViewController {
                            isBottom: (indexPath.item + 1) % 3 == 0)
         }
         
+        let headerRegistration = UICollectionView.SupplementaryRegistration<HomeHeaderView>(elementKind: UICollectionView.elementKindSectionHeader) { header, elementKind, indexPath in
+            let headerTitle = HomeSection.allCases[indexPath.section].title
+            let headerSubtitle = HomeSection.allCases[indexPath.section].subtitle
+            header.configure(title: headerTitle, subtitle: headerSubtitle)
+        }
+        
         homeViewModel.dataSource = DataSource(collectionView: homeView.getCollectionView, cellProvider: { collectionView, indexPath, itemList in
             switch itemList {
             case .best(let top5Music):
@@ -136,5 +121,10 @@ private extension HomeViewController {
                 return cell
             }
         })
+        
+        homeViewModel.dataSource.supplementaryViewProvider = { (collectionView, kind, indexPath) -> UICollectionReusableView? in
+            let header: HomeHeaderView = collectionView.dequeueConfiguredReusableSupplementary(using: headerRegistration, for: indexPath)
+            return header
+        }
     }
 }

@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// iTunes Search API Endpoints
 enum NetworkEndpoints: String {
     //    https://itunes.apple.com/search?term=봄&media=music&limit=25
     //    https://itunes.apple.com/search?term=Marvel&media=movie&limit=25

@@ -10,10 +10,9 @@ import OSLog
 
 import RxSwift
 
+/// iTunes Search API 호출 매니저
 final class APIiTunesSearchManager {
-    
-    // MARK: - Type Methods
-    
+    /// iTunes Search API에 음악 데이터 요청
     func fetchMusicList(with musicRequstDTO: MusicRequestDTO) -> Single<[MusicResultModel]> {
         let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: APIiTunesSearchManager.self))
         
@@ -40,7 +39,7 @@ final class APIiTunesSearchManager {
                         os_log(.debug, log: log, "data: %@", "\(data)")
                         do {
                             let responseDTO = try JSONDecoder().decode(ResponseDTO<MusicResultDTO>.self, from: data)
-                            os_log(.debug, log: log, "responseDTO: %@", "\(responseDTO)")
+//                            os_log(.debug, log: log, "responseDTO: %@", "\(responseDTO)")
                             let musicModelList = responseDTO.results.map { $0.toMusicModel() }
                             single(.success(musicModelList))
                         } catch {
@@ -59,8 +58,11 @@ final class APIiTunesSearchManager {
     }
     
     // TODO: Movies API 호출 코드 만들기
+    /// iTunes Search API에 영화 데이터 요청
 //    func fetchMovieList(with movieRequestDTO: MovieRequestDTO) -> Single<ResponseDTO> {
 //    let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: APIiTunesSearchManager.self))
 //
 //    }
+    
+    // TODO: Podcast API 호출 코드 만들기
 }
