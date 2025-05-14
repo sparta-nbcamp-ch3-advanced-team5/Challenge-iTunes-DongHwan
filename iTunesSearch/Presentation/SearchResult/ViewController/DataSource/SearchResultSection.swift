@@ -11,5 +11,5 @@ enum SearchResultSection: Int, CaseIterable {
     case searchText
     case largeBanner
     case smallBanner
-    case list
+    case collection
 }

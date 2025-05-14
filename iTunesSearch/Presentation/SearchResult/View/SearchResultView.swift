@@ -68,8 +68,8 @@ private extension SearchResultView {
                 return self.createLargeBannerSection()
             case .smallBanner:
                 return self.createSmallBannerSection()
-            case .list:
-                return self.createListSection()
+            case .collection:
+                return self.createCollectionSection()
             }
         }, configuration: config)
         
@@ -127,7 +127,7 @@ private extension SearchResultView {
         return section
     }
     
-    func createListSection() -> NSCollectionLayoutSection {
+    func createCollectionSection() -> NSCollectionLayoutSection {
         let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
                                               heightDimension: .fractionalHeight(bannerGroupAbsoluteHeight / 7))
         let item = NSCollectionLayoutItem(layoutSize: itemSize)

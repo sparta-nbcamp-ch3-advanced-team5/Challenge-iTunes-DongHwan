@@ -12,7 +12,7 @@ import RxSwift
 import SnapKit
 import Then
 
-/// 홈 화면 CollectionView 여름, 가을, 겨울 셀
+/// 음악 CollectionView 여름, 가을, 겨울 Cell
 final class SeasonMusicCell: UICollectionViewCell {
     
     // MARK: - Properties
@@ -21,7 +21,7 @@ final class SeasonMusicCell: UICollectionViewCell {
     
     // MARK: - UI Componenets
     
-    /// 썸네일, LabelStackView 컨테이너 StackView
+    /// 썸네일, LabelStackView 컨테이너 UIStackView
     private let containerStackView = ContainerStackView().then {
         $0.alignment = .center
     }
@@ -29,7 +29,7 @@ final class SeasonMusicCell: UICollectionViewCell {
     /// 앨범 썸네일 UIImageView
     private let thumbnailImageView = ThumbnailImageView(frame: .zero)
     
-    /// Label 컨테이너 StackView
+    /// Label 컨테이너 UIStackView
     private let labelStackView = LabelStackView()
     
     /// 노래 제목 UILabel
@@ -112,24 +112,6 @@ private extension SeasonMusicCell {
         labelStackView.snp.makeConstraints {
             $0.top.bottom.equalToSuperview()
         }
-        
-//        titleLabel.snp.makeConstraints {
-//            $0.leading.equalTo(artistLabel)
-//            $0.trailing.equalToSuperview().inset(15)
-//            $0.bottom.equalTo(artistLabel.snp.top).offset(-2)
-//        }
-//        
-//        artistLabel.snp.makeConstraints {
-//            $0.centerY.equalTo(thumbnailImageView).offset(2)
-//            $0.leading.equalTo(thumbnailImageView.snp.trailing).offset(15)
-//            $0.trailing.equalToSuperview().inset(15)
-//        }
-//        
-//        collectionLabel.snp.makeConstraints {
-//            $0.top.equalTo(artistLabel.snp.bottom).offset(2)
-//            $0.leading.equalTo(artistLabel)
-//            $0.trailing.equalToSuperview().inset(15)
-//        }
         
         separatorView.snp.makeConstraints {
             $0.leading.equalTo(artistLabel)

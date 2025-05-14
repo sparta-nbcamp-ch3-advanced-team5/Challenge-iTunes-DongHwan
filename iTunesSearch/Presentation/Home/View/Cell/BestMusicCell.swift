@@ -12,7 +12,7 @@ import RxSwift
 import SnapKit
 import Then
 
-/// 홈 화면 CollectionView 봄 Best 셀
+/// 음악 CollectionView 봄 Best Cell
 final class BestMusicCell: UICollectionViewCell {
     
     // MARK: - Properties

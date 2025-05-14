@@ -1,5 +1,5 @@
 //
-//  MovieCell.swift
+//  MovieCollectionCell.swift
 //  iTunesSearch
 //
 //  Created by 서동환 on 5/15/25.
@@ -12,19 +12,13 @@ import RxSwift
 import SnapKit
 import Then
 
-/// 검색 결과 CollectionView 영화 Cell
-final class MovieCell: UICollectionViewCell {
+/// 검색 결과 CollectionView 영화 컬렉션 Cell
+final class MovieCollectionCell: UICollectionViewCell {
     
     // MARK: - UI Components
     
-    /// 배경 사진 UIImageView(API에 배경 사진이 없으므로 배경색만 변경)
-    private let backgroundImageView = BackgroundImageView(frame: .zero)
-    
     /// 영화 썸네일 UIImageView
     private let thumnailImageView = ThumbnailImageView(frame: .zero)
-    
-    /// LabelStackView, Button 컨테이너 UIStackView
-    private let containerStackView = ContainerStackView()
     
     /// Label 컨테이너 UIStackView
     private let labelStackView = LabelStackView()
@@ -32,8 +26,8 @@ final class MovieCell: UICollectionViewCell {
     /// 영화 제목 UILabel
     private let titleLabel = TitleLabel()
     
-    /// 영화 설명 UILabel
-    private let descriptionLabel = SubtitleLabel()
+    /// 영화 개봉 연도, 장르 UILabel
+    private let yearGenreLabel = SubtitleLabel()
     
     // TODO: - 아이튠즈 연결 버튼 추가
     
@@ -50,42 +44,35 @@ final class MovieCell: UICollectionViewCell {
     
     // MARK: - Methods
     
-    func configure(title: String, description: String) {
+    func configure(title: String, year: String, genre: String) {
         titleLabel.text = title
-        descriptionLabel.text = description
+        yearGenreLabel.text = "\(year)년 • \(genre)"
     }
 }
 
 // MARK: - UI Methods
 
-private extension MovieCell {
+private extension MovieCollectionCell {
     func setupUI() {
         setViewHierarchy()
         setConstraints()
     }
     
     func setViewHierarchy() {
-        self.addSubviews(backgroundImageView,
-                         thumnailImageView,
-                         containerStackView)
-        
-        containerStackView.addArrangedSubviews(labelStackView)
+        self.addSubviews(thumnailImageView,
+                         labelStackView)
         
         labelStackView.addArrangedSubviews(titleLabel,
-                                           descriptionLabel)
+                                           yearGenreLabel)
     }
     
     func setConstraints() {
-        backgroundImageView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
-        
         thumnailImageView.snp.makeConstraints {
             $0.top.equalToSuperview().inset(15)
-            $0.width.height.equalTo(90)
+            $0.width.height.equalTo(100)
         }
         
-        containerStackView.snp.makeConstraints {
+        labelStackView.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(15)
         }
     }
