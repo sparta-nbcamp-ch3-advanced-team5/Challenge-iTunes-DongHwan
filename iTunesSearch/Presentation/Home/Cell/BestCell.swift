@@ -69,6 +69,7 @@ final class BestCell: UICollectionViewCell {
     // MARK: - Methods
     
     func configure(thumbnailImageURL: String, artistImageColor: UIColor, title: String, artist: String) {
+        // TODO: - 이미지 로드될때 애니메이션 추가
         Task { [weak self] in
             do {
                 let imageData = try await ImageCacheManager.shared.rxFetchImage(from: thumbnailImageURL).value

@@ -43,15 +43,17 @@ final class HomeViewModel {
             for try await _ in input.viewDidLoad.values {
                 guard let self else { return }
                 // TODO: Repository 구현할 때 삭제해야 함
-                let top5MusicRequestDTO = MusicRequestDTO(term: .spring, limit: 5)
-                let summerMusicRequestDTO = MusicRequestDTO(term: .summer, limit: 15)
-                let fallMusicRequestDTO = MusicRequestDTO(term: .fall, limit: 15)
-                let winterMusicRequestDTO = MusicRequestDTO(term: .winter, limit: 15)
+                let top5RequestDTO = RequestDTO(term: MusicTerm.spring.rawValue, mediaType: .music, limit: 5)
+                let summerRequestDTO = RequestDTO(term: MusicTerm.summer.rawValue, mediaType: .music, limit: 15)
+                let fallRequestDTO = RequestDTO(term: MusicTerm.fall.rawValue, mediaType: .music, limit: 15)
+                let winterRequestDTO = RequestDTO(term: MusicTerm.winter.rawValue, mediaType: .music, limit: 15)
                 
-                let musicDataZip = Observable.zip(self.apiiTunesSearchUseCase.rxFetchMusicList(with: top5MusicRequestDTO).asObservable(),
-                                                self.apiiTunesSearchUseCase.rxFetchMusicList(with: summerMusicRequestDTO).asObservable(),
-                                                self.apiiTunesSearchUseCase.rxFetchMusicList(with: fallMusicRequestDTO).asObservable(),
-                                                self.apiiTunesSearchUseCase.rxFetchMusicList(with: winterMusicRequestDTO).asObservable())
+                let top5RxSingle = self.apiiTunesSearchUseCase.rxFetchSearchResultList(with: top5RequestDTO, dtoType: MusicResultDTO.self, transform: { $0.toModel() })
+                let summerRxSingle = self.apiiTunesSearchUseCase.rxFetchSearchResultList(with: summerRequestDTO, dtoType: MusicResultDTO.self, transform: { $0.toModel() })
+                let fallRxSingle = self.apiiTunesSearchUseCase.rxFetchSearchResultList(with: fallRequestDTO, dtoType: MusicResultDTO.self, transform: { $0.toModel() })
+                let winterRxSingle = self.apiiTunesSearchUseCase.rxFetchSearchResultList(with: winterRequestDTO, dtoType: MusicResultDTO.self, transform: { $0.toModel() })
+                
+                let musicDataZip = Observable.zip(top5RxSingle.asObservable(), summerRxSingle.asObservable(), fallRxSingle.asObservable(), winterRxSingle.asObservable())
                 do {
                     for try await value in musicDataZip.values {
                         musicListChunksRelay.accept(value)

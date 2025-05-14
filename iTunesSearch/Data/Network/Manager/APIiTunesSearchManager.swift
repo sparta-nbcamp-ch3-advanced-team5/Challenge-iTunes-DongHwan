@@ -19,14 +19,17 @@ final class APIiTunesSearchManager {
     
     // MARK: - Network Methods
     
-    /// iTunes Search API를 통해 음악 데이터를 비동기로 요청하고, 파싱된 결과를 반환합니다.
+    /// iTunes Search API를 통해 music, movie, podcast 데이터를 비동기로 요청하고, 파싱된 모델 배열을 반환합니다.
     ///
-    /// - Parameter musicRequestDTO: 검색어, 미디어 타입, 결과 수 제한 등을 포함한 요청 정보입니다.
-    /// - Returns: 파싱된 MusicResultModel 배열.
+    /// - Parameters:
+    ///   - requestDTO: 검색어, 미디어 타입, 결과 수 제한 등을 포함한 요청 정보입니다.
+    ///   - dtoType: 디코딩할 DTO 타입입니다.
+    ///   - transform: DTO를 모델로 변환하는 클로저입니다.
+    /// - Returns: 변환된 모델 배열.
     /// - Throws: URL 생성 실패, 네트워크 오류, 데이터 파싱 실패 시 에러를 던집니다.
-    func fetchMusicList(with musicRequestDTO: MusicRequestDTO) async throws -> [MusicResultModel] {
+    func fetchSearchResultList<DTO: Decodable, Model>(with requestDTO: RequestDTO, dtoType: DTO.Type, transform: @escaping (DTO) -> Model) async throws -> [Model] {
         
-        guard let urlRequest: URLRequest = NetworkEndpoints.urlRequest(.baseURL, term: musicRequestDTO.term.rawValue, mediaType: .music, limit: musicRequestDTO.limit) else {
+        guard let urlRequest: URLRequest = NetworkEndpoints.urlRequest(.baseURL, term: requestDTO.term, mediaType: requestDTO.mediaType, limit: requestDTO.limit) else {
             throw NetworkError.invalidURL
         }
         
@@ -39,25 +42,28 @@ final class APIiTunesSearchManager {
         }
         
         do {
-            let responseDTO = try JSONDecoder().decode(ResponseDTO<MusicResultDTO>.self, from: data)
-            let musicModelList = responseDTO.results.map { $0.toMusicModel() }
-            return musicModelList
+            let responseDTO = try JSONDecoder().decode(ResponseDTO<DTO>.self, from: data)
+            return responseDTO.results.map(transform)
         } catch {
             throw DataError.parsingFailed
         }
     }
     
-    /// RxSwift Single을 사용해 iTunes Search API에서 음악 데이터를 요청하고 결과를 emit합니다.
+    /// RxSwift Single을 사용해 iTunes Search API에서 music, movie, podcast 데이터를 요청하고 결과를 emit합니다.
     ///
-    /// - Parameter musicRequestDTO: 검색어, 미디어 타입, 결과 수 제한 등을 포함한 요청 정보입니다.
-    /// - Returns: 파싱된 MusicResultModel 배열을 emit하는 Single.
-    func rxFetchMusicList(with musicRequestDTO: MusicRequestDTO) -> Single<[MusicResultModel]> {
+    /// - Parameters:
+    ///   - requestDTO: 검색어, 미디어 타입, 결과 수 제한 등을 포함한 요청 정보입니다.
+    ///   - dtoType: 디코딩할 DTO 타입입니다.
+    ///   - transform: DTO를 모델로 변환하는 클로저입니다.
+    /// - Returns: 변환된 모델 배열을 emit하는 Single입니다.
+    func rxFetchSearchResultList<DTO: Decodable, Model>(with requestDTO: RequestDTO, dtoType: DTO.Type, transform: @escaping (DTO) -> Model) -> Single<[Model]> {
         return Single.create { [weak self] single in
             Task {
                 do {
-                    let dto = try await self?.fetchMusicList(with: musicRequestDTO)
-                    if let dto {
-                        single(.success(dto))
+                    if let models = try await self?.fetchSearchResultList(with: requestDTO,
+                                                                          dtoType: dtoType,
+                                                                          transform: transform) {
+                        single(.success(models))
                     } else {
                         single(.failure(DataError.fileNotFound))
                     }
@@ -69,13 +75,4 @@ final class APIiTunesSearchManager {
             return Disposables.create()
         }
     }
-    
-    // TODO: Movies API 호출 코드 만들기
-    /// iTunes Search API에 영화 데이터 요청
-//    func fetchMovieList(with movieRequestDTO: MovieRequestDTO) -> Single<ResponseDTO> {
-//    let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
-//
-//    }
-    
-    // TODO: Podcast API 호출 코드 만들기
 }

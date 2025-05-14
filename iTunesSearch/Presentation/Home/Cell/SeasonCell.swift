@@ -71,6 +71,7 @@ final class SeasonCell: UICollectionViewCell {
     // MARK: - Methods
     
     func configure(thumbnailImageURL: String, title: String, artist: String, collection: String, isBottom: Bool) {
+        // TODO: - 이미지 로드될때 애니메이션 추가
         Task { [weak self] in
             do {
                 let imageData = try await ImageCacheManager.shared.rxFetchImage(from: thumbnailImageURL).value

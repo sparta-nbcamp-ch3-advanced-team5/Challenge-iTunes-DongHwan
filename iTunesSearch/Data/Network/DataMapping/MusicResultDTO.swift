@@ -55,7 +55,7 @@ struct MusicResultDTO: Decodable {
 }
 
 extension MusicResultDTO {
-    func toMusicModel() -> MusicResultModel {
+    func toModel() -> MusicResultModel {
         return MusicResultModel(artistName: artistName,
                                 collectionName: collectionName,
                                 trackName: trackName,
