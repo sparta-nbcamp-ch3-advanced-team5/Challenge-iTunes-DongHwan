@@ -41,7 +41,6 @@ final class HomeViewModel {
         Task { [weak self] in
             for try await _ in input.viewDidLoad.values {
                 guard let self else { return }
-                // TODO: Repository 구현할 때 삭제해야 함
                 let top5RequestDTO = iTunesQuery(term: MusicTerm.spring.rawValue, mediaType: .music, limit: 5)
                 let summerRequestDTO = iTunesQuery(term: MusicTerm.summer.rawValue, mediaType: .music, limit: 15)
                 let fallRequestDTO = iTunesQuery(term: MusicTerm.fall.rawValue, mediaType: .music, limit: 15)
