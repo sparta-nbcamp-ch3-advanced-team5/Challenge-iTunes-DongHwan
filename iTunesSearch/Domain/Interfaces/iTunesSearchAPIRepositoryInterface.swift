@@ -7,8 +7,6 @@
 
 import Foundation
 
-import RxSwift
-
 protocol iTunesSearchAPIRepositoryInterface {
-    func rxFetchSearchResultList<DTO: Decodable, Model>(with requestDTO: RequestDTO, dtoType: DTO.Type, transform: @escaping (DTO) -> Model) -> Single<[Model]>
+    func fetchSearchResultList<DTO: Decodable, Model>(with iTunesQuery: iTunesQuery, dtoType: DTO.Type, transform: @escaping (DTO) -> Model) async throws -> [Model]
 }

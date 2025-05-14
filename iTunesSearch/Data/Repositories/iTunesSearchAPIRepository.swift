@@ -7,13 +7,11 @@
 
 import Foundation
 
-import RxSwift
-
 final class iTunesSearchAPIRepository: iTunesSearchAPIRepositoryInterface {
     
     private let manager = iTunesSearchAPIManager()
     
-    func rxFetchSearchResultList<DTO, Model>(with requestDTO: RequestDTO, dtoType: DTO.Type, transform: @escaping (DTO) -> Model) -> Single<[Model]> where DTO : Decodable {
-        manager.rxFetchSearchResultList(with: requestDTO, dtoType: dtoType, transform: transform)
+    func fetchSearchResultList<DTO: Decodable, Model>(with iTunesQuery: iTunesQuery, dtoType: DTO.Type, transform: @escaping (DTO) -> Model) async throws -> [Model] {
+        return try await manager.fetchSearchResultList(with: iTunesQuery, dtoType: dtoType, transform: transform)
     }
 }

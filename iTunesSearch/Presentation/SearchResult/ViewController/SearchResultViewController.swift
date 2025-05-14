@@ -11,8 +11,12 @@ import RxSwift
 import SnapKit
 import Then
 
-/// 검색 결과 ViewController
+/// 검색 결과 화면 ViewController
 final class SearchResultViewController: UIViewController {
+    
+    // MARK: - UI Components
+    
+    private let searchResultView = SearchResultView()
     
     // MARK: - Lifecycle
     
@@ -37,10 +41,12 @@ private extension SearchResultViewController {
     }
     
     func setViewHierarchy() {
-        
+        self.view.addSubview(searchResultView)
     }
     
     func setConstraints() {
-        
+        searchResultView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
     }
 }

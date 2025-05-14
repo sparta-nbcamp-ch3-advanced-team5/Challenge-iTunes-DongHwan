@@ -42,21 +42,19 @@ final class HomeViewModel {
             for try await _ in input.viewDidLoad.values {
                 guard let self else { return }
                 // TODO: Repository 구현할 때 삭제해야 함
-                let top5RequestDTO = RequestDTO(term: MusicTerm.spring.rawValue, mediaType: .music, limit: 5)
-                let summerRequestDTO = RequestDTO(term: MusicTerm.summer.rawValue, mediaType: .music, limit: 15)
-                let fallRequestDTO = RequestDTO(term: MusicTerm.fall.rawValue, mediaType: .music, limit: 15)
-                let winterRequestDTO = RequestDTO(term: MusicTerm.winter.rawValue, mediaType: .music, limit: 15)
+                let top5RequestDTO = iTunesQuery(term: MusicTerm.spring.rawValue, mediaType: .music, limit: 5)
+                let summerRequestDTO = iTunesQuery(term: MusicTerm.summer.rawValue, mediaType: .music, limit: 15)
+                let fallRequestDTO = iTunesQuery(term: MusicTerm.fall.rawValue, mediaType: .music, limit: 15)
+                let winterRequestDTO = iTunesQuery(term: MusicTerm.winter.rawValue, mediaType: .music, limit: 15)
                 
-                let top5RxSingle = self.iTunesSearchAPIUseCase.rxFetchSearchResultList(with: top5RequestDTO, dtoType: MusicResultDTO.self, transform: { $0.toModel() })
-                let summerRxSingle = self.iTunesSearchAPIUseCase.rxFetchSearchResultList(with: summerRequestDTO, dtoType: MusicResultDTO.self, transform: { $0.toModel() })
-                let fallRxSingle = self.iTunesSearchAPIUseCase.rxFetchSearchResultList(with: fallRequestDTO, dtoType: MusicResultDTO.self, transform: { $0.toModel() })
-                let winterRxSingle = self.iTunesSearchAPIUseCase.rxFetchSearchResultList(with: winterRequestDTO, dtoType: MusicResultDTO.self, transform: { $0.toModel() })
+                async let top5MusicList = self.iTunesSearchAPIUseCase.fetchSearchResultList(with: top5RequestDTO, dtoType: MusicResultDTO.self, transform: { $0.toModel() })
+                async let summerMusicList = self.iTunesSearchAPIUseCase.fetchSearchResultList(with: summerRequestDTO, dtoType: MusicResultDTO.self, transform: { $0.toModel() })
+                async let fallMusicList = self.iTunesSearchAPIUseCase.fetchSearchResultList(with: fallRequestDTO, dtoType: MusicResultDTO.self, transform: { $0.toModel() })
+                async let winterMusicList = self.iTunesSearchAPIUseCase.fetchSearchResultList(with: winterRequestDTO, dtoType: MusicResultDTO.self, transform: { $0.toModel() })
                 
-                let musicDataZip = Observable.zip(top5RxSingle.asObservable(), summerRxSingle.asObservable(), fallRxSingle.asObservable(), winterRxSingle.asObservable())
                 do {
-                    for try await value in musicDataZip.values {
-                        musicListChunksRelay.accept(value)
-                    }
+                    let musicListchunks = try await (top5MusicList, summerMusicList, fallMusicList, winterMusicList)
+                    musicListChunksRelay.accept(musicListchunks)
                 } catch {
                     // TODO: - 에러 Alert 표시
                     os_log(.error, log: log, "\(error.localizedDescription)")

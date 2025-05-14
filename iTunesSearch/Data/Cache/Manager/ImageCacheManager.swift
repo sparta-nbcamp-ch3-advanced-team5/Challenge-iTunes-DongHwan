@@ -15,30 +15,16 @@ final class ImageCacheManager {
     
     // MARK: - Properties
     
-    private lazy var log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
-    
-    private let memoryCacher: MemoryCacher
-    private let diskCacher: DiskCacher
+    private let memoryCacher = MemoryCacher(maxCacheCount: 50)
+    private let diskCacher = DiskCacher(diskCacheTracker: DiskCacheTracker(maxCount: 100),
+                                        maxFileCount: 100,
+                                        fileCountForDeleteWhenOverflow: 20)
     
     // MARK: - Initializer
     
-    static let shared: ImageCacheManager = .init(memoryCacher: MemoryCacher(maxCacheCount: 50),
-                                                 diskCacher: DiskCacher(diskCacheTracker: DiskCacheTracker(maxCount: 100),
-                                                                        maxFileCount: 100,
-                                                                        fileCountForDeleteWhenOverflow: 20))
-    
-    /// ImageCacheManager 싱글톤 인스턴스를 초기화합니다.
-    ///
-    /// - Parameters:
-    ///   - memoryCacher: 메모리 캐시 관리를 담당하는 인스턴스입니다.
-    ///   - diskCacher: 디스크 캐시 관리를 담당하는 인스턴스입니다.
-    private init(
-        memoryCacher: MemoryCacher,
-        diskCacher: DiskCacher
-    ) {
-        self.memoryCacher = memoryCacher
-        self.diskCacher = diskCacher
-    }
+    /// ImageCacheManager 싱글톤 인스턴스
+    static let shared = ImageCacheManager()
+    private init() {}
     
     // MARK: - Image Methods
     
@@ -63,22 +49,24 @@ final class ImageCacheManager {
     ///
     /// - Parameter urlString: 이미지 리소스의 URL 문자열입니다.
     /// - Returns: 캐시 또는 네트워크로부터 가져온 이미지 데이터를 emit하는 Single<Data>입니다.
-    func rxFetchImage(from urlString: String) async -> Single<Data> {
-        // 메모리에 캐시된 이미지 확인
-        if let memoryCachedImageData = await memoryCacher.requestImage(key: urlString) {
-            os_log(.debug, log: log, "메모리에 캐시된 이미지 반환")
-            return .just(memoryCachedImageData)
-        }
-        
-        // 디스크에 캐시된 이미지 확인
-        if let diskCachedImage = await diskCacher.requestImage(key: urlString) {
-            await memoryCacher.cacheImage(key: urlString, imageData: diskCachedImage)
-            os_log(.debug, log: log, "디스크에 캐시된 이미지 반환")
-            return .just(diskCachedImage)
-        }
+    func rxFetchImage(from urlString: String) -> Single<Data> {
+        let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
         
         return Single<Data>.create { [weak self] single in
             Task {
+                // 메모리에 캐시된 이미지 확인
+                if let memoryCachedImageData = await self?.memoryCacher.requestImage(key: urlString) {
+                    os_log(.debug, log: log, "메모리에 캐시된 이미지 반환")
+                    single(.success(memoryCachedImageData))
+                }
+                
+                // 디스크에 캐시된 이미지 확인
+                if let diskCachedImage = await self?.diskCacher.requestImage(key: urlString) {
+                    await self?.memoryCacher.cacheImage(key: urlString, imageData: diskCachedImage)
+                    os_log(.debug, log: log, "디스크에 캐시된 이미지 반환")
+                    single(.success(diskCachedImage))
+                }
+                
                 do {
                     // 네트워크 통신 및 이미지 fetch
                     let imageData = try await self?.fetchImage(from: urlString)
@@ -86,8 +74,7 @@ final class ImageCacheManager {
                         // fetch된 이미지를 캐시에 저장
                         await self?.memoryCacher.cacheImage(key: urlString, imageData: imageData)
                         await self?.diskCacher.cacheImage(key: urlString, imageData: imageData)
-                        guard let self else { return }
-                        os_log(.debug, log: self.log, "이미지 캐싱 성공")
+                        os_log(.debug, log: log, "이미지 캐싱 성공")
                         single(.success(imageData))
                     } else {
                         single(.failure(DataError.fileNotFound))

@@ -7,10 +7,8 @@
 
 import Foundation
 
-import RxSwift
-
 protocol iTunesSearchAPIUseCaseInterface {
-    func rxFetchSearchResultList<DTO: Decodable, Model>(with requestDTO: RequestDTO, dtoType: DTO.Type, transform: @escaping (DTO) -> Model) -> Single<[Model]>
+    func fetchSearchResultList<DTO: Decodable, Model>(with iTunesQuery: iTunesQuery, dtoType: DTO.Type, transform: @escaping (DTO) -> Model) async throws -> [Model]
 }
 
 final class iTunesSearchAPIUseCase: iTunesSearchAPIUseCaseInterface {
@@ -21,7 +19,7 @@ final class iTunesSearchAPIUseCase: iTunesSearchAPIUseCaseInterface {
         self.repository = repository
     }
     
-    func rxFetchSearchResultList<DTO, Model>(with requestDTO: RequestDTO, dtoType: DTO.Type, transform: @escaping (DTO) -> Model) -> Single<[Model]> where DTO : Decodable {
-        repository.rxFetchSearchResultList(with: requestDTO, dtoType: dtoType, transform: transform)
+    func fetchSearchResultList<DTO: Decodable, Model>(with iTunesQuery: iTunesQuery, dtoType: DTO.Type, transform: @escaping (DTO) -> Model) async throws -> [Model] {
+        return try await repository.fetchSearchResultList(with: iTunesQuery, dtoType: dtoType, transform: transform)
     }
 }
