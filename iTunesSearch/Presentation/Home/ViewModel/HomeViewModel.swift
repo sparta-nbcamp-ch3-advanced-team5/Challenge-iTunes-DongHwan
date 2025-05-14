@@ -49,10 +49,10 @@ final class HomeViewModel {
                 let fallMusicRequestDTO = MusicRequestDTO(term: .fall, limit: 15)
                 let winterMusicRequestDTO = MusicRequestDTO(term: .winter, limit: 15)
                 
-                return Observable.zip(owner.apiiTunesSearchUseCase.fetchMusicList(with: top5MusicRequestDTO).asObservable(),
-                                      owner.apiiTunesSearchUseCase.fetchMusicList(with: summerMusicRequestDTO).asObservable(),
-                                      owner.apiiTunesSearchUseCase.fetchMusicList(with: fallMusicRequestDTO).asObservable(),
-                                      owner.apiiTunesSearchUseCase.fetchMusicList(with: winterMusicRequestDTO).asObservable())
+                return Observable.zip(owner.apiiTunesSearchUseCase.rxFetchMusicList(with: top5MusicRequestDTO).asObservable(),
+                                      owner.apiiTunesSearchUseCase.rxFetchMusicList(with: summerMusicRequestDTO).asObservable(),
+                                      owner.apiiTunesSearchUseCase.rxFetchMusicList(with: fallMusicRequestDTO).asObservable(),
+                                      owner.apiiTunesSearchUseCase.rxFetchMusicList(with: winterMusicRequestDTO).asObservable())
             }.subscribe(with: self) { owner, element in
                 musicListChunksRelay.accept(element)
             } onError: { owner, error in

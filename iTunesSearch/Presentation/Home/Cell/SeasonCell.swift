@@ -70,7 +70,7 @@ final class SeasonCell: UICollectionViewCell {
     // MARK: - Methods
     
     func configure(thumbnailImageURL: String, title: String, artist: String, collection: String, isBottom: Bool) {
-        ImageCacheManager.shared.loadImage(from: thumbnailImageURL)
+        ImageCacheManager.shared.rxGetImage(from: thumbnailImageURL)
             .observe(on: MainScheduler.instance)
             .subscribe(with: self) { owner, imageData in
                 owner.thumbnailImageView.image = UIImage(data: imageData)
