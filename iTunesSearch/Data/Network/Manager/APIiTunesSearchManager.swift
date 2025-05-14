@@ -10,9 +10,7 @@ import OSLog
 
 import RxSwift
 
-/// iTunes Search API 호출을 관리하는 매니저입니다.
-/// 
-/// 음악, 영화, 팟캐스트 등 다양한 미디어 검색 요청을 처리합니다.
+/// iTunes Search API 호출 매니저
 final class APIiTunesSearchManager {
     
     // MARK: - Properties
