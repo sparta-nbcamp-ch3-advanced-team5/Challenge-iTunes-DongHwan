@@ -18,8 +18,7 @@ final class HomeViewModel {
     
     private lazy var log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
     
-//    private let apiiTunesSearchUseCase: APIiTunesSearchUseCase
-    private let apiiTunesSearchUseCase = APIiTunesSearchManager()
+    private let iTunesSearchAPIUseCase: iTunesSearchAPIUseCase
     
     // MARK: - Input (ViewController ➡️ ViewModel)
     
@@ -48,10 +47,10 @@ final class HomeViewModel {
                 let fallRequestDTO = RequestDTO(term: MusicTerm.fall.rawValue, mediaType: .music, limit: 15)
                 let winterRequestDTO = RequestDTO(term: MusicTerm.winter.rawValue, mediaType: .music, limit: 15)
                 
-                let top5RxSingle = self.apiiTunesSearchUseCase.rxFetchSearchResultList(with: top5RequestDTO, dtoType: MusicResultDTO.self, transform: { $0.toModel() })
-                let summerRxSingle = self.apiiTunesSearchUseCase.rxFetchSearchResultList(with: summerRequestDTO, dtoType: MusicResultDTO.self, transform: { $0.toModel() })
-                let fallRxSingle = self.apiiTunesSearchUseCase.rxFetchSearchResultList(with: fallRequestDTO, dtoType: MusicResultDTO.self, transform: { $0.toModel() })
-                let winterRxSingle = self.apiiTunesSearchUseCase.rxFetchSearchResultList(with: winterRequestDTO, dtoType: MusicResultDTO.self, transform: { $0.toModel() })
+                let top5RxSingle = self.iTunesSearchAPIUseCase.rxFetchSearchResultList(with: top5RequestDTO, dtoType: MusicResultDTO.self, transform: { $0.toModel() })
+                let summerRxSingle = self.iTunesSearchAPIUseCase.rxFetchSearchResultList(with: summerRequestDTO, dtoType: MusicResultDTO.self, transform: { $0.toModel() })
+                let fallRxSingle = self.iTunesSearchAPIUseCase.rxFetchSearchResultList(with: fallRequestDTO, dtoType: MusicResultDTO.self, transform: { $0.toModel() })
+                let winterRxSingle = self.iTunesSearchAPIUseCase.rxFetchSearchResultList(with: winterRequestDTO, dtoType: MusicResultDTO.self, transform: { $0.toModel() })
                 
                 let musicDataZip = Observable.zip(top5RxSingle.asObservable(), summerRxSingle.asObservable(), fallRxSingle.asObservable(), winterRxSingle.asObservable())
                 do {
@@ -71,7 +70,7 @@ final class HomeViewModel {
     
     // MARK: - Initializer
     
-    //    init(apiiTunesSearchUseCase: APIiTunesSearchUseCase) {
-    //        self.apiiTunesSearchUseCase = apiiTunesSearchUseCase
-    //    }
+    init(iTunesSearchAPIUseCase: iTunesSearchAPIUseCase) {
+        self.iTunesSearchAPIUseCase = iTunesSearchAPIUseCase
+    }
 }

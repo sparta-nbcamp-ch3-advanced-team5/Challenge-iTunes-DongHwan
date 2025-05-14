@@ -18,7 +18,15 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: windowScene)
-        let homeViewController = HomeViewController(homeViewModel: HomeViewModel())
+        // TODO: 의존성 주입
+        
+        let iTunesSearchAPIRepository = iTunesSearchAPIRepository()
+        
+        let iTunesSearchAPIUseCase = iTunesSearchAPIUseCase(repository: iTunesSearchAPIRepository)
+        
+        let homeViewModel = HomeViewModel(iTunesSearchAPIUseCase: iTunesSearchAPIUseCase)
+        
+        let homeViewController = HomeViewController(homeViewModel: homeViewModel)
         window.rootViewController = UINavigationController(rootViewController: homeViewController)
         window.makeKeyAndVisible()
         self.window = window

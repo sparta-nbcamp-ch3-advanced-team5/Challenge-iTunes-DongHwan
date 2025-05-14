@@ -1,5 +1,5 @@
 //
-//  APIiTunesSearchManager.swift
+//  iTunesSearchAPIManager.swift
 //  iTunesSearch
 //
 //  Created by 서동환 on 5/12/25.
@@ -11,7 +11,7 @@ import OSLog
 import RxSwift
 
 /// iTunes Search API 호출 매니저
-final class APIiTunesSearchManager {
+final class iTunesSearchAPIManager {
     
     // MARK: - Properties
     
@@ -29,7 +29,7 @@ final class APIiTunesSearchManager {
     /// - Throws: URL 생성 실패, 네트워크 오류, 데이터 파싱 실패 시 에러를 던집니다.
     func fetchSearchResultList<DTO: Decodable, Model>(with requestDTO: RequestDTO, dtoType: DTO.Type, transform: @escaping (DTO) -> Model) async throws -> [Model] {
         
-        guard let urlRequest: URLRequest = NetworkEndpoints.urlRequest(.baseURL, term: requestDTO.term, mediaType: requestDTO.mediaType, limit: requestDTO.limit) else {
+        guard let urlRequest: URLRequest = APIEndpoints.urlRequest(.baseURL, term: requestDTO.term, mediaType: requestDTO.mediaType, limit: requestDTO.limit) else {
             throw NetworkError.invalidURL
         }
         

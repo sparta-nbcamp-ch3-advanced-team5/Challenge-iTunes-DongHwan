@@ -1,5 +1,5 @@
 //
-//  NetworkEndpoints.swift
+//  APIEndpoints.swift
 //  iTunesSearch
 //
 //  Created by 서동환 on 5/12/25.
@@ -8,7 +8,7 @@
 import Foundation
 
 /// iTunes Search API Endpoints
-enum NetworkEndpoints: String {
+enum APIEndpoints: String {
     case baseURL = "https://itunes.apple.com/search"
     
     static func urlRequest(_ baseURL: Self, term: String, mediaType: MediaType, limit: Int) -> URLRequest? {
