@@ -20,14 +20,14 @@ final class HomeView: UIView {
     
     // MARK: - UI Components
     
-    /// 홈 화면 CollectionView
-    private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
+    /// 음악 CollectionView
+    private lazy var musicCollectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
     
     // MARK: - Getter
     
-    /// 홈 화면 CollectionView 반환
-    var getCollectionView: UICollectionView {
-        return collectionView
+    /// 음악 CollectionView 반환
+    var getMusicCollectionView: UICollectionView {
+        return musicCollectionView
     }
     
     // MARK: - Initializer
@@ -51,11 +51,11 @@ private extension HomeView {
     }
     
     func setViewHierarchy() {
-        self.addSubview(collectionView)
+        self.addSubview(musicCollectionView)
     }
     
     func setConstraints() {
-        collectionView.snp.makeConstraints {
+        musicCollectionView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
     }
@@ -118,7 +118,6 @@ private extension HomeView {
         
         return section
     }
-    
     
     func createHeader() -> NSCollectionLayoutBoundarySupplementaryItem {
         let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(groupFractionalWidth), heightDimension: .absolute(60))

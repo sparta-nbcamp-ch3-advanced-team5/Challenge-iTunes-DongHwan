@@ -1,5 +1,5 @@
 //
-//  BestCell.swift
+//  BestMusicCell.swift
 //  iTunesSearch
 //
 //  Created by 서동환 on 5/12/25.
@@ -13,7 +13,7 @@ import SnapKit
 import Then
 
 /// 홈 화면 CollectionView 봄 Best 셀
-final class BestCell: UICollectionViewCell {
+final class BestMusicCell: UICollectionViewCell {
     
     // MARK: - Properties
     
@@ -22,38 +22,28 @@ final class BestCell: UICollectionViewCell {
     // MARK: - UI Components
     
     /// 가수 사진 UIImageView(API에 가수 사진이 없으므로 배경색만 변경)
-    private let artistImageView = UIImageView().then {
+    private let artistImageView = BackgroundImageView(frame: .zero).then {
         let config = UIImage.SymbolConfiguration(pointSize: 50)
         $0.image = UIImage(systemName: "music.note", withConfiguration: config)?.withRenderingMode(.alwaysOriginal).withTintColor(.white)
-        $0.contentMode = .center
-        $0.backgroundColor = .placeholderText
-        $0.layer.masksToBounds = true
-        $0.layer.cornerRadius = 10
     }
+    
+    /// 썸네일, LabelStackView 컨테이너 StackView
+    private let containerStackView = ContainerStackView()
     
     /// 앨범 썸네일 UIImageView
-    private let thumbnailImageView = UIImageView().then {
-        $0.contentMode = .scaleAspectFill
-        $0.backgroundColor = .white
-        $0.layer.masksToBounds = true
-        $0.layer.cornerRadius = 10
-    }
+    private let thumbnailImageView = ThumbnailImageView(frame: .zero)
+    
+    /// Label 컨테이너 StackView
+    private let labelStackView = LabelStackView()
+    
+    /// LabelStackView가 위쪽 간격을 갖도록 하는 Spacer
+    private let topSpacer = UIView.spacer(axis: .vertical)
     
     /// 노래 제목 UILabel
-    private let titleLabel = UILabel().then {
-        $0.text = "봄 (feat. Sandara Park)"
-        $0.font = .systemFont(ofSize: 14, weight: .bold)
-        $0.textColor = .label
-        $0.numberOfLines = 1
-    }
+    private let titleLabel = TitleLabel()
     
     /// 가수 이름 UILabel
-    private let artistLabel = UILabel().then {
-        $0.text = "Park Bom"
-        $0.font = .systemFont(ofSize: 14)
-        $0.textColor = .secondaryLabel
-        $0.numberOfLines = 1
-    }
+    private let artistLabel = SubtitleLabel()
     
     // MARK: - Initializer
     
@@ -88,16 +78,20 @@ final class BestCell: UICollectionViewCell {
 
 // MARK: - UI Methods
 
-private extension BestCell {
+private extension BestMusicCell {
     func setupUI() {
         setViewHierarchy()
         setConstraints()
     }
     
     func setViewHierarchy() {
-        self.addSubviews(artistImageView,
-                         thumbnailImageView, titleLabel,
-                         artistLabel)
+        self.addSubviews(artistImageView, containerStackView)
+        
+        containerStackView.addArrangedSubviews(thumbnailImageView, labelStackView)
+        
+        labelStackView.addArrangedSubviews(topSpacer,
+                                           titleLabel,
+                                           artistLabel)
     }
     
     func setConstraints() {
@@ -105,22 +99,22 @@ private extension BestCell {
             $0.edges.equalToSuperview()
         }
         
-        thumbnailImageView.snp.makeConstraints {
-            $0.leading.equalToSuperview().inset(15)
+        containerStackView.snp.makeConstraints {
+            $0.leading.trailing.equalToSuperview().inset(15)
             $0.bottom.equalToSuperview().inset(15)
-            $0.width.height.equalTo(40)
+            $0.height.equalTo(44)
         }
         
-        titleLabel.snp.makeConstraints {
-            $0.leading.equalTo(artistLabel)
-            $0.trailing.equalToSuperview().inset(10)
-            $0.bottom.equalTo(artistLabel.snp.top).offset(-2)
+        thumbnailImageView.snp.makeConstraints {
+            $0.width.height.equalTo(44)
         }
         
-        artistLabel.snp.makeConstraints {
-            $0.leading.equalTo(thumbnailImageView.snp.trailing).offset(10)
-            $0.trailing.equalToSuperview().inset(10)
-            $0.bottom.equalTo(thumbnailImageView)
+        topSpacer.snp.makeConstraints {
+            $0.height.equalTo(1)
+        }
+        
+        labelStackView.snp.makeConstraints {
+            $0.top.bottom.equalToSuperview()
         }
     }
 }

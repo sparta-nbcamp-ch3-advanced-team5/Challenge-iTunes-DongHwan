@@ -102,7 +102,7 @@ private extension HomeViewController {
                                         summerMusicList: summerMusicList,
                                         fallMusicList: fallMusicList,
                                         winterMusicList: winterMusicList,
-                                        animatingDifferences: false)
+                                        animatingDifferences: true)
             }.disposed(by: disposeBag)
     }
 }
@@ -112,7 +112,7 @@ private extension HomeViewController {
 private extension HomeViewController {
     /// Diffable DataSource 설정
     func configureDataSource() {
-        let bestCellRegistration = UICollectionView.CellRegistration<BestCell, MusicResultModel> { cell, indexPath, item in
+        let bestCellRegistration = UICollectionView.CellRegistration<BestMusicCell, MusicResultModel> { cell, indexPath, item in
             let artistImageColor = UIColor.artistImageColors[item.artistImageColorIndex]
             cell.configure(thumbnailImageURL: item.artworkUrl100,
                            artistImageColor: artistImageColor,
@@ -120,7 +120,7 @@ private extension HomeViewController {
                            artist: item.artistName)
         }
         
-        let seasonCellRegistration = UICollectionView.CellRegistration<SeasonCell, MusicResultModel> { cell, indexPath, item in
+        let seasonCellRegistration = UICollectionView.CellRegistration<SeasonMusicCell, MusicResultModel> { cell, indexPath, item in
             cell.configure(thumbnailImageURL: item.artworkUrl100,
                            title: item.trackName,
                            artist: item.artistName,
@@ -134,7 +134,7 @@ private extension HomeViewController {
             header.configure(title: headerTitle, subtitle: headerSubtitle)
         }
         
-        dataSource = DataSource(collectionView: homeView.getCollectionView, cellProvider: { collectionView, indexPath, itemList in
+        dataSource = DataSource(collectionView: homeView.getMusicCollectionView, cellProvider: { collectionView, indexPath, itemList in
             switch itemList {
             case .best(let top5Music):
                 let cell = collectionView.dequeueConfiguredReusableCell(using: bestCellRegistration,

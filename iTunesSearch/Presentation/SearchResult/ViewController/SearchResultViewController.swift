@@ -16,6 +16,7 @@ final class SearchResultViewController: UIViewController {
     
     // MARK: - UI Components
     
+    /// 검색 결과 화면 View
     private let searchResultView = SearchResultView()
     
     // MARK: - Lifecycle

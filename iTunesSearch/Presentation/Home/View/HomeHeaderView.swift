@@ -19,17 +19,17 @@ final class HomeHeaderView: UICollectionReusableView {
     
     // MARK: - UI Components
     
-    private let titleLabel = UILabel().then {
-        $0.text = "봄 Best"
+    /// Label 컨테이너 StackView
+    private let labelStackView = LabelStackView()
+    
+    /// LabelStackView가 위쪽 간격을 갖도록 하는 Spacer
+    private let topSpacer = UIView.spacer(axis: .vertical)
+    
+    private let titleLabel = TitleLabel().then {
         $0.font = .systemFont(ofSize: 24, weight: .bold)
-        $0.textColor = .label
     }
     
-    private let subtitleLabel = UILabel().then {
-        $0.text = "봄에 어울리는 음악 Best 5"
-        $0.font = .systemFont(ofSize: 14)
-        $0.textColor = .secondaryLabel
-    }
+    private let subtitleLabel = SubtitleLabel()
     
     // MARK: - Initializer
     
@@ -59,19 +59,20 @@ private extension HomeHeaderView {
     }
     
     func setViewHierarchy() {
-        self.addSubviews(titleLabel,
-                         subtitleLabel)
+        self.addSubview(labelStackView)
+        
+        labelStackView.addArrangedSubviews(topSpacer,
+                                           titleLabel,
+                                           subtitleLabel)
     }
     
     func setConstraints() {
-        titleLabel.snp.makeConstraints {
-            $0.leading.trailing.equalToSuperview()
-            $0.bottom.equalTo(subtitleLabel.snp.top).offset(-2)
+        labelStackView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
         }
         
-        subtitleLabel.snp.makeConstraints {
-            $0.leading.trailing.equalToSuperview()
-            $0.bottom.equalToSuperview()
+        topSpacer.snp.makeConstraints {
+            $0.height.equalTo(1)
         }
     }
 }
