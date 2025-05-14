@@ -25,7 +25,7 @@ final class iTunesSearchAPIManager {
     ///   - transform: DTO를 모델로 변환하는 클로저입니다.
     /// - Returns: 변환된 모델 배열.
     /// - Throws: URL 생성 실패, 네트워크 오류, 데이터 파싱 실패 시 에러를 던집니다.
-    func fetchSearchResultList<DTO: Decodable, Model>(with iTunesQuery: iTunesQuery, dtoType: DTO.Type, transform: @escaping (DTO) -> Model) async throws -> [Model] {
+    func fetchSearchResultList<DTO: Decodable, Model>(with iTunesQuery: iTunesQuery, dtoType: DTO.Type, transform: (DTO) -> Model) async throws -> [Model] {
         
         guard let urlRequest: URLRequest = APIEndpoints.urlRequest(.baseURL, term: iTunesQuery.term, mediaType: iTunesQuery.mediaType, limit: iTunesQuery.limit) else {
             throw NetworkError.invalidURL

@@ -11,7 +11,7 @@ final class iTunesSearchAPIRepository: iTunesSearchAPIRepositoryInterface {
     
     private let manager = iTunesSearchAPIManager()
     
-    func fetchSearchResultList<DTO: Decodable, Model>(with iTunesQuery: iTunesQuery, dtoType: DTO.Type, transform: @escaping (DTO) -> Model) async throws -> [Model] {
+    func fetchSearchResultList<DTO: Decodable, Model>(with iTunesQuery: iTunesQuery, dtoType: DTO.Type, transform: (DTO) -> Model) async throws -> [Model] {
         return try await manager.fetchSearchResultList(with: iTunesQuery, dtoType: dtoType, transform: transform)
     }
 }

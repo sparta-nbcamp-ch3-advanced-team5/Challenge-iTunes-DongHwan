@@ -72,7 +72,7 @@ final class BestCell: UICollectionViewCell {
         // TODO: - 이미지 로드될때 애니메이션 추가
         Task { [weak self] in
             do {
-                let imageData = try await ImageCacheManager.shared.rxFetchImage(from: thumbnailImageURL).value
+                let imageData = try await ImageCacheManager.shared.fetchImage(from: thumbnailImageURL)
                 self?.thumbnailImageView.image = UIImage(data: imageData)
             } catch {
                 guard let self else { return }

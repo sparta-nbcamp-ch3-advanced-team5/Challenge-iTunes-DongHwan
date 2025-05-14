@@ -8,8 +8,6 @@
 import Foundation
 import OSLog
 
-import RxSwift
-
 /// 이미지 캐시 매니저
 final class ImageCacheManager {
     
@@ -28,62 +26,39 @@ final class ImageCacheManager {
     
     // MARK: - Image Methods
     
-    /// 주어진 URL에서 이미지 데이터를 비동기로 다운로드합니다.
+    /// 주어진 URL을 키값으로 메모리/디스크 캐시에서 이미지를 우선 확인하고, 없으면 URL에서 이미지 데이터를 비동기로 다운로드합니다.
     ///
     /// - Parameter urlString: 이미지 리소스의 URL 문자열입니다.
-    /// - Returns: 다운로드된 이미지 데이터.
+    /// - Returns: 캐시 또는 네트워크로부터 가져온 이미지 데이터.
     /// - Throws: URL 생성 실패 또는 네트워크 오류 발생 시 에러를 던집니다.
     func fetchImage(from urlString: String) async throws -> Data {
+        let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
+        
+        // 1. 메모리에 캐시된 이미지 확인
+        if let memoryCachedImageData = await memoryCacher.requestImage(key: urlString) {
+            os_log(.debug, log: log, "메모리에 캐시된 이미지 반환")
+            return memoryCachedImageData
+        }
+        
+        // 2. 디스크에 캐시된 이미지 확인
+        if let diskCachedImage = await diskCacher.requestImage(key: urlString) {
+            await memoryCacher.cacheImage(key: urlString, imageData: diskCachedImage)
+            os_log(.debug, log: log, "디스크에 캐시된 이미지 반환")
+            return diskCachedImage
+        }
+        
         // URL 생성
         guard let url = URL(string: urlString) else {
             throw NetworkError.invalidURL
         }
         
+        // 3. 네트워크에서 이미지 fetch
         // URLSessionConfiguration.ephemeral: NSCache를 따로 사용하므로 URLSession의 캐시를 사용하지 않음
         let (imageData, _) = try await URLSession(configuration: URLSessionConfiguration.ephemeral).data(from: url)
+        await memoryCacher.cacheImage(key: urlString, imageData: imageData)
+        await diskCacher.cacheImage(key: urlString, imageData: imageData)
+        os_log(.debug, log: log, "이미지 캐싱 성공")
         
         return imageData
-    }
-    
-    /// RxSwift Single을 사용해 이미지 로드를 제공합니다. 메모리/디스크 캐시를 우선 확인하고, 없으면 네트워크에서 가져옵니다.
-    ///
-    /// - Parameter urlString: 이미지 리소스의 URL 문자열입니다.
-    /// - Returns: 캐시 또는 네트워크로부터 가져온 이미지 데이터를 emit하는 Single<Data>입니다.
-    func rxFetchImage(from urlString: String) -> Single<Data> {
-        let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
-        
-        return Single<Data>.create { [weak self] single in
-            Task {
-                // 메모리에 캐시된 이미지 확인
-                if let memoryCachedImageData = await self?.memoryCacher.requestImage(key: urlString) {
-                    os_log(.debug, log: log, "메모리에 캐시된 이미지 반환")
-                    single(.success(memoryCachedImageData))
-                }
-                
-                // 디스크에 캐시된 이미지 확인
-                if let diskCachedImage = await self?.diskCacher.requestImage(key: urlString) {
-                    await self?.memoryCacher.cacheImage(key: urlString, imageData: diskCachedImage)
-                    os_log(.debug, log: log, "디스크에 캐시된 이미지 반환")
-                    single(.success(diskCachedImage))
-                }
-                
-                do {
-                    // 네트워크 통신 및 이미지 fetch
-                    let imageData = try await self?.fetchImage(from: urlString)
-                    if let imageData {
-                        // fetch된 이미지를 캐시에 저장
-                        await self?.memoryCacher.cacheImage(key: urlString, imageData: imageData)
-                        await self?.diskCacher.cacheImage(key: urlString, imageData: imageData)
-                        os_log(.debug, log: log, "이미지 캐싱 성공")
-                        single(.success(imageData))
-                    } else {
-                        single(.failure(DataError.fileNotFound))
-                    }
-                } catch {
-                    single(.failure(error))
-                }
-            }
-            return Disposables.create()
-        }
     }
 }

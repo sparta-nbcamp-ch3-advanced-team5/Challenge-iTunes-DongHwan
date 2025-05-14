@@ -8,5 +8,5 @@
 import Foundation
 
 protocol iTunesSearchAPIRepositoryInterface {
-    func fetchSearchResultList<DTO: Decodable, Model>(with iTunesQuery: iTunesQuery, dtoType: DTO.Type, transform: @escaping (DTO) -> Model) async throws -> [Model]
+    func fetchSearchResultList<DTO: Decodable, Model>(with iTunesQuery: iTunesQuery, dtoType: DTO.Type, transform: (DTO) -> Model) async throws -> [Model]
 }

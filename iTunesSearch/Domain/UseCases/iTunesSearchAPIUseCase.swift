@@ -8,7 +8,7 @@
 import Foundation
 
 protocol iTunesSearchAPIUseCaseInterface {
-    func fetchSearchResultList<DTO: Decodable, Model>(with iTunesQuery: iTunesQuery, dtoType: DTO.Type, transform: @escaping (DTO) -> Model) async throws -> [Model]
+    func fetchSearchResultList<DTO: Decodable, Model>(with iTunesQuery: iTunesQuery, dtoType: DTO.Type, transform: (DTO) -> Model) async throws -> [Model]
 }
 
 final class iTunesSearchAPIUseCase: iTunesSearchAPIUseCaseInterface {
@@ -19,7 +19,7 @@ final class iTunesSearchAPIUseCase: iTunesSearchAPIUseCaseInterface {
         self.repository = repository
     }
     
-    func fetchSearchResultList<DTO: Decodable, Model>(with iTunesQuery: iTunesQuery, dtoType: DTO.Type, transform: @escaping (DTO) -> Model) async throws -> [Model] {
+    func fetchSearchResultList<DTO: Decodable, Model>(with iTunesQuery: iTunesQuery, dtoType: DTO.Type, transform: (DTO) -> Model) async throws -> [Model] {
         return try await repository.fetchSearchResultList(with: iTunesQuery, dtoType: dtoType, transform: transform)
     }
 }
