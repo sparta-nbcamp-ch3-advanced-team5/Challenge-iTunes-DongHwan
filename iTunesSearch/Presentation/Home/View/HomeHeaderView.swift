@@ -68,7 +68,7 @@ private extension HomeHeaderView {
     
     func setConstraints() {
         labelStackView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.leading.trailing.bottom.equalToSuperview()
         }
         
         topSpacer.snp.makeConstraints {

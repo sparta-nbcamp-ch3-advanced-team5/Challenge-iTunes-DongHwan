@@ -16,8 +16,8 @@ final class LabelStackView: UIStackView {
         super.init(frame: frame)
         
         self.axis = .vertical
+        self.spacing = 2
         self.alignment = .leading
-        self.distribution = .equalSpacing
     }
     
     required init(coder: NSCoder) {

@@ -22,9 +22,7 @@ final class SeasonMusicCell: UICollectionViewCell {
     // MARK: - UI Componenets
     
     /// 썸네일, LabelStackView 컨테이너 UIStackView
-    private let containerStackView = ContainerStackView().then {
-        $0.alignment = .center
-    }
+    private let containerStackView = ContainerStackView()
     
     /// 앨범 썸네일 UIImageView
     private let thumbnailImageView = ThumbnailImageView(frame: .zero)
@@ -102,17 +100,11 @@ private extension SeasonMusicCell {
     
     func setConstraints() {
         containerStackView.snp.makeConstraints {
-            $0.leading.trailing.equalToSuperview()
-            $0.centerY.equalToSuperview()
-            $0.height.equalTo(60)
+            $0.edges.equalToSuperview()
         }
         
         thumbnailImageView.snp.makeConstraints {
-            $0.width.height.equalTo(60)
-        }
-        
-        labelStackView.snp.makeConstraints {
-            $0.top.bottom.equalToSuperview()
+            $0.width.height.equalTo(64)
         }
         
         separatorView.snp.makeConstraints {

@@ -103,19 +103,15 @@ private extension BestMusicCell {
         
         containerStackView.snp.makeConstraints {
             $0.leading.trailing.bottom.equalToSuperview().inset(15)
-            $0.height.equalTo(44)
+            $0.height.equalTo(50)
         }
         
         thumbnailImageView.snp.makeConstraints {
-            $0.width.height.equalTo(44)
+            $0.width.height.equalTo(50)
         }
         
         topSpacer.snp.makeConstraints {
             $0.height.equalTo(1)
-        }
-        
-        labelStackView.snp.makeConstraints {
-            $0.top.bottom.equalToSuperview()
         }
     }
 }

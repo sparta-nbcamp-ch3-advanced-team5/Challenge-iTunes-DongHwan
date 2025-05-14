@@ -17,6 +17,7 @@ final class ContainerStackView: UIStackView {
         
         self.axis = .horizontal
         self.spacing = 10
+        self.alignment = .center
     }
     
     required init(coder: NSCoder) {
