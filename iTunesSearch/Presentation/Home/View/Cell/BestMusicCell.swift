@@ -45,6 +45,8 @@ final class BestMusicCell: UICollectionViewCell {
     /// 가수 이름 UILabel
     private let artistLabel = SubtitleLabel()
     
+    // TODO: - 아이튠즈 연결 버튼 추가
+    
     // MARK: - Initializer
     
     override init(frame: CGRect) {
@@ -100,8 +102,7 @@ private extension BestMusicCell {
         }
         
         containerStackView.snp.makeConstraints {
-            $0.leading.trailing.equalToSuperview().inset(15)
-            $0.bottom.equalToSuperview().inset(15)
+            $0.leading.trailing.bottom.equalToSuperview().inset(15)
             $0.height.equalTo(44)
         }
         

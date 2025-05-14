@@ -47,6 +47,8 @@ final class SeasonMusicCell: UICollectionViewCell {
         $0.backgroundColor = .separator
     }
     
+    // TODO: - 아이튠즈 연결 버튼 추가
+    
     // MARK: - Initializer
     
     override init(frame: CGRect) {
@@ -115,8 +117,7 @@ private extension SeasonMusicCell {
         
         separatorView.snp.makeConstraints {
             $0.leading.equalTo(artistLabel)
-            $0.trailing.equalToSuperview()
-            $0.bottom.equalToSuperview()
+            $0.trailing.bottom.equalToSuperview()
             $0.height.equalTo(0.5)
         }
     }
