@@ -10,7 +10,9 @@ import OSLog
 
 import RxSwift
 
-/// iTunes Search API 호출 매니저
+/// iTunes Search API 호출을 관리하는 매니저입니다.
+/// 
+/// 음악, 영화, 팟캐스트 등 다양한 미디어 검색 요청을 처리합니다.
 final class APIiTunesSearchManager {
     
     // MARK: - Properties
@@ -19,7 +21,11 @@ final class APIiTunesSearchManager {
     
     // MARK: - Network Methods
     
-    /// iTunes Search API로 음악 데이터 Fetch 및 파싱하여 반환
+    /// iTunes Search API를 통해 음악 데이터를 비동기로 요청하고, 파싱된 결과를 반환합니다.
+    ///
+    /// - Parameter musicRequestDTO: 검색어, 미디어 타입, 결과 수 제한 등을 포함한 요청 정보입니다.
+    /// - Returns: 파싱된 MusicResultModel 배열.
+    /// - Throws: URL 생성 실패, 네트워크 오류, 데이터 파싱 실패 시 에러를 던집니다.
     func fetchMusicList(with musicRequestDTO: MusicRequestDTO) async throws -> [MusicResultModel] {
         
         guard let urlRequest: URLRequest = NetworkEndpoints.urlRequest(.baseURL, term: musicRequestDTO.term.rawValue, mediaType: .music, limit: musicRequestDTO.limit) else {
@@ -43,7 +49,10 @@ final class APIiTunesSearchManager {
         }
     }
     
-    /// iTunes Search API에 음악 데이터 요청을 보내고, 파싱된 데이터를 받아 RxSwift Single로 방출
+    /// RxSwift Single을 사용해 iTunes Search API에서 음악 데이터를 요청하고 결과를 emit합니다.
+    ///
+    /// - Parameter musicRequestDTO: 검색어, 미디어 타입, 결과 수 제한 등을 포함한 요청 정보입니다.
+    /// - Returns: 파싱된 MusicResultModel 배열을 emit하는 Single.
     func rxFetchMusicList(with musicRequestDTO: MusicRequestDTO) -> Single<[MusicResultModel]> {
         return Single.create { [weak self] single in
             Task {

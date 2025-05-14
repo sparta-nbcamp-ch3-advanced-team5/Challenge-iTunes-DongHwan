@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import OSLog
 
 import RxSwift
 
@@ -14,20 +15,38 @@ final class ImageCacheManager {
     
     // MARK: - Properties
     
-    /// ImageCacheManager 싱글톤
-    static let shared = ImageCacheManager()
-    private init() {}
+    private lazy var log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
     
-    /// URL에 대한 이미지가 저장되는 캐시
-    private let cachedImages = NSCache<NSString, NSData>()
-    /// 디스크 저장용 딕셔너리
-//    private var cacheInfoDict: [NSString: ImageCacheInfoDTO] {
-//        if let dict = UserDefaults.standard.dictionary(forKey: Key.)
-//    }
+    private let memoryCacher: MemoryCacher
+    private let diskCacher: DiskCacher
+    
+    // MARK: - Initializer
+    
+    static let shared: ImageCacheManager = .init(memoryCacher: MemoryCacher(maxCacheCount: 50),
+                                                 diskCacher: DiskCacher(diskCacheTracker: DiskCacheTracker(maxCount: 100),
+                                                                        maxFileCount: 100,
+                                                                        fileCountForDeleteWhenOverflow: 20))
+    
+    /// ImageCacheManager 싱글톤 인스턴스를 초기화합니다.
+    ///
+    /// - Parameters:
+    ///   - memoryCacher: 메모리 캐시 관리를 담당하는 인스턴스입니다.
+    ///   - diskCacher: 디스크 캐시 관리를 담당하는 인스턴스입니다.
+    private init(
+        memoryCacher: MemoryCacher,
+        diskCacher: DiskCacher
+    ) {
+        self.memoryCacher = memoryCacher
+        self.diskCacher = diskCacher
+    }
     
     // MARK: - Image Methods
     
-    /// 네트워크에서 이미지 Fetch하여 반환
+    /// 주어진 URL에서 이미지 데이터를 비동기로 다운로드합니다.
+    ///
+    /// - Parameter urlString: 이미지 리소스의 URL 문자열입니다.
+    /// - Returns: 다운로드된 이미지 데이터.
+    /// - Throws: URL 생성 실패 또는 네트워크 오류 발생 시 에러를 던집니다.
     func fetchImage(from urlString: String) async throws -> Data {
         // URL 생성
         guard let url = URL(string: urlString) else {
@@ -40,26 +59,35 @@ final class ImageCacheManager {
         return imageData
     }
     
-    /// 네트워크에 이미지 요청을 보내고, Fetch된 데이터를 받아 RxSwift Single로 방출
-    func rxGetImage(from urlString: String) -> Single<Data> {
-        let key = urlString as NSString
+    /// RxSwift Single을 사용해 이미지 로드를 제공합니다. 메모리/디스크 캐시를 우선 확인하고, 없으면 네트워크에서 가져옵니다.
+    ///
+    /// - Parameter urlString: 이미지 리소스의 URL 문자열입니다.
+    /// - Returns: 캐시 또는 네트워크로부터 가져온 이미지 데이터를 emit하는 Single<Data>입니다.
+    func rxFetchImage(from urlString: String) async -> Single<Data> {
+        // 메모리에 캐시된 이미지 확인
+        if let memoryCachedImageData = await memoryCacher.requestImage(key: urlString) {
+            os_log(.debug, log: log, "메모리에 캐시된 이미지 반환")
+            return .just(memoryCachedImageData)
+        }
+        
+        // 디스크에 캐시된 이미지 확인
+        if let diskCachedImage = await diskCacher.requestImage(key: urlString) {
+            await memoryCacher.cacheImage(key: urlString, imageData: diskCachedImage)
+            os_log(.debug, log: log, "디스크에 캐시된 이미지 반환")
+            return .just(diskCachedImage)
+        }
         
         return Single<Data>.create { [weak self] single in
-            // TODO: 디스크 캐싱
-            
-            // 캐시된 이미지 확인
-            if let cachedImageData = self?.cachedImages.object(forKey: key) {
-                single(.success(cachedImageData as Data))
-                return Disposables.create()
-            }
-            
             Task {
                 do {
                     // 네트워크 통신 및 이미지 fetch
                     let imageData = try await self?.fetchImage(from: urlString)
                     if let imageData {
                         // fetch된 이미지를 캐시에 저장
-                        self?.cachedImages.setObject(imageData as NSData, forKey: urlString as NSString)
+                        await self?.memoryCacher.cacheImage(key: urlString, imageData: imageData)
+                        await self?.diskCacher.cacheImage(key: urlString, imageData: imageData)
+                        guard let self else { return }
+                        os_log(.debug, log: self.log, "이미지 캐싱 성공")
                         single(.success(imageData))
                     } else {
                         single(.failure(DataError.fileNotFound))
@@ -70,8 +98,5 @@ final class ImageCacheManager {
             }
             return Disposables.create()
         }
-        .asObservable()
-        .share(replay: 1, scope: .whileConnected)
-        .asSingle()
     }
 }

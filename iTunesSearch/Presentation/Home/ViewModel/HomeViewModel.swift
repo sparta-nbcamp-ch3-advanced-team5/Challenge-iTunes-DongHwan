@@ -17,9 +17,8 @@ final class HomeViewModel {
     // MARK: - Properties
     
     private lazy var log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
-    private let disposeBag = DisposeBag()
     
-    //    private let apiiTunesSearchUseCase: APIiTunesSearchUseCase
+//    private let apiiTunesSearchUseCase: APIiTunesSearchUseCase
     private let apiiTunesSearchUseCase = APIiTunesSearchManager()
     
     // MARK: - Input (ViewController ➡️ ViewModel)
@@ -40,25 +39,29 @@ final class HomeViewModel {
     func transform(input: Input) -> Output {
         let musicListChunksRelay = PublishRelay<MusicListChunks>()
         
-        input.viewDidLoad
-            .withUnretained(self)
-            .flatMapLatest { owner, _ in
+        Task { [weak self] in
+            for try await _ in input.viewDidLoad.values {
+                guard let self else { return }
                 // TODO: Repository 구현할 때 삭제해야 함
                 let top5MusicRequestDTO = MusicRequestDTO(term: .spring, limit: 5)
                 let summerMusicRequestDTO = MusicRequestDTO(term: .summer, limit: 15)
                 let fallMusicRequestDTO = MusicRequestDTO(term: .fall, limit: 15)
                 let winterMusicRequestDTO = MusicRequestDTO(term: .winter, limit: 15)
                 
-                return Observable.zip(owner.apiiTunesSearchUseCase.rxFetchMusicList(with: top5MusicRequestDTO).asObservable(),
-                                      owner.apiiTunesSearchUseCase.rxFetchMusicList(with: summerMusicRequestDTO).asObservable(),
-                                      owner.apiiTunesSearchUseCase.rxFetchMusicList(with: fallMusicRequestDTO).asObservable(),
-                                      owner.apiiTunesSearchUseCase.rxFetchMusicList(with: winterMusicRequestDTO).asObservable())
-            }.subscribe(with: self) { owner, element in
-                musicListChunksRelay.accept(element)
-            } onError: { owner, error in
-                // TODO: - 에러 Alert 표시
-                os_log(.error, log: owner.log, "\(error.localizedDescription)")
-            }.disposed(by: disposeBag)
+                let musicDataZip = Observable.zip(self.apiiTunesSearchUseCase.rxFetchMusicList(with: top5MusicRequestDTO).asObservable(),
+                                                self.apiiTunesSearchUseCase.rxFetchMusicList(with: summerMusicRequestDTO).asObservable(),
+                                                self.apiiTunesSearchUseCase.rxFetchMusicList(with: fallMusicRequestDTO).asObservable(),
+                                                self.apiiTunesSearchUseCase.rxFetchMusicList(with: winterMusicRequestDTO).asObservable())
+                do {
+                    for try await value in musicDataZip.values {
+                        musicListChunksRelay.accept(value)
+                    }
+                } catch {
+                    // TODO: - 에러 Alert 표시
+                    os_log(.error, log: log, "\(error.localizedDescription)")
+                }
+            }
+        }
         
         return Output(musicListChunksRelay: musicListChunksRelay)
     }

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import OSLog
 
 import RxSwift
 import SnapKit
@@ -16,7 +17,7 @@ final class SeasonCell: UICollectionViewCell {
     
     // MARK: - Properties
     
-    private let disposeBag = DisposeBag()
+    private lazy var log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
     
     // MARK: - UI Componenets
     
@@ -70,11 +71,15 @@ final class SeasonCell: UICollectionViewCell {
     // MARK: - Methods
     
     func configure(thumbnailImageURL: String, title: String, artist: String, collection: String, isBottom: Bool) {
-        ImageCacheManager.shared.rxGetImage(from: thumbnailImageURL)
-            .observe(on: MainScheduler.instance)
-            .subscribe(with: self) { owner, imageData in
-                owner.thumbnailImageView.image = UIImage(data: imageData)
-            }.disposed(by: disposeBag)
+        Task { [weak self] in
+            do {
+                let imageData = try await ImageCacheManager.shared.rxFetchImage(from: thumbnailImageURL).value
+                self?.thumbnailImageView.image = UIImage(data: imageData)
+            } catch {
+                guard let self else { return }
+                os_log(.error, log: self.log, "\(error.localizedDescription)")
+            }
+        }
         
         titleLabel.text = title
         artistLabel.text = artist
