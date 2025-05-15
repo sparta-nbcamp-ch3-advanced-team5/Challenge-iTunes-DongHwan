@@ -26,7 +26,7 @@ final class HomeViewController: UIViewController {
     private var snapshot = HomeSnapshot()
     
     /// 네트워크 통신 Task 저장(deinit 될 때 실행 중단용)
-    private var fetchTask: [Task<Void, Never>]?
+    private var fetchTask: Task<Void, Never>?
     
     // MARK: - UI Components
     
@@ -62,7 +62,7 @@ final class HomeViewController: UIViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        fetchTask?.forEach { $0.cancel() }
+        fetchTask?.cancel()
         fetchTask = nil
     }
 }
@@ -106,31 +106,16 @@ private extension HomeViewController {
         // ViewModel ➡️ Output
         let output = homeViewModel.transform(input: input)
         
-        let top5Task = Task { [weak self] in
-            for await top5MusicList in output.top5MusicListRelay.asDriver().values {
-                self?.updateSection(of: .springBest, with: top5MusicList, animatingDifferences: true)
+        fetchTask = Task { [weak self] in
+            for await element in output.musicListChunksRelay.asDriver(onErrorJustReturn: ([], [], [], [])).values {
+                let (top5MusicList, summerMusicList, fallMusicList, winterMusicList) = element
+                self?.configureSnapshot(top5MusicList: top5MusicList,
+                                       summerMusicList: summerMusicList,
+                                       fallMusicList: fallMusicList,
+                                       winterMusicList: winterMusicList,
+                                       animatingDifferences: true)
             }
         }
-        
-        let summerTask = Task { [weak self] in
-            for await summerMusicList in output.summerMusicListRelay.asDriver().values {
-                self?.updateSection(of: .summer, with: summerMusicList, animatingDifferences: true)
-            }
-        }
-        
-        let fallTask = Task { [weak self] in
-            for await fallMusicList in output.fallMusicListRelay.asDriver().values {
-                self?.updateSection(of: .fall, with: fallMusicList, animatingDifferences: true)
-            }
-        }
-        
-        let winterTask = Task { [weak self] in
-            for await winterMusicList in output.winterMusicListRelay.asDriver().values {
-                self?.updateSection(of: .winter, with: winterMusicList, animatingDifferences: true)
-            }
-        }
-        
-        [top5Task, summerTask, fallTask, winterTask].forEach { fetchTask?.append($0) }
     }
 }
 
@@ -180,26 +165,22 @@ private extension HomeViewController {
             let header: HomeHeaderView = collectionView.dequeueConfiguredReusableSupplementary(using: headerRegistration, for: indexPath)
             return header
         }
-        
-        configureSnapshot()
     }
     
     /// Diffable DataSource Snapshot 설정
-    func configureSnapshot() {
+    func configureSnapshot(top5MusicList: [MusicResultModel],
+                           summerMusicList: [MusicResultModel],
+                           fallMusicList: [MusicResultModel],
+                           winterMusicList: [MusicResultModel],
+                           animatingDifferences: Bool) {
         snapshot.deleteAllItems()
         snapshot.appendSections(HomeSection.allCases)
-    }
-    
-    func updateSection(of section: HomeSection, with musicList: [MusicResultModel], animatingDifferences: Bool) {
-        let newItems: [HomeItem]
-        switch section {
-        case .springBest:
-            newItems = musicList.map { HomeItem.best($0) }
-        default:
-            newItems = musicList.map { HomeItem.season($0) }
-        }
         
-        snapshot.appendItems(newItems, toSection: section)
+        snapshot.appendItems(top5MusicList.map { HomeItem.best($0) }, toSection: .springBest)
+        snapshot.appendItems(summerMusicList.map { HomeItem.season($0) }, toSection: .summer)
+        snapshot.appendItems(fallMusicList.map { HomeItem.season($0) }, toSection: .fall)
+        snapshot.appendItems(winterMusicList.map { HomeItem.season($0) }, toSection: .winter)
+        
         dataSource.apply(snapshot, animatingDifferences: animatingDifferences)
     }
 }

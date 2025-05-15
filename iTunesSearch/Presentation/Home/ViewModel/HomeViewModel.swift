@@ -19,7 +19,7 @@ final class HomeViewModel {
     private let iTunesSearchAPIUseCase: iTunesSearchAPIUseCase
     
     /// 네트워크 통신 Task 저장(deinit 될 때 실행 중단용)
-    private var fetchTask: [Task<Void, Never>]?
+    private var fetchTask: Task<Void, Never>?
     
     // MARK: - Input (ViewController ➡️ ViewModel)
     
@@ -28,11 +28,9 @@ final class HomeViewModel {
     }
     
     // MARK: - Output (ViewModel ➡️ ViewController)
+    typealias MusicListChunks = ([MusicResultModel], [MusicResultModel], [MusicResultModel], [MusicResultModel])
     struct Output {
-        let top5MusicListRelay: BehaviorRelay<[MusicResultModel]>
-        let summerMusicListRelay: BehaviorRelay<[MusicResultModel]>
-        let fallMusicListRelay: BehaviorRelay<[MusicResultModel]>
-        let winterMusicListRelay: BehaviorRelay<[MusicResultModel]>
+        let musicListChunksRelay: BehaviorRelay<MusicListChunks>
     }
     
     // MARK: - Transform (Input ➡️ Output)
@@ -40,20 +38,23 @@ final class HomeViewModel {
     func transform(input: Input) -> Output {
         let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
         
-        let top5MusicListRelay = BehaviorRelay<[MusicResultModel]>(value: [])
-        let summerMusicListRelay = BehaviorRelay<[MusicResultModel]>(value: [])
-        let fallMusicListRelay = BehaviorRelay<[MusicResultModel]>(value: [])
-        let winterMusicListRelay = BehaviorRelay<[MusicResultModel]>(value: [])
+        let musicListChunksRelay = BehaviorRelay<MusicListChunks>(value: ([], [], [], []))
         
-        let top5Task = Task { [iTunesSearchAPIUseCase] in
+        fetchTask = Task { [iTunesSearchAPIUseCase] in
             for await _ in input.viewDidLoad.values {
-                let top5QueryDTO = iTunesQuery(term: MusicTerm.spring.rawValue, mediaType: .music, limit: 5)
-                async let top5MusicList = iTunesSearchAPIUseCase.fetchSearchResultList(with: top5QueryDTO,
-                                                                                       dtoType: MusicResultDTO.self,
-                                                                                       transform: { $0.toModel() })
+                let top5RequestDTO = iTunesQuery(term: MusicTerm.spring.rawValue, mediaType: .music, limit: 5)
+                let summerRequestDTO = iTunesQuery(term: MusicTerm.summer.rawValue, mediaType: .music, limit: 15)
+                let fallRequestDTO = iTunesQuery(term: MusicTerm.fall.rawValue, mediaType: .music, limit: 15)
+                let winterRequestDTO = iTunesQuery(term: MusicTerm.winter.rawValue, mediaType: .music, limit: 15)
+
+                async let top5MusicList = iTunesSearchAPIUseCase.fetchSearchResultList(with: top5RequestDTO, dtoType: MusicResultDTO.self, transform: { $0.toModel() })
+                async let summerMusicList = iTunesSearchAPIUseCase.fetchSearchResultList(with: summerRequestDTO, dtoType: MusicResultDTO.self, transform: { $0.toModel() })
+                async let fallMusicList = iTunesSearchAPIUseCase.fetchSearchResultList(with: fallRequestDTO, dtoType: MusicResultDTO.self, transform: { $0.toModel() })
+                async let winterMusicList = iTunesSearchAPIUseCase.fetchSearchResultList(with: winterRequestDTO, dtoType: MusicResultDTO.self, transform: { $0.toModel() })
+
                 do {
-                    let result = try await top5MusicList
-                    top5MusicListRelay.accept(result)
+                    let musicListchunks = try await (top5MusicList, summerMusicList, fallMusicList, winterMusicList)
+                    musicListChunksRelay.accept(musicListchunks)
                 } catch {
                     // TODO: - 에러 Alert 표시
                     os_log(.error, log: log, "\(error.localizedDescription)")
@@ -61,60 +62,7 @@ final class HomeViewModel {
             }
         }
         
-        let summerTask = Task { [iTunesSearchAPIUseCase] in
-            for await _ in input.viewDidLoad.values {
-                let summerQueryDTO = iTunesQuery(term: MusicTerm.summer.rawValue, mediaType: .music, limit: 15)
-                async let summerMusicList = iTunesSearchAPIUseCase.fetchSearchResultList(with: summerQueryDTO,
-                                                                                         dtoType: MusicResultDTO.self,
-                                                                                         transform: { $0.toModel() })
-                do {
-                    let results = try await summerMusicList
-                    summerMusicListRelay.accept(results)
-                } catch {
-                    // TODO: - 에러 Alert 표시
-                    os_log(.error, log: log, "\(error.localizedDescription)")
-                }
-            }
-        }
-        
-        let fallTask = Task { [iTunesSearchAPIUseCase] in
-            for await _ in input.viewDidLoad.values {
-                let fallQueryDTO = iTunesQuery(term: MusicTerm.fall.rawValue, mediaType: .music, limit: 15)
-                async let fallMusicList = iTunesSearchAPIUseCase.fetchSearchResultList(with: fallQueryDTO,
-                                                                                       dtoType: MusicResultDTO.self,
-                                                                                       transform: { $0.toModel() })
-                do {
-                    let results = try await fallMusicList
-                    fallMusicListRelay.accept(results)
-                } catch {
-                    // TODO: - 에러 Alert 표시
-                    os_log(.error, log: log, "\(error.localizedDescription)")
-                }
-            }
-        }
-        
-        let winterTask = Task { [iTunesSearchAPIUseCase] in
-            for await _ in input.viewDidLoad.values {
-                let winterQueryDTO = iTunesQuery(term: MusicTerm.winter.rawValue, mediaType: .music, limit: 15)
-                async let winterMusicList = iTunesSearchAPIUseCase.fetchSearchResultList(with: winterQueryDTO,
-                                                                                         dtoType: MusicResultDTO.self,
-                                                                                         transform: { $0.toModel() })
-                do {
-                    let results = try await winterMusicList
-                    winterMusicListRelay.accept(results)
-                } catch {
-                    // TODO: - 에러 Alert 표시
-                    os_log(.error, log: log, "\(error.localizedDescription)")
-                }
-            }
-        }
-        
-        [top5Task, summerTask, fallTask, winterTask].forEach { fetchTask?.append($0) }
-        
-        return Output(top5MusicListRelay: top5MusicListRelay,
-                      summerMusicListRelay: summerMusicListRelay,
-                      fallMusicListRelay: fallMusicListRelay,
-                      winterMusicListRelay: winterMusicListRelay)
+        return Output(musicListChunksRelay: musicListChunksRelay)
     }
     
     // MARK: - Initializer
@@ -124,7 +72,7 @@ final class HomeViewModel {
     }
     
     deinit {
-        fetchTask?.forEach { $0.cancel() }
+        fetchTask?.cancel()
         fetchTask = nil
     }
 }
