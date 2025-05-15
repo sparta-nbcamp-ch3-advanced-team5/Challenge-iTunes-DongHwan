@@ -23,23 +23,23 @@ final class HomeViewModel {
     // MARK: - Input (ViewController ➡️ ViewModel)
     
     struct Input {
-        let viewDidLoad: Observable<Void>
+        let viewDidLoad: Infallible<Void>
     }
     
     // MARK: - Output (ViewModel ➡️ ViewController)
     // top5, summer, fall, winter
     typealias MusicListChunks = ([MusicResultModel], [MusicResultModel], [MusicResultModel], [MusicResultModel])
     struct Output {
-        let musicListChunksRelay: PublishRelay<MusicListChunks>
+        let musicListChunksRelay: BehaviorRelay<MusicListChunks>
     }
     
     // MARK: - Transform (Input ➡️ Output)
     
     func transform(input: Input) -> Output {
-        let musicListChunksRelay = PublishRelay<MusicListChunks>()
+        let musicListChunksRelay = BehaviorRelay<MusicListChunks>(value: ([], [], [], []))
         
         Task { [weak self] in
-            for try await _ in input.viewDidLoad.values {
+            for await _ in input.viewDidLoad.values {
                 guard let self else { return }
                 let top5RequestDTO = iTunesQuery(term: MusicTerm.spring.rawValue, mediaType: .music, limit: 5)
                 let summerRequestDTO = iTunesQuery(term: MusicTerm.summer.rawValue, mediaType: .music, limit: 15)

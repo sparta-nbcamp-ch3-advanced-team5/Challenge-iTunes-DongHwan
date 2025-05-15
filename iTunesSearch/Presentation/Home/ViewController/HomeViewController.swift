@@ -17,19 +17,20 @@ final class HomeViewController: UIViewController {
     
     // MARK: - Properties
     
-    private var homeViewModel: HomeViewModel
-    private let disposeBag = DisposeBag()
+    private let homeViewModel: HomeViewModel
     
     // Diffable DataSource
-    typealias DataSource = UICollectionViewDiffableDataSource<HomeSection, HomeItem>
-    typealias Snapshot = NSDiffableDataSourceSnapshot<HomeSection, HomeItem>
-    private var dataSource: DataSource!
-    private var snapshot = Snapshot()
+    typealias HomeDataSource = UICollectionViewDiffableDataSource<HomeSection, HomeItem>
+    typealias HomeSnapshot = NSDiffableDataSourceSnapshot<HomeSection, HomeItem>
+    private var dataSource: HomeDataSource!
+    private var snapshot = HomeSnapshot()
+    
+    private var fetchTask: Task<Void, Never>?
     
     // MARK: - UI Components
     
     /// 홈 화면 네비게이션 바 SearchController
-    private let searchController = UISearchController(searchResultsController: SearchResultViewController())
+    private let searchController = UISearchController(searchResultsController: SearchResultViewController(searchResultViewModel: SearchResultViewModel()))
     
     /// 홈 화면 View
     private let homeView = HomeView()
@@ -53,6 +54,13 @@ final class HomeViewController: UIViewController {
         setupUI()
         configureDataSource()
         bind()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        fetchTask?.cancel()
+        fetchTask = nil
     }
 }
 
@@ -89,21 +97,22 @@ private extension HomeViewController {
     
     func bind() {
         // Input ➡️ ViewModel
-        let input = HomeViewModel.Input(viewDidLoad: Observable.just(()))
+        let input = HomeViewModel.Input(viewDidLoad: Infallible.just(()))
         
         // ViewModel ➡️ Output
         let output = homeViewModel.transform(input: input)
         
-        output.musicListChunksRelay
-            .asDriver(onErrorJustReturn: ([], [], [], []))
-            .drive(with: self) { owner, element in
+        fetchTask = Task { [weak self] in
+            for await element in output.musicListChunksRelay.asDriver(onErrorJustReturn: ([], [], [], [])).values {
+                guard let self else { return }
                 let (top5MusicList, summerMusicList, fallMusicList, winterMusicList) = element
-                owner.configureSnapshot(top5MusicList: top5MusicList,
+                self.configureSnapshot(top5MusicList: top5MusicList,
                                         summerMusicList: summerMusicList,
                                         fallMusicList: fallMusicList,
                                         winterMusicList: winterMusicList,
                                         animatingDifferences: true)
-            }.disposed(by: disposeBag)
+            }
+        }
     }
 }
 
@@ -134,7 +143,7 @@ private extension HomeViewController {
             header.configure(title: headerTitle, subtitle: headerSubtitle)
         }
         
-        dataSource = DataSource(collectionView: homeView.getMusicCollectionView, cellProvider: { collectionView, indexPath, itemList in
+        dataSource = HomeDataSource(collectionView: homeView.getMusicCollectionView, cellProvider: { collectionView, indexPath, itemList in
             switch itemList {
             case .best(let top5Music):
                 let cell = collectionView.dequeueConfiguredReusableCell(using: bestCellRegistration,
