@@ -24,10 +24,13 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         let iTunesSearchAPIUseCase = iTunesSearchAPIUseCase(repository: iTunesSearchAPIRepository)
         
-        let homeViewModel = HomeViewModel(iTunesSearchAPIUseCase: iTunesSearchAPIUseCase)
+        let homeVM = HomeViewModel(iTunesSearchAPIUseCase: iTunesSearchAPIUseCase)
         
-        let homeViewController = HomeViewController(homeViewModel: homeViewModel)
-        window.rootViewController = UINavigationController(rootViewController: homeViewController)
+        let searchResultVM = SearchResultViewModel(iTunesSearchAPIUseCase: iTunesSearchAPIUseCase)
+        let searchVC = SearchResultViewController(searchResultViewModel: searchResultVM)
+        
+        let homeVC = HomeViewController(homeViewModel: homeVM, searchResultViewController: searchVC)
+        window.rootViewController = UINavigationController(rootViewController: homeVC)
         window.makeKeyAndVisible()
         self.window = window
     }

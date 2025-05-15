@@ -21,7 +21,16 @@ final class SearchResultView: UIView {
     // MARK: - UI Components
     
     /// 검색 결과 CollectionView
-    private lazy var searchCollectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
+    private lazy var searchResultCollectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
+    
+    // MARK: - Getter
+    
+    /// 음악 CollectionView 반환
+    var getSearchResultCollectionView: UICollectionView {
+        return searchResultCollectionView
+    }
+    
+    // MARK: - Initializer
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -42,11 +51,11 @@ private extension SearchResultView {
     }
     
     func setViewHierarchy() {
-        self.addSubviews(searchCollectionView)
+        self.addSubview(searchResultCollectionView)
     }
     
     func setConstraints() {
-        searchCollectionView.snp.makeConstraints {
+        searchResultCollectionView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
     }

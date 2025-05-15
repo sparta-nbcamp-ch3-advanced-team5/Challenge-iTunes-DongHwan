@@ -73,6 +73,7 @@ extension MovieResultDTO {
                                 primaryGenreName: primaryGenreName,
                                 shortDescription: shortDescription,
                                 longDescription: longDescription,
-                                hasITunesExtras: hasITunesExtras)
+                                hasITunesExtras: hasITunesExtras,
+                                backgroundArtistImageColorHex: BackgroundColorsHex.allCases.randomElement()!.rawValue)
     }
 }

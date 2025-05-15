@@ -44,7 +44,7 @@ final class MovieCollectionCell: UICollectionViewCell {
     
     // MARK: - Methods
     
-    func configure(title: String, year: String, genre: String) {
+    func configure(thumbnailImageURL: String, title: String, year: String, genre: String) {
         titleLabel.text = title
         yearGenreLabel.text = "\(year)년 • \(genre)"
     }

@@ -32,8 +32,8 @@ final class MovieCell: UICollectionViewCell {
     /// 영화 제목 UILabel
     private let titleLabel = TitleLabel()
     
-    /// 영화 설명 UILabel
-    private let descriptionLabel = SubtitleLabel()
+    /// 영화 장르 UILabel
+    private let genreLabel = SubtitleLabel()
     
     // TODO: - 아이튠즈 연결 버튼 추가
     
@@ -50,9 +50,10 @@ final class MovieCell: UICollectionViewCell {
     
     // MARK: - Methods
     
-    func configure(title: String, description: String) {
+    func configure(thumbnailImageURL: String, backgroundImageColor: UIColor, title: String, genre: String) {
+        backgroundImageView.backgroundColor = backgroundImageColor
         titleLabel.text = title
-        descriptionLabel.text = description
+        genreLabel.text = genre
     }
 }
 
@@ -72,7 +73,7 @@ private extension MovieCell {
         containerStackView.addArrangedSubviews(labelStackView)
         
         labelStackView.addArrangedSubviews(titleLabel,
-                                           descriptionLabel)
+                                           genreLabel)
     }
     
     func setConstraints() {

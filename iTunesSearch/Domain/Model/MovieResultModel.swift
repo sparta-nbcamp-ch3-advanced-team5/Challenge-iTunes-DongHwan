@@ -44,4 +44,6 @@ struct MovieResultModel: Hashable {
     let longDescription: String
     /// ?
     let hasITunesExtras: Bool?
+    /// 배경 사진 UIImageView 배경색 Hex
+    let backgroundArtistImageColorHex: String
 }

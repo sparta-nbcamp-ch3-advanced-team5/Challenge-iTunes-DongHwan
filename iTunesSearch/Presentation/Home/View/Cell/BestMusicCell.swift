@@ -22,7 +22,7 @@ final class BestMusicCell: UICollectionViewCell {
     // MARK: - UI Components
     
     /// 가수 사진 UIImageView(API에 가수 사진이 없으므로 배경색만 변경)
-    private let artistImageView = BackgroundImageView(frame: .zero).then {
+    private let backgroundArtistImageView = BackgroundImageView(frame: .zero).then {
         let config = UIImage.SymbolConfiguration(pointSize: 50)
         $0.image = UIImage(systemName: "music.note", withConfiguration: config)?.withRenderingMode(.alwaysOriginal).withTintColor(.white)
     }
@@ -60,7 +60,7 @@ final class BestMusicCell: UICollectionViewCell {
     
     // MARK: - Methods
     
-    func configure(thumbnailImageURL: String, artistImageColor: UIColor, title: String, artist: String) {
+    func configure(thumbnailImageURL: String, backgroundArtistImageColor: UIColor, title: String, artist: String) {
         // TODO: - 이미지 로드될때 애니메이션 추가
         Task { [weak self] in
             do {
@@ -72,7 +72,7 @@ final class BestMusicCell: UICollectionViewCell {
             }
         }
         
-        artistImageView.backgroundColor = artistImageColor
+        backgroundArtistImageView.backgroundColor = backgroundArtistImageColor
         titleLabel.text = title
         artistLabel.text = artist
     }
@@ -87,7 +87,7 @@ private extension BestMusicCell {
     }
     
     func setViewHierarchy() {
-        self.addSubviews(artistImageView, containerStackView)
+        self.addSubviews(backgroundArtistImageView, containerStackView)
         
         containerStackView.addArrangedSubviews(thumbnailImageView, labelStackView)
         
@@ -97,7 +97,7 @@ private extension BestMusicCell {
     }
     
     func setConstraints() {
-        artistImageView.snp.makeConstraints {
+        backgroundArtistImageView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
         

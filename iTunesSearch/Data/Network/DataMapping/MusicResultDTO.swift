@@ -73,6 +73,6 @@ extension MusicResultDTO {
                                 primaryGenreName: primaryGenreName,
                                 collectionArtistName: collectionArtistName,
                                 collectionArtistViewURL: collectionViewURL,
-                                artistImageColorIndex: .random(in: 0...6))
+                                backgroundArtistImageColorHex: BackgroundColorsHex.allCases.randomElement()!.rawValue)
     }
 }

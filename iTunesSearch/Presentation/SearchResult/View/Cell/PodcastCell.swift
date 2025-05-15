@@ -26,11 +26,11 @@ final class PodcastCell: UICollectionViewCell {
     /// Label 컨테이너 UIStackView
     private let labelStackView = LabelStackView()
     
+    /// 팟캐스트 마케팅 문구 UILabel
+    private let marketingPhrasesLabel = SubtitleLabel()
+    
     /// 팟캐스트 제목 UILabel
     private let titleLabel = TitleLabel()
-    
-    /// 팟캐스트 설명 UILabel
-    private let descriptionLabel = SubtitleLabel()
     
     // TODO: - 아이튠즈 연결 버튼 추가
     
@@ -47,9 +47,9 @@ final class PodcastCell: UICollectionViewCell {
     
     // MARK: - Methods
     
-    func configure(title: String, description: String) {
+    func configure(thumbnailImageURL: String, marketingPhrases: String, title: String) {
+        marketingPhrasesLabel.text = marketingPhrases
         titleLabel.text = title
-        descriptionLabel.text = description
     }
 }
 
@@ -67,8 +67,8 @@ private extension PodcastCell {
         
         containerStackView.addArrangedSubviews(labelStackView)
         
-        labelStackView.addArrangedSubviews(titleLabel,
-                                           descriptionLabel)
+        labelStackView.addArrangedSubviews(marketingPhrasesLabel,
+                                           titleLabel)
     }
     
     func setConstraints() {
