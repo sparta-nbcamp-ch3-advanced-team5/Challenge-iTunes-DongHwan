@@ -18,19 +18,23 @@ final class PodcastCell: UICollectionViewCell {
     // MARK: - UI Components
     
     /// 팟캐스트 썸네일 UIImageView
-    private let thumnailImageView = ThumbnailImageView(frame: .zero)
-    
+    private let thumbnailImageView = ThumbnailImageView(frame: .zero)
+    /// 팟캐스트 마케팅 문구 UILabel
+    private let marketingPhrasesLabel = UILabel().then {
+        $0.font = .systemFont(ofSize: 24, weight: .bold)
+        $0.textColor = .label
+        $0.numberOfLines = 2
+    }
     /// LabelStackView, Button 컨테이너 UIStackView
     private let containerStackView = ContainerStackView()
-    
     /// Label 컨테이너 UIStackView
     private let labelStackView = LabelStackView()
-    
-    /// 팟캐스트 마케팅 문구 UILabel
-    private let marketingPhrasesLabel = SubtitleLabel()
-    
     /// 팟캐스트 제목 UILabel
     private let titleLabel = TitleLabel()
+    /// 팟캐스트 진행자 UILabel
+    private let artistLabel = SubtitleLabel()
+    /// 아이튠즈 링크 이동 버튼
+    private let goToButton = GoToButton()
     
     // TODO: - 아이튠즈 연결 버튼 추가
     
@@ -38,6 +42,9 @@ final class PodcastCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        self.layer.masksToBounds = true
+        self.layer.cornerRadius = 10
+        
         setupUI()
     }
     
@@ -47,9 +54,21 @@ final class PodcastCell: UICollectionViewCell {
     
     // MARK: - Methods
     
-    func configure(thumbnailImageURL: String, marketingPhrases: String, title: String) {
+    func configure(thumbnailImageURL: String, marketingPhrases: String, title: String, artist: String) {
+        let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
+        
+        // TODO: - 이미지 로드될때 애니메이션 추가
+        Task { [weak self] in
+            do {
+                let imageData = try await ImageCacheManager.shared.fetchImage(from: thumbnailImageURL)
+                self?.thumbnailImageView.image = UIImage(data: imageData)
+            } catch {
+                os_log(.error, log: log, "\(error.localizedDescription)")
+            }
+        }
         marketingPhrasesLabel.text = marketingPhrases
         titleLabel.text = title
+        artistLabel.text = artist
     }
 }
 
@@ -62,23 +81,35 @@ private extension PodcastCell {
     }
     
     func setViewHierarchy() {
-        self.addSubviews(thumnailImageView,
-                         containerStackView)
+        self.contentView.addSubviews(thumbnailImageView,
+                                     marketingPhrasesLabel,
+                                     containerStackView)
         
-        containerStackView.addArrangedSubviews(labelStackView)
+        containerStackView.addArrangedSubviews(labelStackView, goToButton)
         
-        labelStackView.addArrangedSubviews(marketingPhrasesLabel,
-                                           titleLabel)
+        labelStackView.addArrangedSubviews(titleLabel,
+                                           artistLabel)
     }
     
     func setConstraints() {
-        thumnailImageView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+        thumbnailImageView.snp.makeConstraints {
+            $0.top.leading.trailing.equalToSuperview()
+            $0.bottom.equalTo(containerStackView.snp.top)
+        }
+        
+        marketingPhrasesLabel.snp.makeConstraints {
+            $0.leading.equalToSuperview().inset(15)
+            $0.trailing.equalToSuperview().inset(45)
+            $0.bottom.equalTo(containerStackView.snp.top).offset(-15)
         }
         
         containerStackView.snp.makeConstraints {
             $0.leading.trailing.bottom.equalToSuperview().inset(15)
             $0.height.equalTo(60)
+        }
+        
+        goToButton.snp.makeConstraints {
+            $0.width.equalTo(72)
         }
     }
 }

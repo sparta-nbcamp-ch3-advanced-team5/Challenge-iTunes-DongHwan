@@ -1,8 +1,8 @@
 //
-//  HomeHeaderView.swift
+//  SearchResultHeaderView.swift
 //  iTunesSearch
 //
-//  Created by 서동환 on 5/13/25.
+//  Created by 서동환 on 5/16/25.
 //
 
 import UIKit
@@ -10,26 +10,22 @@ import UIKit
 import SnapKit
 import Then
 
-/// 홈 화면 CollectionView Header
-final class HomeHeaderView: UICollectionReusableView {
+final class SearchResultHeaderView: UICollectionReusableView {
     
     // MARK: - Properties
     
-    static let identifier = String(describing: HomeHeaderView.self)
+    static let identifier = String(describing: SearchResultHeaderView.self)
     
     // MARK: - UI Components
     
-    /// Label 컨테이너 StackView
+    /// Label 컨테이너 UIStackView
     private let labelStackView = LabelStackView()
-    
-    /// LabelStackView가 위쪽 간격을 갖도록 하는 Spacer
+    /// LabelStackView가 위쪽 간격을 갖도록 하는 UIView
     private let topSpacer = UIView.spacer(axis: .vertical)
     /// Header 제목 UILabel
     private let titleLabel = TitleLabel().then {
         $0.font = .systemFont(ofSize: 24, weight: .bold)
     }
-    /// Header 부제목 UILabel
-    private let subtitleLabel = SubtitleLabel()
     
     // MARK: - Initializer
     
@@ -44,15 +40,14 @@ final class HomeHeaderView: UICollectionReusableView {
     
     // MARK: - Methods
     
-    func configure(title: String, subtitle: String) {
+    func configure(title: String) {
         titleLabel.text = title
-        subtitleLabel.text = subtitle
     }
 }
 
 // MARK: - UI Methods
 
-private extension HomeHeaderView {
+private extension SearchResultHeaderView {
     func setupUI() {
         setViewHierarchy()
         setConstraints()
@@ -62,8 +57,7 @@ private extension HomeHeaderView {
         self.addSubview(labelStackView)
         
         labelStackView.addArrangedSubviews(topSpacer,
-                                           titleLabel,
-                                           subtitleLabel)
+                                           titleLabel)
     }
     
     func setConstraints() {
@@ -76,3 +70,4 @@ private extension HomeHeaderView {
         }
     }
 }
+

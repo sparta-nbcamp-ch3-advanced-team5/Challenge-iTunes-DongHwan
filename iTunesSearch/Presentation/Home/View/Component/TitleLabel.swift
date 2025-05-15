@@ -14,7 +14,6 @@ final class TitleLabel: UILabel {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        self.text = "봄 (feat. Sandara Park)"
         self.font = .systemFont(ofSize: 17, weight: .semibold)
         self.textColor = .label
         self.numberOfLines = 1

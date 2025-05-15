@@ -14,7 +14,6 @@ final class SubtitleLabel: UILabel {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        self.text = "Park Bom"
         self.font = .systemFont(ofSize: 14)
         self.textColor = .secondaryLabel
         self.numberOfLines = 1

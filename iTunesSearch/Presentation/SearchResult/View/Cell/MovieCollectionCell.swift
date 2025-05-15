@@ -18,7 +18,7 @@ final class MovieCollectionCell: UICollectionViewCell {
     // MARK: - UI Components
     
     /// 영화 썸네일 UIImageView
-    private let thumnailImageView = ThumbnailImageView(frame: .zero)
+    private let thumbnailImageView = ThumbnailImageView(frame: .zero)
     
     /// Label 컨테이너 UIStackView
     private let labelStackView = LabelStackView()
@@ -45,6 +45,18 @@ final class MovieCollectionCell: UICollectionViewCell {
     // MARK: - Methods
     
     func configure(thumbnailImageURL: String, title: String, year: String, genre: String) {
+        let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
+        
+        // TODO: - 이미지 로드될때 애니메이션 추가
+        Task { [weak self] in
+            do {
+                let imageData = try await ImageCacheManager.shared.fetchImage(from: thumbnailImageURL)
+                self?.thumbnailImageView.image = UIImage(data: imageData)
+            } catch {
+                os_log(.error, log: log, "\(error.localizedDescription)")
+            }
+        }
+        
         titleLabel.text = title
         yearGenreLabel.text = "\(year)년 • \(genre)"
     }
@@ -59,15 +71,15 @@ private extension MovieCollectionCell {
     }
     
     func setViewHierarchy() {
-        self.addSubviews(thumnailImageView,
-                         labelStackView)
+        self.contentView.addSubviews(thumbnailImageView,
+                                     labelStackView)
         
         labelStackView.addArrangedSubviews(titleLabel,
                                            yearGenreLabel)
     }
     
     func setConstraints() {
-        thumnailImageView.snp.makeConstraints {
+        thumbnailImageView.snp.makeConstraints {
             $0.top.equalToSuperview().inset(15)
             $0.width.height.equalTo(100)
         }

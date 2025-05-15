@@ -28,6 +28,7 @@ final class HomeViewModel {
     }
     
     // MARK: - Output (ViewModel ➡️ ViewController)
+    /// top5MusicList, summerMusicList, fallMusicList, winterMusicList
     typealias MusicListChunks = ([MusicResultModel], [MusicResultModel], [MusicResultModel], [MusicResultModel])
     struct Output {
         let musicListChunksRelay: BehaviorRelay<MusicListChunks>
@@ -47,10 +48,18 @@ final class HomeViewModel {
                 let fallRequestDTO = iTunesQuery(term: MusicTerm.fall.rawValue, mediaType: .music, limit: 15)
                 let winterRequestDTO = iTunesQuery(term: MusicTerm.winter.rawValue, mediaType: .music, limit: 15)
 
-                async let top5MusicList = iTunesSearchAPIUseCase.fetchSearchResultList(with: top5RequestDTO, dtoType: MusicResultDTO.self, transform: { $0.toModel() })
-                async let summerMusicList = iTunesSearchAPIUseCase.fetchSearchResultList(with: summerRequestDTO, dtoType: MusicResultDTO.self, transform: { $0.toModel() })
-                async let fallMusicList = iTunesSearchAPIUseCase.fetchSearchResultList(with: fallRequestDTO, dtoType: MusicResultDTO.self, transform: { $0.toModel() })
-                async let winterMusicList = iTunesSearchAPIUseCase.fetchSearchResultList(with: winterRequestDTO, dtoType: MusicResultDTO.self, transform: { $0.toModel() })
+                async let top5MusicList = iTunesSearchAPIUseCase.fetchSearchResultList(with: top5RequestDTO,
+                                                                                       dtoType: MusicResultDTO.self,
+                                                                                       transform: { $0.toModel() })
+                async let summerMusicList = iTunesSearchAPIUseCase.fetchSearchResultList(with: summerRequestDTO,
+                                                                                         dtoType: MusicResultDTO.self,
+                                                                                         transform: { $0.toModel() })
+                async let fallMusicList = iTunesSearchAPIUseCase.fetchSearchResultList(with: fallRequestDTO,
+                                                                                       dtoType: MusicResultDTO.self,
+                                                                                       transform: { $0.toModel() })
+                async let winterMusicList = iTunesSearchAPIUseCase.fetchSearchResultList(with: winterRequestDTO,
+                                                                                         dtoType: MusicResultDTO.self,
+                                                                                         transform: { $0.toModel() })
 
                 do {
                     let musicListchunks = try await (top5MusicList, summerMusicList, fallMusicList, winterMusicList)

@@ -88,7 +88,7 @@ private extension SeasonMusicCell {
     }
     
     func setViewHierarchy() {
-        self.addSubviews(containerStackView,
+        self.contentView.addSubviews(containerStackView,
                          separatorView)
         
         containerStackView.addArrangedSubviews(thumbnailImageView, labelStackView)

@@ -1,5 +1,5 @@
 //
-//  MarketingPhrases.swift
+//  PodcastMarketingPhrases.swift
 //  iTunesSearch
 //
 //  Created by 서동환 on 5/15/25.
@@ -7,10 +7,11 @@
 
 import Foundation
 
-enum MarketingPhrases: String, CaseIterable {
+enum PodcastMarketingPhrases: String, CaseIterable {
     case podcastOfTheDay = "PODCAST OF THE DAY"
     case spotlight = "SPOTLIGHT"
-    case editorsPick = "EDITOR'S PICK"
-    case trending = "TRENDING"
     case recommendationForYou = "RECOMMENDATION FOR YOU"
+    case topEpisodeToday = "TOP EPISODE TODAY"
+    case featuredShow = "FEATURED SHOW"
+    case cantMissListen = "CAN'T-MISS LISTEN"
 }

@@ -15,10 +15,6 @@ import Then
 /// 음악 CollectionView 봄 Best Cell
 final class BestMusicCell: UICollectionViewCell {
     
-    // MARK: - Properties
-    
-    private lazy var log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
-    
     // MARK: - UI Components
     
     /// 가수 사진 UIImageView(API에 가수 사진이 없으므로 배경색만 변경)
@@ -61,14 +57,15 @@ final class BestMusicCell: UICollectionViewCell {
     // MARK: - Methods
     
     func configure(thumbnailImageURL: String, backgroundArtistImageColor: UIColor, title: String, artist: String) {
+        let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
+        
         // TODO: - 이미지 로드될때 애니메이션 추가
         Task { [weak self] in
             do {
                 let imageData = try await ImageCacheManager.shared.fetchImage(from: thumbnailImageURL)
                 self?.thumbnailImageView.image = UIImage(data: imageData)
             } catch {
-                guard let self else { return }
-                os_log(.error, log: self.log, "\(error.localizedDescription)")
+                os_log(.error, log: log, "\(error.localizedDescription)")
             }
         }
         
@@ -87,7 +84,7 @@ private extension BestMusicCell {
     }
     
     func setViewHierarchy() {
-        self.addSubviews(backgroundArtistImageView, containerStackView)
+        self.contentView.addSubviews(backgroundArtistImageView, containerStackView)
         
         containerStackView.addArrangedSubviews(thumbnailImageView, labelStackView)
         

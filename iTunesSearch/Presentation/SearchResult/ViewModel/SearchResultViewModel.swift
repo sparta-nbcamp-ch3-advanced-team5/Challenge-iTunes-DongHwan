@@ -16,8 +16,6 @@ final class SearchResultViewModel {
     
     // MARK: - Properties
     
-    private lazy var log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
-    
     private let iTunesSearchAPIUseCase: iTunesSearchAPIUseCase
     
     /// 네트워크 통신 Task 저장(deinit 될 때 실행 중단용)
@@ -26,11 +24,11 @@ final class SearchResultViewModel {
     // MARK: - Input (ViewController ➡️ ViewModel)
     
     struct Input {
-        let viewDidLoad: Infallible<Void>
+        let searchText: Infallible<String>
     }
     
     // MARK: - Output (ViewModel ➡️ ViewController)
-    // top5, summer, fall, winter
+    /// searchText, podcastList, movieList
     typealias SearchResultChunks = ([SearchTextModel], [PodcastResultModel], [MovieResultModel])
     struct Output {
         let searchResultChunksRelay: BehaviorRelay<SearchResultChunks>
@@ -39,14 +37,33 @@ final class SearchResultViewModel {
     // MARK: - Transform (Input ➡️ Output)
     
     func transform(input: Input) -> Output {
+        let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
+        
         let searchResultChunksRelay = BehaviorRelay<SearchResultChunks>(value: ([], [], []))
         
-//        fetchTask = Task { [weak self] in
-//            for await _ in input.viewDidLoad.values {
-//                let podcastQueryDTO = iTunesQuery(term: <#T##String#>, mediaType: <#T##MediaType#>, limit: <#T##Int#>)
-//            }
-//        }
-        
+        fetchTask = Task { [iTunesSearchAPIUseCase] in
+            for await text in input.searchText.values {
+                let podcastQueryDTO = iTunesQuery(term: text, mediaType: .podcast, limit: 15)
+                let movieQueryDTO = iTunesQuery(term: text, mediaType: .movie, limit: 15)
+
+                let searchText = SearchTextModel(searchText: text)
+                async let podcastList = iTunesSearchAPIUseCase.fetchSearchResultList(with: podcastQueryDTO,
+                                                                                     dtoType: PodcastResultDTO.self,
+                                                                                     transform: { $0.toModel() })
+                async let movieList = iTunesSearchAPIUseCase.fetchSearchResultList(with: movieQueryDTO,
+                                                                                   dtoType: MovieResultDTO.self,
+                                                                                   transform: { $0.toModel() })
+
+                do {
+                    let searchResultChunks = try await ([searchText], podcastList, movieList)
+                    searchResultChunksRelay.accept(searchResultChunks)
+                } catch {
+                    // TODO: - 에러 Alert 표시
+                    os_log(.error, log: log, "\(error.localizedDescription)")
+                }
+            }
+        }
+
         return Output(searchResultChunksRelay: searchResultChunksRelay)
     }
     

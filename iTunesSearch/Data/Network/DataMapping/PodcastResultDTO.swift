@@ -65,6 +65,6 @@ extension PodcastResultDTO {
                                   trackTimeMillis: trackTimeMillis,
                                   primaryGenreName: primaryGenreName,
                                   artworkUrl600: artworkUrl600,
-                                  marketingPhrase: MarketingPhrases.allCases.randomElement()!.rawValue)
+                                  marketingPhrase: PodcastMarketingPhrases.allCases.randomElement()!.rawValue)
     }
 }

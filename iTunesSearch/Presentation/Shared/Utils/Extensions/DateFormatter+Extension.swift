@@ -15,7 +15,7 @@ extension DateFormatter {
     
     static func getYearFromISO(from string: String) -> String {
         let isoDate = dateFormatter.date(from: string)
-        dateFormatter.dateFormat = "yyyy년"
+        dateFormatter.dateFormat = "yyyy"
         return dateFormatter.string(from: isoDate ?? .now)
     }
 }

@@ -48,7 +48,7 @@ private extension SearchTextCell {
     }
     
     func setViewHierarchy() {
-        self.addSubview(searchTextLabel)
+        self.contentView.addSubview(searchTextLabel)
     }
     
     func setConstraints() {

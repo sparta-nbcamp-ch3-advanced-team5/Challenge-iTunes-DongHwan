@@ -86,7 +86,7 @@ private extension HomeViewController {
         
         searchController.searchBar.placeholder = "영화, 팟캐스트"
         searchController.hidesNavigationBarDuringPresentation = true
-        searchController.searchResultsUpdater = self
+        searchController.searchResultsUpdater = searchResultViewController
     }
     
     func setViewHierarchy() {
@@ -182,12 +182,5 @@ private extension HomeViewController {
         snapshot.appendItems(winterMusicList.map { HomeItem.season($0) }, toSection: .winter)
         
         dataSource.apply(snapshot, animatingDifferences: animatingDifferences)
-    }
-}
-
-
-extension HomeViewController: UISearchResultsUpdating {
-    func updateSearchResults(for searchController: UISearchController) {
-        
     }
 }

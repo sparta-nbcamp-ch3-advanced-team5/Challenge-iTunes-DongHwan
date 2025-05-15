@@ -7,6 +7,7 @@
 
 import UIKit
 
+import RxRelay
 import RxSwift
 import SnapKit
 import Then
@@ -24,6 +25,12 @@ final class SearchResultViewController: UIViewController {
     typealias SearchResultSnapshot = NSDiffableDataSourceSnapshot<SearchResultSection, SearchResultItem>
     private var dataSource: SearchResultDataSource!
     private var snapshot = SearchResultSnapshot()
+    
+    /// 네트워크 통신 Task 저장(deinit 될 때 실행 중단용)
+    private var fetchTask: Task<Void, Never>?
+    
+    /// 검색어
+    private let searchTextRelay = PublishRelay<String>()
     
     // MARK: - UI Components
     
@@ -49,6 +56,12 @@ final class SearchResultViewController: UIViewController {
         setupUI()
         configureDataSource()
         bind()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        fetchTask?.cancel()
+        fetchTask = nil
     }
 }
 
@@ -76,7 +89,21 @@ private extension SearchResultViewController {
     }
     
     func bind() {
+        // Input ➡️ ViewModel
+        let input = SearchResultViewModel.Input(searchText: searchTextRelay.asInfallible())
         
+        // ViewModel ➡️ Output
+        let output = searchResultViewModel.transform(input: input)
+        
+        fetchTask = Task { [weak self] in
+            for await element in output.searchResultChunksRelay.asDriver(onErrorJustReturn: ([], [], [])).values {
+                let (searchText, podcastList, movieList) = element
+                self?.configureSnapshot(searchText: searchText,
+                                        podcastList: podcastList,
+                                        movieList: movieList,
+                                        animatingDifferences: true)
+            }
+        }
     }
 }
 
@@ -92,7 +119,8 @@ private extension SearchResultViewController {
         let podCastCellRegistration = UICollectionView.CellRegistration<PodcastCell, PodcastResultModel> { cell, indexPath, item in
             cell.configure(thumbnailImageURL: item.artworkUrl600,
                            marketingPhrases: item.marketingPhrase,
-                           title: item.trackName)
+                           title: item.trackName,
+                           artist: item.artistName)
         }
         
         let movieCellRegistration = UICollectionView.CellRegistration<MovieCell, MovieResultModel> { cell, indexPath, item in
@@ -111,11 +139,10 @@ private extension SearchResultViewController {
                            genre: item.primaryGenreName)
         }
         
-//        let headerRegistration = UICollectionView.SupplementaryRegistration<HomeHeaderView>(elementKind: UICollectionView.elementKindSectionHeader) { header, elementKind, indexPath in
-//            let headerTitle = HomeSection.allCases[indexPath.section].title
-//            let headerSubtitle = HomeSection.allCases[indexPath.section].subtitle
-//            header.configure(title: headerTitle, subtitle: headerSubtitle)
-//        }
+        let headerRegistration = UICollectionView.SupplementaryRegistration<SearchResultHeaderView>(elementKind: UICollectionView.elementKindSectionHeader) { header, elementKind, indexPath in
+            let headerTitle = HeaderMarketingPhrases.allCases[indexPath.section].rawValue
+            header.configure(title: headerTitle)
+        }
         
         dataSource = SearchResultDataSource(collectionView: searchResultView.getSearchResultCollectionView, cellProvider: { collectionView, indexPath, itemList in
             switch itemList {
@@ -139,10 +166,10 @@ private extension SearchResultViewController {
             
         })
         
-//        dataSource.supplementaryViewProvider = { (collectionView, kind, indexPath) -> UICollectionReusableView? in
-//            let header: HomeHeaderView = collectionView.dequeueConfiguredReusableSupplementary(using: headerRegistration, for: indexPath)
-//            return header
-//        }
+        dataSource.supplementaryViewProvider = { (collectionView, kind, indexPath) -> UICollectionReusableView? in
+            let header: SearchResultHeaderView = collectionView.dequeueConfiguredReusableSupplementary(using: headerRegistration, for: indexPath)
+            return header
+        }
     }
     
     /// Diffable DataSource Snapshot 설정
@@ -155,9 +182,16 @@ private extension SearchResultViewController {
         
         snapshot.appendItems(searchText.map { SearchResultItem.searchText($0) }, toSection: .searchText)
         snapshot.appendItems(podcastList.map { SearchResultItem.podcast($0) }, toSection: .largeBanner)
+        // TODO: - smallBanner와 collection에 데이터 분배 로직 추가
         snapshot.appendItems(movieList.map { SearchResultItem.movie($0) }, toSection: .smallBanner)
         snapshot.appendItems(movieList.map { SearchResultItem.movieCollection($0) }, toSection: .collection)
         
         dataSource.apply(snapshot, animatingDifferences: animatingDifferences)
+    }
+}
+
+extension SearchResultViewController: UISearchResultsUpdating {
+    func updateSearchResults(for searchController: UISearchController) {
+        searchTextRelay.accept(searchController.searchBar.text ?? "")
     }
 }

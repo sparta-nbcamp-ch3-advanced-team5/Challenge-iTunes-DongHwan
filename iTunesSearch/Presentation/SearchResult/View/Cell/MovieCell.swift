@@ -21,7 +21,7 @@ final class MovieCell: UICollectionViewCell {
     private let backgroundImageView = BackgroundImageView(frame: .zero)
     
     /// 영화 썸네일 UIImageView
-    private let thumnailImageView = ThumbnailImageView(frame: .zero)
+    private let thumbnailImageView = ThumbnailImageView(frame: .zero)
     
     /// LabelStackView, Button 컨테이너 UIStackView
     private let containerStackView = ContainerStackView()
@@ -51,6 +51,17 @@ final class MovieCell: UICollectionViewCell {
     // MARK: - Methods
     
     func configure(thumbnailImageURL: String, backgroundImageColor: UIColor, title: String, genre: String) {
+        let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
+        
+        // TODO: - 이미지 로드될때 애니메이션 추가
+        Task { [weak self] in
+            do {
+                let imageData = try await ImageCacheManager.shared.fetchImage(from: thumbnailImageURL)
+                self?.thumbnailImageView.image = UIImage(data: imageData)
+            } catch {
+                os_log(.error, log: log, "\(error.localizedDescription)")
+            }
+        }
         backgroundImageView.backgroundColor = backgroundImageColor
         titleLabel.text = title
         genreLabel.text = genre
@@ -66,9 +77,9 @@ private extension MovieCell {
     }
     
     func setViewHierarchy() {
-        self.addSubviews(backgroundImageView,
-                         thumnailImageView,
-                         containerStackView)
+        self.contentView.addSubviews(backgroundImageView,
+                                     thumbnailImageView,
+                                     containerStackView)
         
         containerStackView.addArrangedSubviews(labelStackView)
         
@@ -81,7 +92,7 @@ private extension MovieCell {
             $0.edges.equalToSuperview()
         }
         
-        thumnailImageView.snp.makeConstraints {
+        thumbnailImageView.snp.makeConstraints {
             $0.top.equalToSuperview().inset(15)
             $0.width.height.equalTo(90)
         }
