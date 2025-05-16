@@ -15,8 +15,6 @@ final class SearchResultView: UIView {
     
     // MARK: - Properties
     
-    private var sectionIdentifierList: [SearchResultSection] = []
-    
     private let topBottomInset: CGFloat
     private let leadingTrailingInset: CGFloat
     private let largeBannerItemHeight: CGFloat
@@ -57,11 +55,6 @@ final class SearchResultView: UIView {
         setupUI()
     }
     
-    convenience init(sectionIdentifiers: [SearchResultSection]) {
-        self.init(frame: .zero)
-        self.sectionIdentifierList = sectionIdentifiers
-    }
-    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -95,15 +88,6 @@ private extension SearchResultView {
         
         let layout = UICollectionViewCompositionalLayout(sectionProvider: { sectionIndex, _ in
             guard let section = SearchResultSection(rawValue: sectionIndex) else { return nil }
-//            let sectionIdentifier = self.sectionIdentifierList[sectionIndex]
-//            switch sectionIdentifier {
-//            case .searchText:
-//                return self.createSearchTextSection()
-//            case .largeBanner:
-//                return self.createLargeBannerSelction()
-//            case .list:
-//                return self.createListSection()
-//            }
             switch section {
             case .searchText:
                 return self.createSearchTextSection()

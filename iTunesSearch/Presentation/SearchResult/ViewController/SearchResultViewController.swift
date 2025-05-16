@@ -31,11 +31,18 @@ final class SearchResultViewController: UIViewController {
     
     /// 검색어 Relay
     private let searchTextRelay = PublishRelay<String>()
+    weak var delegate: SearchResultViewControllerDelegate?
     
     // MARK: - UI Components
     
     /// 검색 결과 화면 View
     private let searchResultView = SearchResultView()
+    
+    // MARK: - Getter
+    
+    var getSearchResultView: SearchResultView {
+        return searchResultView
+    }
     
     // MARK: - Initializer
     
@@ -60,8 +67,14 @@ final class SearchResultViewController: UIViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        // 네트워크 작업 취소
         fetchTask?.cancel()
         fetchTask = nil
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+        delegate?.willBeginDragging()
     }
 }
 
@@ -70,8 +83,13 @@ final class SearchResultViewController: UIViewController {
 private extension SearchResultViewController {
     func setupUI() {
         setAppearance()
+        setDelegates()
         setViewHierarchy()
         setConstraints()
+    }
+    
+    func setDelegates() {
+        searchResultView.getSearchResultCollectionView.delegate = self
     }
     
     func setAppearance() {
@@ -90,7 +108,7 @@ private extension SearchResultViewController {
     
     func bind() {
         // Input ➡️ ViewModel
-        let input = SearchResultViewModel.Input(searchText: searchTextRelay.asInfallible().distinctUntilChanged().debounce(.milliseconds(300), scheduler: MainScheduler.instance))
+        let input = SearchResultViewModel.Input(searchText: searchTextRelay.asInfallible().distinctUntilChanged())
         
         // ViewModel ➡️ Output
         let output = searchResultViewModel.transform(input: input)
@@ -102,6 +120,16 @@ private extension SearchResultViewController {
                                         podcastList: podcastList,
                                         movieList: movieList,
                                         animatingDifferences: false)
+            }
+        }
+        
+        // View ➡️ ViewController
+        Task {
+            for await indexPath in searchResultView.getSearchResultCollectionView.rx.itemSelected.asInfallible().values {
+                debugPrint(indexPath)
+                if indexPath.section == 0 {
+                    delegate?.searchTextCellTapped()
+                }
             }
         }
     }
@@ -182,8 +210,19 @@ private extension SearchResultViewController {
     }
 }
 
-extension SearchResultViewController: UISearchResultsUpdating {
-    func updateSearchResults(for searchController: UISearchController) {
-        searchTextRelay.accept(searchController.searchBar.text ?? "")
+// MARK: - UISearchBarDelegate
+
+extension SearchResultViewController: UISearchBarDelegate {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        searchTextRelay.accept(searchText)
+        searchResultView.getSearchResultCollectionView.scrollToItem(at: IndexPath(item: -1, section: 0), at: .top, animated: false)
+    }
+}
+
+// MARK: - UICollectionViewDelegate
+
+extension SearchResultViewController: UICollectionViewDelegate {
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        delegate?.willBeginDragging()
     }
 }

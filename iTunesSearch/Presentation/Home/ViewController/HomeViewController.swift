@@ -33,7 +33,7 @@ final class HomeViewController: UIViewController {
     /// 홈 화면 네비게이션 바 SearchController
     private let searchController: UISearchController
     /// 검색 결과 ViewController
-    private let searchResultViewController: SearchResultViewController
+    private let searchResultVC: SearchResultViewController
     /// 홈 화면 View
     private let homeView = HomeView()
     
@@ -41,7 +41,7 @@ final class HomeViewController: UIViewController {
     
     init(homeViewModel: HomeViewModel, searchResultViewController: SearchResultViewController) {
         self.homeViewModel = homeViewModel
-        self.searchResultViewController = searchResultViewController
+        self.searchResultVC = searchResultViewController
         searchController = UISearchController(searchResultsController: searchResultViewController)
         super.init(nibName: nil, bundle: nil)
     }
@@ -62,6 +62,7 @@ final class HomeViewController: UIViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        // 네트워크 작업 취소
         fetchTask?.cancel()
         fetchTask = nil
     }
@@ -72,6 +73,7 @@ final class HomeViewController: UIViewController {
 private extension HomeViewController {
     func setupUI() {
         setAppearance()
+        setDelegates()
         setViewHierarchy()
         setConstraints()
     }
@@ -86,7 +88,11 @@ private extension HomeViewController {
         
         searchController.searchBar.placeholder = "영화, 팟캐스트"
         searchController.hidesNavigationBarDuringPresentation = true
-        searchController.searchResultsUpdater = searchResultViewController
+    }
+    
+    func setDelegates() {
+        searchResultVC.delegate = self
+        searchController.searchBar.delegate = searchResultVC
     }
     
     func setViewHierarchy() {
@@ -113,7 +119,7 @@ private extension HomeViewController {
                                        summerMusicList: summerMusicList,
                                        fallMusicList: fallMusicList,
                                        winterMusicList: winterMusicList,
-                                       animatingDifferences: true)
+                                       animatingDifferences: false)
             }
         }
     }
@@ -182,5 +188,17 @@ private extension HomeViewController {
         snapshot.appendItems(winterMusicList.map { HomeItem.season($0) }, toSection: .winter)
         
         dataSource.apply(snapshot, animatingDifferences: animatingDifferences)
+    }
+}
+
+extension HomeViewController: SearchResultViewControllerDelegate {
+    /// 키보드 내림
+    func willBeginDragging() {
+        self.searchController.searchBar.resignFirstResponder()
+    }
+    
+    /// 검색 취소
+    func searchTextCellTapped() {
+        self.searchController.isActive = false
     }
 }

@@ -63,7 +63,6 @@ final class SearchResultViewModel {
                 }
             }
         }
-
         return Output(searchResultChunksRelay: searchResultChunksRelay)
     }
     
@@ -74,6 +73,7 @@ final class SearchResultViewModel {
     }
     
     deinit {
+        // 네트워크 작업 취소
         fetchTask?.cancel()
         fetchTask = nil
     }

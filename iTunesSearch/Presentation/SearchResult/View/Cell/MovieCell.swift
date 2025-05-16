@@ -15,6 +15,11 @@ import Then
 /// 검색 결과 CollectionView 영화 컬렉션 Cell
 final class MovieCell: UICollectionViewCell {
     
+    // MARK: - Properties
+    
+    /// 네트워크 통신 Task 저장(deinit 될 때 실행 중단용)
+    private var fetchTask: Task<Void, Never>?
+    
     // MARK: - UI Components
     
     /// 썸네일, LabelStackView 컨테이너 StackView
@@ -58,15 +63,31 @@ final class MovieCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    deinit {
+        fetchTask?.cancel()
+        fetchTask = nil
+    }
+    
+    // MARK: - Lifecycle
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        fetchTask?.cancel()
+        fetchTask = nil
+        thumbnailImageView.image = nil
+        thumbnailImageView.activityIndicator.startAnimating()
+    }
+    
     // MARK: - Methods
     
     func configure(thumbnailImageURL: String, title: String, year: String, genre: String, description: String) {
         let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
         
         // TODO: - 이미지 로드될때 애니메이션 추가
-        Task { [weak self] in
+        fetchTask = Task { [weak self] in
             do {
                 let imageData = try await ImageCacheManager.shared.fetchImage(from: thumbnailImageURL)
+                self?.thumbnailImageView.activityIndicator.stopAnimating()
                 self?.thumbnailImageView.image = UIImage(data: imageData)
             } catch {
                 os_log(.error, log: log, "\(error.localizedDescription)")

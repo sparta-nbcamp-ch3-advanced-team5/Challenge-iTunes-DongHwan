@@ -15,6 +15,11 @@ import Then
 /// 음악 CollectionView 봄 Best Cell
 final class BestMusicCell: UICollectionViewCell {
     
+    // MARK: - Properties
+    
+    /// 네트워크 통신 Task 저장(deinit 될 때 실행 중단용)
+    private var fetchTask: Task<Void, Never>?
+    
     // MARK: - UI Components
     
     /// 가수 사진 UIImageView(API에 가수 사진이 없으므로 배경색만 변경)
@@ -54,15 +59,31 @@ final class BestMusicCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    deinit {
+        fetchTask?.cancel()
+        fetchTask = nil
+    }
+    
+    // MARK: - Lifecycle
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        fetchTask?.cancel()
+        fetchTask = nil
+        thumbnailImageView.image = nil
+        thumbnailImageView.activityIndicator.startAnimating()
+    }
+    
     // MARK: - Methods
     
     func configure(thumbnailImageURL: String, backgroundArtistImageColor: UIColor, title: String, artist: String) {
         let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
         
         // TODO: - 이미지 로드될때 애니메이션 추가
-        Task { [weak self] in
+        fetchTask = Task { [weak self] in
             do {
                 let imageData = try await ImageCacheManager.shared.fetchImage(from: thumbnailImageURL)
+                self?.thumbnailImageView.activityIndicator.stopAnimating()
                 self?.thumbnailImageView.image = UIImage(data: imageData)
             } catch {
                 os_log(.error, log: log, "\(error.localizedDescription)")

@@ -23,7 +23,9 @@ final class PodcastCell: UICollectionViewCell {
     // MARK: - UI Components
     
     /// 팟캐스트 썸네일 UIImageView
-    private let thumbnailImageView = ThumbnailImageView(frame: .zero)
+    private let thumbnailImageView = ThumbnailImageView(frame: .zero).then {
+        $0.activityIndicator.style = .large
+    }
     /// 팟캐스트 마케팅 문구 UILabel
     private let marketingPhrasesLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 24, weight: .bold)
@@ -57,12 +59,19 @@ final class PodcastCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    deinit {
+        fetchTask?.cancel()
+        fetchTask = nil
+    }
+    
     // MARK: - Lifecycle
     
     override func prepareForReuse() {
         super.prepareForReuse()
         fetchTask?.cancel()
         fetchTask = nil
+        thumbnailImageView.image = nil
+        thumbnailImageView.activityIndicator.startAnimating()
     }
     
     // MARK: - Methods
@@ -74,6 +83,7 @@ final class PodcastCell: UICollectionViewCell {
         fetchTask = Task { [weak self] in
             do {
                 let imageData = try await ImageCacheManager.shared.fetchImage(from: thumbnailImageURL)
+                self?.thumbnailImageView.activityIndicator.stopAnimating()
                 self?.thumbnailImageView.image = UIImage(data: imageData)
             } catch {
                 os_log(.error, log: log, "\(error.localizedDescription)")

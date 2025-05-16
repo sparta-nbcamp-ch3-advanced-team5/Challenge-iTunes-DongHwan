@@ -7,6 +7,7 @@
 
 import UIKit
 
+/// 사파리로 이동하는 버튼
 final class GoToButton: UIButton {
     
     // MARK: - Initializer
