@@ -17,7 +17,7 @@ final class SeasonMusicCell: UICollectionViewCell {
     
     // MARK: - Properties
     
-    /// 네트워크 통신 Task 저장(deinit 될 때 실행 중단용)
+    /// 네트워크 통신 `Task` 저장(`deinit` 될 때 실행 중단용)
     private var fetchTask: Task<Void, Never>?
     
     // MARK: - UI Componenets
@@ -26,7 +26,7 @@ final class SeasonMusicCell: UICollectionViewCell {
     private let containerStackView = ContainerStackView()
     
     /// 앨범 썸네일 UIImageView
-    private let thumbnailImageView = ThumbnailImageView(frame: .zero)
+    private let thumbnailView = ThumbnailView(frame: .zero)
     
     /// Label 컨테이너 UIStackView
     private let labelStackView = LabelStackView()
@@ -70,21 +70,21 @@ final class SeasonMusicCell: UICollectionViewCell {
         super.prepareForReuse()
         fetchTask?.cancel()
         fetchTask = nil
-        thumbnailImageView.image = nil
-        thumbnailImageView.activityIndicator.startAnimating()
+        thumbnailView.prepareForReuse()
     }
     
     // MARK: - Methods
     
-    func configure(thumbnailImageURL: String, title: String, artist: String, collection: String, isBottom: Bool) {
+    func configure(thumbnailURL: String, title: String, artist: String, collection: String, isBottom: Bool) {
         let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
         
         // TODO: - 이미지 로드될때 애니메이션 추가
         fetchTask = Task { [weak self] in
             do {
-                let imageData = try await ImageCacheManager.shared.fetchImage(from: thumbnailImageURL)
-                self?.thumbnailImageView.activityIndicator.stopAnimating()
-                self?.thumbnailImageView.image = UIImage(data: imageData)
+                let imageData = try await ImageCacheManager.shared.fetchImage(from: thumbnailURL)
+                self?.thumbnailView.getActivityIndicator.stopAnimating()
+                self?.thumbnailView.getThumbnailImageView.image = UIImage(data: imageData)
+                self?.thumbnailView.startFadeInAnimation()
             } catch {
                 os_log(.error, log: log, "\(error.localizedDescription)")
             }
@@ -97,7 +97,7 @@ final class SeasonMusicCell: UICollectionViewCell {
     }
 }
 
-// MARK: - UI Methods
+// MARK: - Setting Methods
 
 private extension SeasonMusicCell {
     func setupUI() {
@@ -107,9 +107,9 @@ private extension SeasonMusicCell {
     
     func setViewHierarchy() {
         self.contentView.addSubviews(containerStackView,
-                         separatorView)
+                                     separatorView)
         
-        containerStackView.addArrangedSubviews(thumbnailImageView, labelStackView)
+        containerStackView.addArrangedSubviews(thumbnailView, labelStackView)
         
         labelStackView.addArrangedSubviews(titleLabel,
                                            artistLabel,
@@ -121,7 +121,7 @@ private extension SeasonMusicCell {
             $0.edges.equalToSuperview()
         }
         
-        thumbnailImageView.snp.makeConstraints {
+        thumbnailView.snp.makeConstraints {
             $0.width.height.equalTo(64)
         }
         

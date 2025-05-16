@@ -17,7 +17,7 @@ final class BestMusicCell: UICollectionViewCell {
     
     // MARK: - Properties
     
-    /// 네트워크 통신 Task 저장(deinit 될 때 실행 중단용)
+    /// 네트워크 통신 `Task` 저장(`deinit` 될 때 실행 중단용)
     private var fetchTask: Task<Void, Never>?
     
     // MARK: - UI Components
@@ -32,7 +32,7 @@ final class BestMusicCell: UICollectionViewCell {
     private let containerStackView = ContainerStackView()
     
     /// 앨범 썸네일 UIImageView
-    private let thumbnailImageView = ThumbnailImageView(frame: .zero)
+    private let thumbnailView = ThumbnailView(frame: .zero)
     
     /// Label 컨테이너 StackView
     private let labelStackView = LabelStackView()
@@ -70,21 +70,21 @@ final class BestMusicCell: UICollectionViewCell {
         super.prepareForReuse()
         fetchTask?.cancel()
         fetchTask = nil
-        thumbnailImageView.image = nil
-        thumbnailImageView.activityIndicator.startAnimating()
+        thumbnailView.prepareForReuse()
     }
     
     // MARK: - Methods
     
-    func configure(thumbnailImageURL: String, backgroundArtistImageColor: UIColor, title: String, artist: String) {
+    func configure(thumbnailURL: String, backgroundArtistImageColor: UIColor, title: String, artist: String) {
         let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
         
         // TODO: - 이미지 로드될때 애니메이션 추가
         fetchTask = Task { [weak self] in
             do {
-                let imageData = try await ImageCacheManager.shared.fetchImage(from: thumbnailImageURL)
-                self?.thumbnailImageView.activityIndicator.stopAnimating()
-                self?.thumbnailImageView.image = UIImage(data: imageData)
+                let imageData = try await ImageCacheManager.shared.fetchImage(from: thumbnailURL)
+                self?.thumbnailView.getActivityIndicator.stopAnimating()
+                self?.thumbnailView.getThumbnailImageView.image = UIImage(data: imageData)
+                self?.thumbnailView.startFadeInAnimation()
             } catch {
                 os_log(.error, log: log, "\(error.localizedDescription)")
             }
@@ -96,7 +96,7 @@ final class BestMusicCell: UICollectionViewCell {
     }
 }
 
-// MARK: - UI Methods
+// MARK: - Setting Methods
 
 private extension BestMusicCell {
     func setupUI() {
@@ -107,7 +107,7 @@ private extension BestMusicCell {
     func setViewHierarchy() {
         self.contentView.addSubviews(backgroundArtistImageView, containerStackView)
         
-        containerStackView.addArrangedSubviews(thumbnailImageView, labelStackView)
+        containerStackView.addArrangedSubviews(thumbnailView, labelStackView)
         
         labelStackView.addArrangedSubviews(topSpacer,
                                            titleLabel,
@@ -124,7 +124,7 @@ private extension BestMusicCell {
             $0.height.equalTo(50)
         }
         
-        thumbnailImageView.snp.makeConstraints {
+        thumbnailView.snp.makeConstraints {
             $0.width.height.equalTo(50)
         }
         

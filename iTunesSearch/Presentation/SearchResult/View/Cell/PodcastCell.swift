@@ -17,14 +17,14 @@ final class PodcastCell: UICollectionViewCell {
     
     // MARK: - Properties
     
-    /// 네트워크 통신 Task 저장(deinit 될 때 실행 중단용)
+    /// 네트워크 통신 `Task` 저장(`deinit` 될 때 실행 중단용)
     private var fetchTask: Task<Void, Never>?
     
     // MARK: - UI Components
     
     /// 팟캐스트 썸네일 UIImageView
-    private let thumbnailImageView = ThumbnailImageView(frame: .zero).then {
-        $0.activityIndicator.style = .large
+    private let thumbnailView = ThumbnailView(frame: .zero).then {
+        $0.getActivityIndicator.style = .large
     }
     /// 팟캐스트 마케팅 문구 UILabel
     private let marketingPhrasesLabel = UILabel().then {
@@ -42,8 +42,6 @@ final class PodcastCell: UICollectionViewCell {
     private let artistLabel = SubtitleLabel()
     /// 아이튠즈 링크 이동 버튼
     private let goToButton = GoToButton()
-    
-    // TODO: - 아이튠즈 연결 버튼 추가
     
     // MARK: - Initializer
     
@@ -70,21 +68,21 @@ final class PodcastCell: UICollectionViewCell {
         super.prepareForReuse()
         fetchTask?.cancel()
         fetchTask = nil
-        thumbnailImageView.image = nil
-        thumbnailImageView.activityIndicator.startAnimating()
+        thumbnailView.prepareForReuse()
     }
     
     // MARK: - Methods
     
-    func configure(thumbnailImageURL: String, marketingPhrases: String, title: String, artist: String) {
+    func configure(thumbnailURL: String, marketingPhrases: String, title: String, artist: String) {
         let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
         
         // TODO: - 이미지 로드될때 애니메이션 추가
         fetchTask = Task { [weak self] in
             do {
-                let imageData = try await ImageCacheManager.shared.fetchImage(from: thumbnailImageURL)
-                self?.thumbnailImageView.activityIndicator.stopAnimating()
-                self?.thumbnailImageView.image = UIImage(data: imageData)
+                let imageData = try await ImageCacheManager.shared.fetchImage(from: thumbnailURL)
+                self?.thumbnailView.getActivityIndicator.stopAnimating()
+                self?.thumbnailView.getThumbnailImageView.image = UIImage(data: imageData)
+                self?.thumbnailView.startFadeInAnimation()
             } catch {
                 os_log(.error, log: log, "\(error.localizedDescription)")
             }
@@ -95,7 +93,7 @@ final class PodcastCell: UICollectionViewCell {
     }
 }
 
-// MARK: - UI Methods
+// MARK: - Setting Methods
 
 private extension PodcastCell {
     func setupUI() {
@@ -104,7 +102,7 @@ private extension PodcastCell {
     }
     
     func setViewHierarchy() {
-        self.contentView.addSubviews(thumbnailImageView,
+        self.contentView.addSubviews(thumbnailView,
                                      marketingPhrasesLabel,
                                      containerStackView)
         
@@ -115,19 +113,19 @@ private extension PodcastCell {
     }
     
     func setConstraints() {
-        thumbnailImageView.snp.makeConstraints {
+        thumbnailView.snp.makeConstraints {
             $0.top.leading.trailing.equalToSuperview()
-            $0.height.equalTo(thumbnailImageView.snp.width)
+            $0.height.equalTo(thumbnailView.snp.width)
         }
         
         marketingPhrasesLabel.snp.makeConstraints {
             $0.leading.equalToSuperview().inset(15)
             $0.trailing.equalToSuperview().inset(45)
-            $0.bottom.equalTo(thumbnailImageView).offset(-15)
+            $0.bottom.equalTo(thumbnailView).offset(-15)
         }
         
         containerStackView.snp.makeConstraints {
-            $0.top.equalTo(thumbnailImageView.snp.bottom).offset(10)
+            $0.top.equalTo(thumbnailView.snp.bottom).offset(10)
             $0.leading.trailing.equalToSuperview().inset(15)
         }
         

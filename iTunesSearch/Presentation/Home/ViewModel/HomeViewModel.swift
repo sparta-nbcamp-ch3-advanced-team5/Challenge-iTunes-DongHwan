@@ -18,7 +18,7 @@ final class HomeViewModel {
     
     private let iTunesSearchAPIUseCase: iTunesSearchAPIUseCase
     
-    /// 네트워크 통신 Task 저장(deinit 될 때 실행 중단용)
+    /// 네트워크 통신 `Task` 저장(`deinit` 될 때 실행 중단용)
     private var fetchTask: Task<Void, Never>?
     
     // MARK: - Input (ViewController ➡️ ViewModel)

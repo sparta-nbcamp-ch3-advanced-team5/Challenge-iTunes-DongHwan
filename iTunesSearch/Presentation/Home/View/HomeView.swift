@@ -41,7 +41,7 @@ final class HomeView: UIView {
     }
 }
 
-// MARK: - UI Methods
+// MARK: - Setting Methods
 
 private extension HomeView {
     func setupUI() {

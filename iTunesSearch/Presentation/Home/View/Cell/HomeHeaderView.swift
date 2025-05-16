@@ -45,7 +45,7 @@ final class HomeHeaderView: UICollectionReusableView {
     }
 }
 
-// MARK: - UI Methods
+// MARK: - Setting Methods
 
 private extension HomeHeaderView {
     func setupUI() {

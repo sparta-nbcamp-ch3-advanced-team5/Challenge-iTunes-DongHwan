@@ -37,7 +37,7 @@ final class SearchResultHeaderView: UICollectionReusableView {
     }
 }
 
-// MARK: - UI Methods
+// MARK: - Setting Methods
 
 private extension SearchResultHeaderView {
     func setupUI() {

@@ -60,7 +60,7 @@ final class SearchResultView: UIView {
     }
 }
 
-// MARK: - UI Methods
+// MARK: - Setting Methods
 
 private extension SearchResultView {
     func setupUI() {

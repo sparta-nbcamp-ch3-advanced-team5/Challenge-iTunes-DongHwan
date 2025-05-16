@@ -39,7 +39,7 @@ final class SearchTextCell: UICollectionViewCell {
     }
 }
 
-// MARK: - UI Methods
+// MARK: - Setting Methods
 
 private extension SearchTextCell {
     func setupUI() {

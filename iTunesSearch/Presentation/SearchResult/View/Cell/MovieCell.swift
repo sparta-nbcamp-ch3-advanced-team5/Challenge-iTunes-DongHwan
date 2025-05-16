@@ -17,7 +17,7 @@ final class MovieCell: UICollectionViewCell {
     
     // MARK: - Properties
     
-    /// 네트워크 통신 Task 저장(deinit 될 때 실행 중단용)
+    /// 네트워크 통신 `Task` 저장(`deinit` 될 때 실행 중단용)
     private var fetchTask: Task<Void, Never>?
     
     // MARK: - UI Components
@@ -28,7 +28,7 @@ final class MovieCell: UICollectionViewCell {
     }
     
     /// 영화 썸네일 UIImageView
-    private let thumbnailImageView = ThumbnailImageView(frame: .zero).then {
+    private let thumbnailView = ThumbnailView(frame: .zero).then {
         $0.contentMode = .scaleAspectFit
     }
     
@@ -74,21 +74,21 @@ final class MovieCell: UICollectionViewCell {
         super.prepareForReuse()
         fetchTask?.cancel()
         fetchTask = nil
-        thumbnailImageView.image = nil
-        thumbnailImageView.activityIndicator.startAnimating()
+        thumbnailView.prepareForReuse()
     }
     
     // MARK: - Methods
     
-    func configure(thumbnailImageURL: String, title: String, year: String, genre: String, description: String) {
+    func configure(thumbnailURL: String, title: String, year: String, genre: String, description: String) {
         let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
         
         // TODO: - 이미지 로드될때 애니메이션 추가
         fetchTask = Task { [weak self] in
             do {
-                let imageData = try await ImageCacheManager.shared.fetchImage(from: thumbnailImageURL)
-                self?.thumbnailImageView.activityIndicator.stopAnimating()
-                self?.thumbnailImageView.image = UIImage(data: imageData)
+                let imageData = try await ImageCacheManager.shared.fetchImage(from: thumbnailURL)
+                self?.thumbnailView.getActivityIndicator.stopAnimating()
+                self?.thumbnailView.getThumbnailImageView.image = UIImage(data: imageData)
+                self?.thumbnailView.startFadeInAnimation()
             } catch {
                 os_log(.error, log: log, "\(error.localizedDescription)")
             }
@@ -100,7 +100,7 @@ final class MovieCell: UICollectionViewCell {
     }
 }
 
-// MARK: - UI Methods
+// MARK: - Setting Methods
 
 private extension MovieCell {
     func setupUI() {
@@ -111,7 +111,7 @@ private extension MovieCell {
     func setViewHierarchy() {
         self.contentView.addSubviews(containerStackView, labelStackView)
         
-        containerStackView.addArrangedSubviews(thumbnailImageView, labelStackView)
+        containerStackView.addArrangedSubviews(thumbnailView, labelStackView)
         
         labelStackView.addArrangedSubviews(titleLabel,
                                            yearGenreLabel,
@@ -123,11 +123,11 @@ private extension MovieCell {
             $0.edges.equalToSuperview()
         }
         
-        thumbnailImageView.snp.makeConstraints {
+        thumbnailView.snp.makeConstraints {
             $0.height.equalTo(150)
         }
         
-        thumbnailImageView.snp.makeConstraints {
+        thumbnailView.snp.makeConstraints {
             $0.width.equalTo(100)
         }
     }

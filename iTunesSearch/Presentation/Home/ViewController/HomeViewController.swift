@@ -25,7 +25,7 @@ final class HomeViewController: UIViewController {
     private var dataSource: HomeDataSource!
     private var snapshot = HomeSnapshot()
     
-    /// 네트워크 통신 Task 저장(deinit 될 때 실행 중단용)
+    /// 네트워크 통신 `Task` 저장(`deinit` 될 때 실행 중단용)
     private var fetchTask: Task<Void, Never>?
     
     // MARK: - UI Components
@@ -68,7 +68,7 @@ final class HomeViewController: UIViewController {
     }
 }
 
-// MARK: - UI Methods
+// MARK: - Setting Methods
 
 private extension HomeViewController {
     func setupUI() {
@@ -132,14 +132,14 @@ private extension HomeViewController {
     func configureDataSource() {
         let bestCellRegistration = UICollectionView.CellRegistration<BestMusicCell, MusicResultModel> { cell, indexPath, item in
             let color = UIColor(hex: item.backgroundArtistImageColorHex)
-            cell.configure(thumbnailImageURL: item.artworkUrl100,
+            cell.configure(thumbnailURL: item.artworkUrl100,
                            backgroundArtistImageColor: color,
                            title: item.trackName,
                            artist: item.artistName)
         }
         
         let seasonCellRegistration = UICollectionView.CellRegistration<SeasonMusicCell, MusicResultModel> { cell, indexPath, item in
-            cell.configure(thumbnailImageURL: item.artworkUrl100,
+            cell.configure(thumbnailURL: item.artworkUrl100,
                            title: item.trackName,
                            artist: item.artistName,
                            collection: item.collectionName ?? "",

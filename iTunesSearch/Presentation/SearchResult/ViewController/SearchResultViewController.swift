@@ -26,7 +26,7 @@ final class SearchResultViewController: UIViewController {
     private var dataSource: SearchResultDataSource!
     private var snapshot = SearchResultSnapshot()
     
-    /// 네트워크 통신 Task 저장(deinit 될 때 실행 중단용)
+    /// 네트워크 통신 `Task` 저장(`deinit` 될 때 실행 중단용)
     private var fetchTask: Task<Void, Never>?
     
     /// 검색어 Relay
@@ -78,7 +78,7 @@ final class SearchResultViewController: UIViewController {
     }
 }
 
-// MARK: - UI Methods
+// MARK: - Setting Methods
 
 private extension SearchResultViewController {
     func setupUI() {
@@ -145,7 +145,7 @@ private extension SearchResultViewController {
         }
         
         let podCastCellRegistration = UICollectionView.CellRegistration<PodcastCell, PodcastResultModel> { cell, indexPath, item in
-            cell.configure(thumbnailImageURL: item.artworkUrl600,
+            cell.configure(thumbnailURL: item.artworkUrl600,
                            marketingPhrases: item.marketingPhrase,
                            title: item.trackName,
                            artist: item.artistName)
@@ -153,7 +153,7 @@ private extension SearchResultViewController {
         
         let movieCellRegistration = UICollectionView.CellRegistration<MovieCell, MovieResultModel> { cell, indexPath, item in
             let year = DateFormatter.getYearFromISO(from: item.releaseDate)
-            cell.configure(thumbnailImageURL: item.artworkUrl100,
+            cell.configure(thumbnailURL: item.artworkUrl100,
                            title: item.trackName,
                            year: year,
                            genre: item.primaryGenreName,
@@ -215,7 +215,10 @@ private extension SearchResultViewController {
 extension SearchResultViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         searchTextRelay.accept(searchText)
-        searchResultView.getSearchResultCollectionView.scrollToItem(at: IndexPath(item: -1, section: 0), at: .top, animated: false)
+        // Section 생성 확인 후 이동하지 않으면 Crash 발생
+        if searchResultView.getSearchResultCollectionView.numberOfSections > 0 {
+            searchResultView.getSearchResultCollectionView.scrollToItem(at: IndexPath(item: -1, section: 0), at: .top, animated: false)
+            }
     }
 }
 
