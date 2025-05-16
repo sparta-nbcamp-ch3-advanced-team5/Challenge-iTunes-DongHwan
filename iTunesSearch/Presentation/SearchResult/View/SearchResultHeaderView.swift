@@ -12,16 +12,8 @@ import Then
 
 final class SearchResultHeaderView: UICollectionReusableView {
     
-    // MARK: - Properties
-    
-    static let identifier = String(describing: SearchResultHeaderView.self)
-    
     // MARK: - UI Components
     
-    /// Label 컨테이너 UIStackView
-    private let labelStackView = LabelStackView()
-    /// LabelStackView가 위쪽 간격을 갖도록 하는 UIView
-    private let topSpacer = UIView.spacer(axis: .vertical)
     /// Header 제목 UILabel
     private let titleLabel = TitleLabel().then {
         $0.font = .systemFont(ofSize: 24, weight: .bold)
@@ -54,19 +46,12 @@ private extension SearchResultHeaderView {
     }
     
     func setViewHierarchy() {
-        self.addSubview(labelStackView)
-        
-        labelStackView.addArrangedSubviews(topSpacer,
-                                           titleLabel)
+        self.addSubview(titleLabel)
     }
     
     func setConstraints() {
-        labelStackView.snp.makeConstraints {
+        titleLabel.snp.makeConstraints {
             $0.leading.trailing.bottom.equalToSuperview()
-        }
-        
-        topSpacer.snp.makeConstraints {
-            $0.height.equalTo(1)
         }
     }
 }

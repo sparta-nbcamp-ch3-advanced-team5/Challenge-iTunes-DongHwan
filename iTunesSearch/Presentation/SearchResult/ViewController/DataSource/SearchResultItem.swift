@@ -10,6 +10,5 @@ import Foundation
 enum SearchResultItem: Hashable {
     case searchText(SearchTextModel)
     case podcast(PodcastResultModel)
-    case movie(MovieResultModel)
-    case movieCollection(MovieResultModel)
+    case movieList(MovieResultModel)
 }

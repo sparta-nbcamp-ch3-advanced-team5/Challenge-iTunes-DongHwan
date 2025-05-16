@@ -13,10 +13,6 @@ import Then
 /// 홈 화면 CollectionView Header
 final class HomeHeaderView: UICollectionReusableView {
     
-    // MARK: - Properties
-    
-    static let identifier = String(describing: HomeHeaderView.self)
-    
     // MARK: - UI Components
     
     /// Label 컨테이너 StackView

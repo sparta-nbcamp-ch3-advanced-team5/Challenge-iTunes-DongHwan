@@ -15,6 +15,11 @@ import Then
 /// 검색 결과 CollectionView 팟캐스트 Cell
 final class PodcastCell: UICollectionViewCell {
     
+    // MARK: - Properties
+    
+    /// 네트워크 통신 Task 저장(deinit 될 때 실행 중단용)
+    private var fetchTask: Task<Void, Never>?
+    
     // MARK: - UI Components
     
     /// 팟캐스트 썸네일 UIImageView
@@ -52,13 +57,21 @@ final class PodcastCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Lifecycle
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        fetchTask?.cancel()
+        fetchTask = nil
+    }
+    
     // MARK: - Methods
     
     func configure(thumbnailImageURL: String, marketingPhrases: String, title: String, artist: String) {
         let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
         
         // TODO: - 이미지 로드될때 애니메이션 추가
-        Task { [weak self] in
+        fetchTask = Task { [weak self] in
             do {
                 let imageData = try await ImageCacheManager.shared.fetchImage(from: thumbnailImageURL)
                 self?.thumbnailImageView.image = UIImage(data: imageData)

@@ -10,6 +10,5 @@ import Foundation
 enum SearchResultSection: Int, CaseIterable {
     case searchText
     case largeBanner
-    case smallBanner
-    case collection
+    case list
 }

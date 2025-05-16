@@ -12,28 +12,38 @@ import RxSwift
 import SnapKit
 import Then
 
-/// 검색 결과 CollectionView 영화 Cell
+/// 검색 결과 CollectionView 영화 컬렉션 Cell
 final class MovieCell: UICollectionViewCell {
     
     // MARK: - UI Components
     
-    /// 배경 사진 UIImageView(API에 배경 사진이 없으므로 배경색만 변경)
-    private let backgroundImageView = BackgroundImageView(frame: .zero)
+    /// 썸네일, LabelStackView 컨테이너 StackView
+    private let containerStackView = ContainerStackView().then {
+        $0.alignment = .top
+    }
     
     /// 영화 썸네일 UIImageView
-    private let thumbnailImageView = ThumbnailImageView(frame: .zero)
-    
-    /// LabelStackView, Button 컨테이너 UIStackView
-    private let containerStackView = ContainerStackView()
+    private let thumbnailImageView = ThumbnailImageView(frame: .zero).then {
+        $0.contentMode = .scaleAspectFit
+    }
     
     /// Label 컨테이너 UIStackView
-    private let labelStackView = LabelStackView()
+    private let labelStackView = LabelStackView().then {
+        $0.spacing = 5
+    }
     
     /// 영화 제목 UILabel
-    private let titleLabel = TitleLabel()
+    private let titleLabel = TitleLabel().then {
+        $0.numberOfLines = 2
+    }
     
-    /// 영화 장르 UILabel
-    private let genreLabel = SubtitleLabel()
+    /// 영화 개봉 연도, 장르 UILabel
+    private let yearGenreLabel = SubtitleLabel()
+    
+    /// 영화 설명 UILabel
+    private let descriptionLabel = SubtitleLabel().then {
+        $0.numberOfLines = 5
+    }
     
     // TODO: - 아이튠즈 연결 버튼 추가
     
@@ -50,7 +60,7 @@ final class MovieCell: UICollectionViewCell {
     
     // MARK: - Methods
     
-    func configure(thumbnailImageURL: String, backgroundImageColor: UIColor, title: String, genre: String) {
+    func configure(thumbnailImageURL: String, title: String, year: String, genre: String, description: String) {
         let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
         
         // TODO: - 이미지 로드될때 애니메이션 추가
@@ -62,9 +72,10 @@ final class MovieCell: UICollectionViewCell {
                 os_log(.error, log: log, "\(error.localizedDescription)")
             }
         }
-        backgroundImageView.backgroundColor = backgroundImageColor
+        
         titleLabel.text = title
-        genreLabel.text = genre
+        yearGenreLabel.text = "\(year)년 • \(genre)"
+        descriptionLabel.text = description
     }
 }
 
@@ -77,28 +88,26 @@ private extension MovieCell {
     }
     
     func setViewHierarchy() {
-        self.contentView.addSubviews(backgroundImageView,
-                                     thumbnailImageView,
-                                     containerStackView)
+        self.contentView.addSubviews(containerStackView, labelStackView)
         
-        containerStackView.addArrangedSubviews(labelStackView)
+        containerStackView.addArrangedSubviews(thumbnailImageView, labelStackView)
         
         labelStackView.addArrangedSubviews(titleLabel,
-                                           genreLabel)
+                                           yearGenreLabel,
+                                           descriptionLabel)
     }
     
     func setConstraints() {
-        backgroundImageView.snp.makeConstraints {
+        containerStackView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
         
         thumbnailImageView.snp.makeConstraints {
-            $0.top.equalToSuperview().inset(15)
-            $0.width.height.equalTo(90)
+            $0.height.equalTo(150)
         }
         
-        containerStackView.snp.makeConstraints {
-            $0.leading.trailing.equalToSuperview().inset(15)
+        thumbnailImageView.snp.makeConstraints {
+            $0.width.equalTo(100)
         }
     }
 }

@@ -124,19 +124,12 @@ private extension SearchResultViewController {
         }
         
         let movieCellRegistration = UICollectionView.CellRegistration<MovieCell, MovieResultModel> { cell, indexPath, item in
-            let color = UIColor(hex: item.backgroundArtistImageColorHex)
-            cell.configure(thumbnailImageURL:  item.artworkUrl100,
-                           backgroundImageColor: color,
-                           title: item.trackName,
-                           genre: item.primaryGenreName)
-        }
-        
-        let movieCollectionCellRegistration = UICollectionView.CellRegistration<MovieCollectionCell, MovieResultModel> { cell, indexPath, item in
             let year = DateFormatter.getYearFromISO(from: item.releaseDate)
             cell.configure(thumbnailImageURL: item.artworkUrl100,
                            title: item.trackName,
                            year: year,
-                           genre: item.primaryGenreName)
+                           genre: item.primaryGenreName,
+                           description: item.longDescription)
         }
         
         let headerRegistration = UICollectionView.SupplementaryRegistration<SearchResultHeaderView>(elementKind: UICollectionView.elementKindSectionHeader) { header, elementKind, indexPath in
@@ -154,12 +147,8 @@ private extension SearchResultViewController {
                 return collectionView.dequeueConfiguredReusableCell(using: podCastCellRegistration,
                                                                     for: indexPath,
                                                                     item: podcast)
-            case .movie(let movie):
+            case .movieList(let movie):
                 return collectionView.dequeueConfiguredReusableCell(using: movieCellRegistration,
-                                                                    for: indexPath,
-                                                                    item: movie)
-            case .movieCollection(let movie):
-                return collectionView.dequeueConfiguredReusableCell(using: movieCollectionCellRegistration,
                                                                     for: indexPath,
                                                                     item: movie)
             }
@@ -182,9 +171,7 @@ private extension SearchResultViewController {
         
         snapshot.appendItems(searchText.map { SearchResultItem.searchText($0) }, toSection: .searchText)
         snapshot.appendItems(podcastList.map { SearchResultItem.podcast($0) }, toSection: .largeBanner)
-        // TODO: - smallBanner와 collection에 데이터 분배 로직 추가
-        snapshot.appendItems(movieList.map { SearchResultItem.movie($0) }, toSection: .smallBanner)
-        snapshot.appendItems(movieList.map { SearchResultItem.movieCollection($0) }, toSection: .collection)
+        snapshot.appendItems(movieList.map { SearchResultItem.movieList($0) }, toSection: .list)
         
         dataSource.apply(snapshot, animatingDifferences: animatingDifferences)
     }
@@ -192,6 +179,7 @@ private extension SearchResultViewController {
 
 extension SearchResultViewController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
+        // TODO: - 검색 버튼 눌렀을때만 accept 하도록 변경
         searchTextRelay.accept(searchController.searchBar.text ?? "")
     }
 }

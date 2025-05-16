@@ -68,7 +68,7 @@ private extension HomeView {
         config.interSectionSpacing = 20
         
         let layout = UICollectionViewCompositionalLayout(sectionProvider: { [weak self] sectionIndex, _ in
-            guard let self , let section = HomeSection(rawValue: sectionIndex) else { return nil }
+            guard let self, let section = HomeSection(rawValue: sectionIndex) else { return nil }
             switch section {
             case .springBest:
                 return self.createCarouselBannerSection()

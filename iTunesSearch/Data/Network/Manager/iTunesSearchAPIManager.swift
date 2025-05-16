@@ -43,6 +43,7 @@ final class iTunesSearchAPIManager {
             let responseDTO = try JSONDecoder().decode(ResponseDTO<DTO>.self, from: data)
             return responseDTO.results.map(transform)
         } catch {
+            os_log(.error, log: log, "\(error)")
             throw DataError.parsingFailed
         }
     }

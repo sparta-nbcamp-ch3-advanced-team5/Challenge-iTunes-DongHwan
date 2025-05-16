@@ -43,8 +43,8 @@ final class SearchResultViewModel {
         
         fetchTask = Task { [iTunesSearchAPIUseCase] in
             for await text in input.searchText.values {
-                let podcastQueryDTO = iTunesQuery(term: text, mediaType: .podcast, limit: 15)
-                let movieQueryDTO = iTunesQuery(term: text, mediaType: .movie, limit: 15)
+                let podcastQueryDTO = iTunesQuery(term: text, mediaType: .podcast, limit: 5)
+                let movieQueryDTO = iTunesQuery(term: text, mediaType: .movie, limit: 10)
 
                 let searchText = SearchTextModel(searchText: text)
                 async let podcastList = iTunesSearchAPIUseCase.fetchSearchResultList(with: podcastQueryDTO,

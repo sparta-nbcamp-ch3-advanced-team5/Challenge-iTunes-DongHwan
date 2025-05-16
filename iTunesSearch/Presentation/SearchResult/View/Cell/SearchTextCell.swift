@@ -18,7 +18,7 @@ final class SearchTextCell: UICollectionViewCell {
     
     /// 검색어 UILabel
     private let searchTextLabel = TitleLabel().then {
-        $0.font = .systemFont(ofSize: 30, weight: .bold)
+        $0.font = .systemFont(ofSize: 36, weight: .bold)
     }
     
     // MARK: - Initializer
