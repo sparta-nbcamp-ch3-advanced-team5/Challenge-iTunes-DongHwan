@@ -53,7 +53,7 @@ private extension SearchTextCell {
     
     func setConstraints() {
         searchTextLabel.snp.makeConstraints {
-            $0.leading.trailing.bottom.equalToSuperview()
+            $0.edges.equalToSuperview()
         }
     }
 }

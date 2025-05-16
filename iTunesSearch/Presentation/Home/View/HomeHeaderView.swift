@@ -17,7 +17,6 @@ final class HomeHeaderView: UICollectionReusableView {
     
     /// Label 컨테이너 StackView
     private let labelStackView = LabelStackView()
-    
     /// LabelStackView가 위쪽 간격을 갖도록 하는 Spacer
     private let topSpacer = UIView.spacer(axis: .vertical)
     /// Header 제목 UILabel

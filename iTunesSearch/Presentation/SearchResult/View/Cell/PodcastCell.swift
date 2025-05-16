@@ -107,18 +107,18 @@ private extension PodcastCell {
     func setConstraints() {
         thumbnailImageView.snp.makeConstraints {
             $0.top.leading.trailing.equalToSuperview()
-            $0.bottom.equalTo(containerStackView.snp.top)
+            $0.height.equalTo(thumbnailImageView.snp.width)
         }
         
         marketingPhrasesLabel.snp.makeConstraints {
             $0.leading.equalToSuperview().inset(15)
             $0.trailing.equalToSuperview().inset(45)
-            $0.bottom.equalTo(containerStackView.snp.top).offset(-15)
+            $0.bottom.equalTo(thumbnailImageView).offset(-15)
         }
         
         containerStackView.snp.makeConstraints {
-            $0.leading.trailing.bottom.equalToSuperview().inset(15)
-            $0.height.equalTo(60)
+            $0.top.equalTo(thumbnailImageView.snp.bottom).offset(10)
+            $0.leading.trailing.equalToSuperview().inset(15)
         }
         
         goToButton.snp.makeConstraints {

@@ -15,9 +15,15 @@ final class SearchResultView: UIView {
     
     // MARK: - Properties
     
-    private let groupFractionalWidth: CGFloat = 0.92
-    private let bannerGroupAbsoluteHeight: CGFloat = 440
-    private let listGroupAbsoulteHeight: CGFloat = 900
+    private var sectionIdentifierList: [SearchResultSection] = []
+    
+    private let topBottomInset: CGFloat
+    private let leadingTrailingInset: CGFloat
+    private let largeBannerItemHeight: CGFloat
+    private let listItemHeight: CGFloat
+    
+    private let itemContentInset: NSDirectionalEdgeInsets
+    private let headerContentInset: NSDirectionalEdgeInsets
     
     // MARK: - UI Components
     
@@ -34,8 +40,26 @@ final class SearchResultView: UIView {
     // MARK: - Initializer
     
     override init(frame: CGRect) {
+        topBottomInset = 10
+        leadingTrailingInset = 20
+        itemContentInset = NSDirectionalEdgeInsets(top: topBottomInset,
+                                                   leading: leadingTrailingInset,
+                                                   bottom: topBottomInset,
+                                                   trailing: leadingTrailingInset)
+        headerContentInset = NSDirectionalEdgeInsets(top: 0,
+                                                     leading: leadingTrailingInset,
+                                                     bottom: 0,
+                                                     trailing: leadingTrailingInset)
+        largeBannerItemHeight = 440 + topBottomInset * 2
+        listItemHeight = 150 + topBottomInset * 2
         super.init(frame: frame)
+        
         setupUI()
+    }
+    
+    convenience init(sectionIdentifiers: [SearchResultSection]) {
+        self.init(frame: .zero)
+        self.sectionIdentifierList = sectionIdentifiers
     }
     
     required init?(coder: NSCoder) {
@@ -71,6 +95,15 @@ private extension SearchResultView {
         
         let layout = UICollectionViewCompositionalLayout(sectionProvider: { sectionIndex, _ in
             guard let section = SearchResultSection(rawValue: sectionIndex) else { return nil }
+//            let sectionIdentifier = self.sectionIdentifierList[sectionIndex]
+//            switch sectionIdentifier {
+//            case .searchText:
+//                return self.createSearchTextSection()
+//            case .largeBanner:
+//                return self.createLargeBannerSelction()
+//            case .list:
+//                return self.createListSection()
+//            }
             switch section {
             case .searchText:
                 return self.createSearchTextSection()
@@ -88,39 +121,38 @@ private extension SearchResultView {
         let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
                                               heightDimension: .fractionalHeight(1.0))
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        item.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 0, bottom: 0, trailing: 0)
+        item.contentInsets = NSDirectionalEdgeInsets(top: 20, leading: leadingTrailingInset, bottom: 0, trailing: leadingTrailingInset)
         
-        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(groupFractionalWidth),
-                                               heightDimension: .absolute(80))
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                               heightDimension: .absolute(60))
         let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
         
         let section = NSCollectionLayoutSection(group: group)
-        
         return section
     }
     
     func createLargeBannerSection() -> NSCollectionLayoutSection {
         let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-                                              heightDimension: .fractionalHeight(1.0))
+                                              heightDimension: .absolute(largeBannerItemHeight))
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        item.contentInsets = itemContentInset
         
-        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(groupFractionalWidth),
-                                               heightDimension: .absolute(bannerGroupAbsoluteHeight))
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                               heightDimension: .estimated(largeBannerItemHeight * 5))
         let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
-        group.interItemSpacing = NSCollectionLayoutSpacing.fixed(20)
         
         let section = NSCollectionLayoutSection(group: group)
-        
         return section
     }
     
     func createListSection() -> NSCollectionLayoutSection {
         let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-                                              heightDimension: .absolute(200))
+                                              heightDimension: .absolute(listItemHeight))
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        item.contentInsets = itemContentInset
         
-        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(groupFractionalWidth),
-                                               heightDimension: .estimated(3000))
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                               heightDimension: .estimated(largeBannerItemHeight * 10))
         let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
         
         let section = NSCollectionLayoutSection(group: group)
@@ -132,11 +164,12 @@ private extension SearchResultView {
     }
     
     func createHeader() -> NSCollectionLayoutBoundarySupplementaryItem {
-        let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(groupFractionalWidth), heightDimension: .absolute(60))
+        let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                                heightDimension: .absolute(70))
         let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerSize,
-                                                                            elementKind: UICollectionView.elementKindSectionHeader,
-                                                                            alignment: .top)
-        sectionHeader.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 5, bottom: 5, trailing: 5)
+                                                                        elementKind: UICollectionView.elementKindSectionHeader,
+                                                                        alignment: .top)
+        sectionHeader.contentInsets = headerContentInset
         
         return sectionHeader
     }

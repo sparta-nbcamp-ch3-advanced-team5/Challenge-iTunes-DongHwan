@@ -20,8 +20,6 @@ struct MovieResultModel: Hashable {
     let collectionViewURL: String?
     /// iTunes Store의 영화로 연결되는 URL
     let trackViewURL: String
-    /// 30초 프리뷰를 재생할 수 있는 URL
-    let previewURL: String
     /// 100x100 픽셀의 썸네일 URL
     let artworkUrl100: String
     /// 출시일
@@ -35,7 +33,7 @@ struct MovieResultModel: Hashable {
     /// 시리즈 번호
     let trackNumber: Int?
     /// 러닝타임
-    let trackTimeMillis: Int
+    let trackTimeMillis: Int?
     /// 장르
     let primaryGenreName: String
     /// 짧은 설명

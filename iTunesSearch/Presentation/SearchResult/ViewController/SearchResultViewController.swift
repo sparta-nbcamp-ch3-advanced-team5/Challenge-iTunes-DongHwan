@@ -29,7 +29,7 @@ final class SearchResultViewController: UIViewController {
     /// 네트워크 통신 Task 저장(deinit 될 때 실행 중단용)
     private var fetchTask: Task<Void, Never>?
     
-    /// 검색어
+    /// 검색어 Relay
     private let searchTextRelay = PublishRelay<String>()
     
     // MARK: - UI Components
@@ -90,7 +90,7 @@ private extension SearchResultViewController {
     
     func bind() {
         // Input ➡️ ViewModel
-        let input = SearchResultViewModel.Input(searchText: searchTextRelay.asInfallible())
+        let input = SearchResultViewModel.Input(searchText: searchTextRelay.asInfallible().distinctUntilChanged().debounce(.milliseconds(300), scheduler: MainScheduler.instance))
         
         // ViewModel ➡️ Output
         let output = searchResultViewModel.transform(input: input)
@@ -101,7 +101,7 @@ private extension SearchResultViewController {
                 self?.configureSnapshot(searchText: searchText,
                                         podcastList: podcastList,
                                         movieList: movieList,
-                                        animatingDifferences: true)
+                                        animatingDifferences: false)
             }
         }
     }
@@ -152,7 +152,6 @@ private extension SearchResultViewController {
                                                                     for: indexPath,
                                                                     item: movie)
             }
-            
         })
         
         dataSource.supplementaryViewProvider = { (collectionView, kind, indexPath) -> UICollectionReusableView? in
@@ -167,11 +166,17 @@ private extension SearchResultViewController {
                            movieList: [MovieResultModel],
                            animatingDifferences: Bool) {
         snapshot.deleteAllItems()
-        snapshot.appendSections(SearchResultSection.allCases)
         
+        snapshot.appendSections([.searchText])
         snapshot.appendItems(searchText.map { SearchResultItem.searchText($0) }, toSection: .searchText)
-        snapshot.appendItems(podcastList.map { SearchResultItem.podcast($0) }, toSection: .largeBanner)
-        snapshot.appendItems(movieList.map { SearchResultItem.movieList($0) }, toSection: .list)
+        if !podcastList.isEmpty {
+            snapshot.appendSections([.largeBanner])
+            snapshot.appendItems(podcastList.map { SearchResultItem.podcast($0) }, toSection: .largeBanner)
+        }
+        if !movieList.isEmpty {
+            snapshot.appendSections([.list])
+            snapshot.appendItems(movieList.map { SearchResultItem.movieList($0) }, toSection: .list)
+        }
         
         dataSource.apply(snapshot, animatingDifferences: animatingDifferences)
     }
@@ -179,7 +184,6 @@ private extension SearchResultViewController {
 
 extension SearchResultViewController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
-        // TODO: - 검색 버튼 눌렀을때만 accept 하도록 변경
         searchTextRelay.accept(searchController.searchBar.text ?? "")
     }
 }

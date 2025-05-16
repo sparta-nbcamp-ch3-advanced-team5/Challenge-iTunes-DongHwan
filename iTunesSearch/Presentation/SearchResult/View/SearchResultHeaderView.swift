@@ -51,7 +51,7 @@ private extension SearchResultHeaderView {
     
     func setConstraints() {
         titleLabel.snp.makeConstraints {
-            $0.leading.trailing.bottom.equalToSuperview()
+            $0.edges.equalToSuperview()
         }
     }
 }
