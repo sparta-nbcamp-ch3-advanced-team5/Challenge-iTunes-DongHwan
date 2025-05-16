@@ -16,7 +16,7 @@ final class ThumbnailView: UIView {
     // MARK: - UI Components
     
     /// 썸네일 `UIImageView`
-    private let thumbnailImageView = UIImageView().then {
+    private let imageView = UIImageView().then {
         $0.alpha = 0.0
         $0.contentMode = .scaleAspectFill
         $0.backgroundColor = .white
@@ -24,6 +24,7 @@ final class ThumbnailView: UIView {
         $0.layer.cornerRadius = 10
     }
     
+    /// 로딩 애니메이션 `UIActivityIndicatorView`
     private lazy var activityIndicator = UIActivityIndicatorView().then {
         $0.center = self.center
         $0.style = .medium
@@ -31,14 +32,17 @@ final class ThumbnailView: UIView {
         $0.startAnimating()
     }
     
+    /// 페이딩 애니메이션 `UIViewPropertyAnimator`
     private var animator: UIViewPropertyAnimator?
     
     // MARK: - Getter
     
+    /// 썸네일 `UIimageView` 반환
     var getThumbnailImageView: UIImageView {
-        return thumbnailImageView
+        return imageView
     }
     
+    /// 로딩 애니메이션 `UIActivityIndicatorView` 반환
     var getActivityIndicator: UIActivityIndicatorView {
         return activityIndicator
     }
@@ -61,25 +65,42 @@ private extension ThumbnailView {
     func setupUI() {
         setViewHierarchy()
         setConstraints()
+        setAnimator()
     }
     
     func setViewHierarchy() {
-        self.addSubview(activityIndicator)
+        self.addSubviews(imageView,
+                         activityIndicator)
     }
     
     func setConstraints() {
+        imageView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        
         activityIndicator.snp.makeConstraints {
             $0.centerX.centerY.equalToSuperview()
         }
     }
+    
+    func setAnimator() {
+        animator = UIViewPropertyAnimator(duration: 0.2, curve: .linear) {
+            self.imageView.alpha = 1.0
+        }
+    }
 }
 
-// MARK: - Private Methods
+// MARK: - Methods
 
-private extension ThumbnailView {
-    func fadeInAnimation() {
-        animator = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.4, delay: 0, animations: {
-            self.thumbnailImageView.alpha = 1.0
-        })
+extension ThumbnailView {
+    /// 셀 재사용 시 이미지 초기화
+    func prepareForReuse() {
+        activityIndicator.startAnimating()
+        animator?.stopAnimation(true)
+    }
+    
+    /// 썸네일 Fade In 애니메이션
+    func startFadeInAnimation() {
+        animator?.startAnimation()
     }
 }
