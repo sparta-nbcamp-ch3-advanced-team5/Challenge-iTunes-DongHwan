@@ -21,34 +21,43 @@ final class PodcastCell: UICollectionViewCell {
     private var fetchTask: Task<Void, Never>?
     
     // MARK: - UI Components
-    
-    /// 팟캐스트 썸네일 UIImageView
+    /// 코너값 표현을 위한 컨테이너 `UIView`
+    private let cornerRadiusView = UIView().then {
+        $0.backgroundColor = .systemBackground
+        $0.layer.masksToBounds = true
+        $0.layer.cornerRadius = 15
+    }
+    /// 팟캐스트 썸네일 `UIImageView`
     private let thumbnailView = ThumbnailView(frame: .zero).then {
+        $0.getThumbnailImageView.layer.maskedCorners = CACornerMask(arrayLiteral: .layerMinXMinYCorner, .layerMaxXMinYCorner)
         $0.getActivityIndicator.style = .large
     }
-    /// 팟캐스트 마케팅 문구 UILabel
+    /// 팟캐스트 마케팅 문구 `UILabel`
     private let marketingPhrasesLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 24, weight: .bold)
         $0.textColor = .label
         $0.numberOfLines = 2
     }
-    /// LabelStackView, Button 컨테이너 UIStackView
+    /// `LabelStackView`, `goToButton` 컨테이너 `UIStackView`
     private let containerStackView = ContainerStackView()
-    /// Label 컨테이너 UIStackView
+    /// Label 컨테이너 `UIStackView`
     private let labelStackView = LabelStackView()
-    /// 팟캐스트 제목 UILabel
+    /// 팟캐스트 제목 `UILabel`
     private let titleLabel = TitleLabel()
-    /// 팟캐스트 진행자 UILabel
+    /// 팟캐스트 진행자 `UILabel`
     private let artistLabel = SubtitleLabel()
-    /// 아이튠즈 링크 이동 버튼
+    /// 아이튠즈 링크 이동 `UIButton`
     private let goToButton = GoToButton()
     
     // MARK: - Initializer
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.layer.masksToBounds = true
-        self.layer.cornerRadius = 15
+        // 셀에 그림자 적용
+        self.layer.masksToBounds = false
+        self.layer.shadowOpacity = 0.3
+        self.layer.shadowOffset = CGSize(width: 0, height: 2)
+        self.layer.shadowRadius = 15
         
         // TODO: - 셀 배경 그림자 넣기
         
@@ -103,9 +112,11 @@ private extension PodcastCell {
     }
     
     func setViewHierarchy() {
-        self.contentView.addSubviews(thumbnailView,
-                                     marketingPhrasesLabel,
-                                     containerStackView)
+        self.contentView.addSubviews(cornerRadiusView)
+        
+        cornerRadiusView.addSubviews(thumbnailView,
+                                           marketingPhrasesLabel,
+                                           containerStackView)
         
         containerStackView.addArrangedSubviews(labelStackView, goToButton)
         
@@ -114,6 +125,10 @@ private extension PodcastCell {
     }
     
     func setConstraints() {
+        cornerRadiusView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        
         thumbnailView.snp.makeConstraints {
             $0.top.leading.trailing.equalToSuperview()
             $0.height.equalTo(thumbnailView.snp.width)
