@@ -101,12 +101,6 @@ private extension SearchResultViewController {
         Task {
             for await searchText in output.searchTextModelRelay.asDriver().values {
                 self.configureSearchTextSnapshot(searchText: searchText)
-
-//                if snapshot.itemIdentifiers(inSection: .searchText).isEmpty {
-//                    self.configureSearchTextSnapshot(searchText: searchText)
-//                } else {
-//                    self.updateSearchTextSnapshot(searchText: searchText)
-//                }
             }
         }
         
@@ -114,7 +108,8 @@ private extension SearchResultViewController {
             for await element in output.searchResultChunksRelay.asDriver(onErrorJustReturn: ([], [])).values {
                 let (podcastList, movieList) = element
                 self.configureResultsSnapshot(podcastList: podcastList,
-                                              movieList: movieList)
+                                              movieList: movieList,
+                                              animatingDifferences: false)
             }
         }
         
@@ -181,20 +176,19 @@ private extension SearchResultViewController {
             let header: SearchResultHeaderView = collectionView.dequeueConfiguredReusableSupplementary(using: headerRegistration, for: indexPath)
             return header
         }
-        
-        snapshot.appendSections(SearchResultSection.allCases)
     }
     
     func configureSearchTextSnapshot(searchText: [SearchTextModel]) {
-        let oldItems = snapshot.itemIdentifiers(inSection: .searchText)
-        snapshot.deleteItems(oldItems)
+        snapshot.deleteAllItems()
+        snapshot.appendSections([.searchText])
         snapshot.appendItems(searchText.map { SearchResultItem.searchText($0) }, toSection: .searchText)
         dataSource.applySnapshotUsingReloadData(snapshot)
     }
     
     /// Diffable DataSource Snapshot 설정
     func configureResultsSnapshot(podcastList: [PodcastResultModel],
-                                  movieList: [MovieResultModel]) {
+                                  movieList: [MovieResultModel],
+                                  animatingDifferences: Bool) {
         snapshot.deleteSections([.largeBanner, .list])
         if !podcastList.isEmpty {
             snapshot.appendSections([.largeBanner])
@@ -206,11 +200,7 @@ private extension SearchResultViewController {
         }
         
         dataSource.applySnapshotUsingReloadData(snapshot)
-    }
-    
-    func updateSearchTextSnapshot(searchText: [SearchTextModel]) {
-        snapshot.reconfigureItems(searchText.map { SearchResultItem.searchText($0) })
-        dataSource.applySnapshotUsingReloadData(snapshot)
+        dataSource.apply(snapshot, animatingDifferences: animatingDifferences)
     }
 }
 

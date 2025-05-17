@@ -132,7 +132,8 @@ private extension PodcastCell {
         }
         
         goToButton.snp.makeConstraints {
-            $0.width.equalTo(72)
+            $0.width.equalTo(70)
+            $0.height.equalTo(34)
         }
     }
 }

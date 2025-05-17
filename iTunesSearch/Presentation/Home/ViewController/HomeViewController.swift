@@ -109,7 +109,8 @@ private extension HomeViewController {
                 self.configureSnapshot(top5MusicList: top5MusicList,
                                        summerMusicList: summerMusicList,
                                        fallMusicList: fallMusicList,
-                                       winterMusicList: winterMusicList)
+                                       winterMusicList: winterMusicList,
+                                       animatingDifferences: true)
             }
         }
     }
@@ -167,16 +168,28 @@ private extension HomeViewController {
     func configureSnapshot(top5MusicList: [MusicResultModel],
                            summerMusicList: [MusicResultModel],
                            fallMusicList: [MusicResultModel],
-                           winterMusicList: [MusicResultModel]) {
+                           winterMusicList: [MusicResultModel],
+                           animatingDifferences: Bool) {
         snapshot.deleteSections(HomeSection.allCases)
-        snapshot.appendSections(HomeSection.allCases)
         
-        snapshot.appendItems(top5MusicList.map { HomeItem.best($0) }, toSection: .springBest)
-        snapshot.appendItems(summerMusicList.map { HomeItem.season($0) }, toSection: .summer)
-        snapshot.appendItems(fallMusicList.map { HomeItem.season($0) }, toSection: .fall)
-        snapshot.appendItems(winterMusicList.map { HomeItem.season($0) }, toSection: .winter)
+        if !top5MusicList.isEmpty {
+            snapshot.appendSections([.springBest])
+            snapshot.appendItems(top5MusicList.map { HomeItem.best($0) }, toSection: .springBest)
+        }
+        if !summerMusicList.isEmpty {
+            snapshot.appendSections([.summer])
+            snapshot.appendItems(summerMusicList.map { HomeItem.season($0) }, toSection: .summer)
+        }
+        if !fallMusicList.isEmpty {
+            snapshot.appendSections([.fall])
+            snapshot.appendItems(fallMusicList.map { HomeItem.season($0) }, toSection: .fall)
+        }
+        if !winterMusicList.isEmpty {
+            snapshot.appendSections([.winter])
+            snapshot.appendItems(winterMusicList.map { HomeItem.season($0) }, toSection: .winter)
+        }
         
-        dataSource.applySnapshotUsingReloadData(snapshot)
+        dataSource.apply(snapshot, animatingDifferences: animatingDifferences)
     }
 }
 

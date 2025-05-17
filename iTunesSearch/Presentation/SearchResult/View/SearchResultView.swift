@@ -40,14 +40,14 @@ final class SearchResultView: UIView {
     override init(frame: CGRect) {
         topBottomInset = 10
         leadingTrailingInset = 20
-        itemContentInset = NSDirectionalEdgeInsets(top: topBottomInset,
-                                                   leading: leadingTrailingInset,
-                                                   bottom: topBottomInset,
-                                                   trailing: leadingTrailingInset)
-        headerContentInset = NSDirectionalEdgeInsets(top: 0,
-                                                     leading: leadingTrailingInset,
-                                                     bottom: topBottomInset,
-                                                     trailing: leadingTrailingInset)
+        itemContentInset = .init(top: topBottomInset,
+                                 leading: leadingTrailingInset,
+                                 bottom: topBottomInset,
+                                 trailing: leadingTrailingInset)
+        headerContentInset = .init(top: 0,
+                                   leading: leadingTrailingInset,
+                                   bottom: topBottomInset,
+                                   trailing: leadingTrailingInset)
         largeBannerItemHeight = 440 + topBottomInset * 2
         listItemHeight = 150 + topBottomInset * 2
         super.init(frame: frame)
@@ -117,7 +117,7 @@ private extension SearchResultView {
     
     func createLargeBannerSection() -> NSCollectionLayoutSection {
         let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-                                              heightDimension: .absolute(largeBannerItemHeight))
+                                              heightDimension: .fractionalWidth(1.11))
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
         item.contentInsets = itemContentInset
         
@@ -150,7 +150,7 @@ private extension SearchResultView {
     
     func createHeader() -> NSCollectionLayoutBoundarySupplementaryItem {
         let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-                                                heightDimension: .absolute(60))
+                                                heightDimension: .absolute(50))
         let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerSize,
                                                                         elementKind: UICollectionView.elementKindSectionHeader,
                                                                         alignment: .top)
