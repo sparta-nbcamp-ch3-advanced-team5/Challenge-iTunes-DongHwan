@@ -13,4 +13,14 @@ extension UIView {
             self.addSubview($0)
         }
     }
+    
+    func setViewCornerRadAndShadow(baseView: UIView, cornerRad: CGFloat, shadowOffset: CGSize, shadowRad: CGFloat, shadowOpacity: Float) {
+        baseView.layer.masksToBounds = true
+        baseView.layer.cornerRadius = cornerRad
+        
+        layer.masksToBounds = false
+        layer.shadowOffset = shadowOffset
+        layer.shadowRadius = shadowRad
+        layer.shadowOpacity = shadowOpacity
+    }
 }

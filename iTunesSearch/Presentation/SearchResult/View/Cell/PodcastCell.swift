@@ -24,8 +24,6 @@ final class PodcastCell: UICollectionViewCell {
     /// 코너값 표현을 위한 컨테이너 `UIView`
     private let cornerRadiusView = UIView().then {
         $0.backgroundColor = .systemBackground
-        $0.layer.masksToBounds = true
-        $0.layer.cornerRadius = 15
     }
     /// 팟캐스트 썸네일 `UIImageView`
     private let thumbnailView = ThumbnailView(frame: .zero).then {
@@ -54,12 +52,11 @@ final class PodcastCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         // 셀에 그림자 적용
-        self.layer.masksToBounds = false
-        self.layer.shadowOpacity = 0.3
-        self.layer.shadowOffset = CGSize(width: 0, height: 2)
-        self.layer.shadowRadius = 15
-        
-        // TODO: - 셀 배경 그림자 넣기
+        setViewCornerRadAndShadow(baseView: cornerRadiusView,
+                                  cornerRad: 15,
+                                  shadowOffset: CGSize(width: 0, height: 2),
+                                  shadowRad: 15,
+                                  shadowOpacity: 0.2)
         
         setupUI()
     }

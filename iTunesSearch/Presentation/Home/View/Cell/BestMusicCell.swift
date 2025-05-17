@@ -49,6 +49,13 @@ final class BestMusicCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        // 셀에 그림자 적용
+        setViewCornerRadAndShadow(baseView: backgroundArtistImageView,
+                                  cornerRad: 15,
+                                  shadowOffset: CGSize(width: 0, height: 10),
+                                  shadowRad: 15,
+                                  shadowOpacity: 0.2)
+        
         setupUI()
     }
     
