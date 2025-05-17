@@ -18,9 +18,10 @@ extension UIView {
         baseView.layer.masksToBounds = true
         baseView.layer.cornerRadius = cornerRad
         
-        layer.masksToBounds = false
-        layer.shadowOffset = shadowOffset
-        layer.shadowRadius = shadowRad
-        layer.shadowOpacity = shadowOpacity
+        self.layer.masksToBounds = false
+        self.layer.shadowPath = UIBezierPath(roundedRect: self.bounds, cornerRadius: self.layer.cornerRadius).cgPath
+        self.layer.shadowOffset = shadowOffset
+        self.layer.shadowRadius = shadowRad
+        self.layer.shadowOpacity = shadowOpacity
     }
 }

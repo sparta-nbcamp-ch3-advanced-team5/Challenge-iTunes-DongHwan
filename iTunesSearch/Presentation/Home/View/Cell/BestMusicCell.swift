@@ -55,7 +55,6 @@ final class BestMusicCell: UICollectionViewCell {
                                   shadowOffset: CGSize(width: 0, height: 10),
                                   shadowRad: 15,
                                   shadowOpacity: 0.2)
-        
         setupUI()
     }
     

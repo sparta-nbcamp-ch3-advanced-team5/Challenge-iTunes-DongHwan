@@ -57,7 +57,6 @@ final class PodcastCell: UICollectionViewCell {
                                   shadowOffset: CGSize(width: 0, height: 2),
                                   shadowRad: 15,
                                   shadowOpacity: 0.2)
-        
         setupUI()
     }
     
