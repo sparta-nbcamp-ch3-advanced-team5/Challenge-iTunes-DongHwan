@@ -48,7 +48,9 @@ final class PodcastCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.layer.masksToBounds = true
-        self.layer.cornerRadius = 10
+        self.layer.cornerRadius = 15
+        
+        // TODO: - 셀 배경 그림자 넣기
         
         setupUI()
     }
@@ -76,7 +78,6 @@ final class PodcastCell: UICollectionViewCell {
     func configure(thumbnailURL: String, marketingPhrases: String, title: String, artist: String) {
         let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
         
-        // TODO: - 이미지 로드될때 애니메이션 추가
         fetchTask = Task { [weak self] in
             do {
                 let imageData = try await ImageCacheManager.shared.fetchImage(from: thumbnailURL)
@@ -127,6 +128,7 @@ private extension PodcastCell {
         containerStackView.snp.makeConstraints {
             $0.top.equalTo(thumbnailView.snp.bottom).offset(10)
             $0.leading.trailing.equalToSuperview().inset(15)
+            $0.bottom.equalToSuperview().inset(10)
         }
         
         goToButton.snp.makeConstraints {

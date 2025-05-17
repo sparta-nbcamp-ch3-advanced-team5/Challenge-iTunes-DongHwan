@@ -17,8 +17,6 @@ final class HomeHeaderView: UICollectionReusableView {
     
     /// Label 컨테이너 StackView
     private let labelStackView = LabelStackView()
-    /// LabelStackView가 위쪽 간격을 갖도록 하는 Spacer
-    private let topSpacer = UIView.spacer(axis: .vertical)
     /// Header 제목 UILabel
     private let titleLabel = TitleLabel().then {
         $0.font = .systemFont(ofSize: 24, weight: .bold)
@@ -56,18 +54,13 @@ private extension HomeHeaderView {
     func setViewHierarchy() {
         self.addSubview(labelStackView)
         
-        labelStackView.addArrangedSubviews(topSpacer,
-                                           titleLabel,
+        labelStackView.addArrangedSubviews(titleLabel,
                                            subtitleLabel)
     }
     
     func setConstraints() {
         labelStackView.snp.makeConstraints {
             $0.leading.trailing.bottom.equalToSuperview()
-        }
-        
-        topSpacer.snp.makeConstraints {
-            $0.height.equalTo(1)
         }
     }
 }

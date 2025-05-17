@@ -29,8 +29,9 @@ final class SearchResultViewModel {
     
     // MARK: - Output (ViewModel ➡️ ViewController)
     /// searchText, podcastList, movieList
-    typealias SearchResultChunks = ([SearchTextModel], [PodcastResultModel], [MovieResultModel])
+    typealias SearchResultChunks = ([PodcastResultModel], [MovieResultModel])
     struct Output {
+        let searchTextModelRelay: BehaviorRelay<[SearchTextModel]>
         let searchResultChunksRelay: BehaviorRelay<SearchResultChunks>
     }
     
@@ -39,14 +40,21 @@ final class SearchResultViewModel {
     func transform(input: Input) -> Output {
         let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
         
-        let searchResultChunksRelay = BehaviorRelay<SearchResultChunks>(value: ([], [], []))
+        let searchTextModelRelay = BehaviorRelay<[SearchTextModel]>(value: [])
+        let searchResultChunksRelay = BehaviorRelay<SearchResultChunks>(value: ([], []))
+        
+        Task {
+            for await text in input.searchText.values {
+                let searchText = SearchTextModel(searchText: text)
+                searchTextModelRelay.accept([searchText])
+            }
+        }
         
         fetchTask = Task { [iTunesSearchAPIUseCase] in
-            for await text in input.searchText.values {
+            for await text in input.searchText.debounce(.milliseconds(300), scheduler: MainScheduler.instance).values {
                 let podcastQueryDTO = iTunesQuery(term: text, mediaType: .podcast, limit: 5)
                 let movieQueryDTO = iTunesQuery(term: text, mediaType: .movie, limit: 10)
 
-                let searchText = SearchTextModel(searchText: text)
                 async let podcastList = iTunesSearchAPIUseCase.fetchSearchResultList(with: podcastQueryDTO,
                                                                                      dtoType: PodcastResultDTO.self,
                                                                                      transform: { $0.toModel() })
@@ -55,7 +63,7 @@ final class SearchResultViewModel {
                                                                                    transform: { $0.toModel() })
 
                 do {
-                    let searchResultChunks = try await ([searchText], podcastList, movieList)
+                    let searchResultChunks = try await (podcastList, movieList)
                     searchResultChunksRelay.accept(searchResultChunks)
                 } catch {
                     // TODO: - 에러 Alert 표시
@@ -63,7 +71,8 @@ final class SearchResultViewModel {
                 }
             }
         }
-        return Output(searchResultChunksRelay: searchResultChunksRelay)
+        return Output(searchTextModelRelay: searchTextModelRelay,
+                      searchResultChunksRelay: searchResultChunksRelay)
     }
     
     // MARK: - Initializer

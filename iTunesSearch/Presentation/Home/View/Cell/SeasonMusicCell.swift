@@ -78,7 +78,6 @@ final class SeasonMusicCell: UICollectionViewCell {
     func configure(thumbnailURL: String, title: String, artist: String, collection: String, isBottom: Bool) {
         let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
         
-        // TODO: - 이미지 로드될때 애니메이션 추가
         fetchTask = Task { [weak self] in
             do {
                 let imageData = try await ImageCacheManager.shared.fetchImage(from: thumbnailURL)

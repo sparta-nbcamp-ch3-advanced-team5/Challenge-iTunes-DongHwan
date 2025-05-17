@@ -37,9 +37,6 @@ final class BestMusicCell: UICollectionViewCell {
     /// Label 컨테이너 StackView
     private let labelStackView = LabelStackView()
     
-    /// LabelStackView가 위쪽 간격을 갖도록 하는 Spacer
-    private let topSpacer = UIView.spacer(axis: .vertical)
-    
     /// 노래 제목 UILabel
     private let titleLabel = TitleLabel()
     
@@ -78,7 +75,6 @@ final class BestMusicCell: UICollectionViewCell {
     func configure(thumbnailURL: String, backgroundArtistImageColor: UIColor, title: String, artist: String) {
         let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
         
-        // TODO: - 이미지 로드될때 애니메이션 추가
         fetchTask = Task { [weak self] in
             do {
                 let imageData = try await ImageCacheManager.shared.fetchImage(from: thumbnailURL)
@@ -109,8 +105,7 @@ private extension BestMusicCell {
         
         containerStackView.addArrangedSubviews(thumbnailView, labelStackView)
         
-        labelStackView.addArrangedSubviews(topSpacer,
-                                           titleLabel,
+        labelStackView.addArrangedSubviews(titleLabel,
                                            artistLabel)
     }
     
@@ -126,10 +121,6 @@ private extension BestMusicCell {
         
         thumbnailView.snp.makeConstraints {
             $0.width.height.equalTo(50)
-        }
-        
-        topSpacer.snp.makeConstraints {
-            $0.height.equalTo(1)
         }
     }
 }

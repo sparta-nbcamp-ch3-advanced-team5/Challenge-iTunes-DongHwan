@@ -82,7 +82,6 @@ final class MovieCell: UICollectionViewCell {
     func configure(thumbnailURL: String, title: String, year: String, genre: String, description: String) {
         let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
         
-        // TODO: - 이미지 로드될때 애니메이션 추가
         fetchTask = Task { [weak self] in
             do {
                 let imageData = try await ImageCacheManager.shared.fetchImage(from: thumbnailURL)
@@ -109,7 +108,7 @@ private extension MovieCell {
     }
     
     func setViewHierarchy() {
-        self.contentView.addSubviews(containerStackView, labelStackView)
+        self.contentView.addSubviews(containerStackView)
         
         containerStackView.addArrangedSubviews(thumbnailView, labelStackView)
         
@@ -124,11 +123,8 @@ private extension MovieCell {
         }
         
         thumbnailView.snp.makeConstraints {
-            $0.height.equalTo(150)
-        }
-        
-        thumbnailView.snp.makeConstraints {
             $0.width.equalTo(100)
+            $0.height.equalTo(150)
         }
     }
 }

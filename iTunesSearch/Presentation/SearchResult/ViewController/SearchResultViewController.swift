@@ -26,9 +26,6 @@ final class SearchResultViewController: UIViewController {
     private var dataSource: SearchResultDataSource!
     private var snapshot = SearchResultSnapshot()
     
-    /// 네트워크 통신 `Task` 저장(`deinit` 될 때 실행 중단용)
-    private var fetchTask: Task<Void, Never>?
-    
     /// 검색어 Relay
     private let searchTextRelay = PublishRelay<String>()
     weak var delegate: SearchResultViewControllerDelegate?
@@ -63,18 +60,6 @@ final class SearchResultViewController: UIViewController {
         setupUI()
         configureDataSource()
         bind()
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        // 네트워크 작업 취소
-        fetchTask?.cancel()
-        fetchTask = nil
-    }
-    
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesBegan(touches, with: event)
-        delegate?.willBeginDragging()
     }
 }
 
@@ -113,13 +98,23 @@ private extension SearchResultViewController {
         // ViewModel ➡️ Output
         let output = searchResultViewModel.transform(input: input)
         
-        fetchTask = Task { [weak self] in
-            for await element in output.searchResultChunksRelay.asDriver(onErrorJustReturn: ([], [], [])).values {
-                let (searchText, podcastList, movieList) = element
-                self?.configureSnapshot(searchText: searchText,
-                                        podcastList: podcastList,
-                                        movieList: movieList,
-                                        animatingDifferences: false)
+        Task {
+            for await searchText in output.searchTextModelRelay.asDriver().values {
+                self.configureSearchTextSnapshot(searchText: searchText)
+
+//                if snapshot.itemIdentifiers(inSection: .searchText).isEmpty {
+//                    self.configureSearchTextSnapshot(searchText: searchText)
+//                } else {
+//                    self.updateSearchTextSnapshot(searchText: searchText)
+//                }
+            }
+        }
+        
+        Task {
+            for await element in output.searchResultChunksRelay.asDriver(onErrorJustReturn: ([], [])).values {
+                let (podcastList, movieList) = element
+                self.configureResultsSnapshot(podcastList: podcastList,
+                                              movieList: movieList)
             }
         }
         
@@ -186,17 +181,21 @@ private extension SearchResultViewController {
             let header: SearchResultHeaderView = collectionView.dequeueConfiguredReusableSupplementary(using: headerRegistration, for: indexPath)
             return header
         }
+        
+        snapshot.appendSections(SearchResultSection.allCases)
+    }
+    
+    func configureSearchTextSnapshot(searchText: [SearchTextModel]) {
+        let oldItems = snapshot.itemIdentifiers(inSection: .searchText)
+        snapshot.deleteItems(oldItems)
+        snapshot.appendItems(searchText.map { SearchResultItem.searchText($0) }, toSection: .searchText)
+        dataSource.applySnapshotUsingReloadData(snapshot)
     }
     
     /// Diffable DataSource Snapshot 설정
-    func configureSnapshot(searchText: [SearchTextModel],
-                           podcastList: [PodcastResultModel],
-                           movieList: [MovieResultModel],
-                           animatingDifferences: Bool) {
-        snapshot.deleteAllItems()
-        
-        snapshot.appendSections([.searchText])
-        snapshot.appendItems(searchText.map { SearchResultItem.searchText($0) }, toSection: .searchText)
+    func configureResultsSnapshot(podcastList: [PodcastResultModel],
+                                  movieList: [MovieResultModel]) {
+        snapshot.deleteSections([.largeBanner, .list])
         if !podcastList.isEmpty {
             snapshot.appendSections([.largeBanner])
             snapshot.appendItems(podcastList.map { SearchResultItem.podcast($0) }, toSection: .largeBanner)
@@ -206,7 +205,12 @@ private extension SearchResultViewController {
             snapshot.appendItems(movieList.map { SearchResultItem.movieList($0) }, toSection: .list)
         }
         
-        dataSource.apply(snapshot, animatingDifferences: animatingDifferences)
+        dataSource.applySnapshotUsingReloadData(snapshot)
+    }
+    
+    func updateSearchTextSnapshot(searchText: [SearchTextModel]) {
+        snapshot.reconfigureItems(searchText.map { SearchResultItem.searchText($0) })
+        dataSource.applySnapshotUsingReloadData(snapshot)
     }
 }
 
@@ -218,7 +222,7 @@ extension SearchResultViewController: UISearchBarDelegate {
         // Section 생성 확인 후 이동하지 않으면 Crash 발생
         if searchResultView.getSearchResultCollectionView.numberOfSections > 0 {
             searchResultView.getSearchResultCollectionView.scrollToItem(at: IndexPath(item: -1, section: 0), at: .top, animated: false)
-            }
+        }
     }
 }
 

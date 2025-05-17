@@ -8,6 +8,7 @@
 import Foundation
 
 struct MovieResultModel: Hashable {
+    let id = UUID()
     /// 감독 이름
     let artistName: String
     /// 시리즈 이름

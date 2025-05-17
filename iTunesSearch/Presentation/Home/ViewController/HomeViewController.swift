@@ -25,15 +25,12 @@ final class HomeViewController: UIViewController {
     private var dataSource: HomeDataSource!
     private var snapshot = HomeSnapshot()
     
-    /// 네트워크 통신 `Task` 저장(`deinit` 될 때 실행 중단용)
-    private var fetchTask: Task<Void, Never>?
-    
     // MARK: - UI Components
     
     /// 홈 화면 네비게이션 바 SearchController
     private let searchController: UISearchController
     /// 검색 결과 ViewController
-    private let searchResultVC: SearchResultViewController
+    private var searchResultVC: SearchResultViewController
     /// 홈 화면 View
     private let homeView = HomeView()
     
@@ -58,13 +55,6 @@ final class HomeViewController: UIViewController {
         setupUI()
         configureDataSource()
         bind()
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        // 네트워크 작업 취소
-        fetchTask?.cancel()
-        fetchTask = nil
     }
 }
 
@@ -91,6 +81,7 @@ private extension HomeViewController {
     }
     
     func setDelegates() {
+        homeView.getMusicCollectionView.delegate = self
         searchResultVC.delegate = self
         searchController.searchBar.delegate = searchResultVC
     }
@@ -112,14 +103,13 @@ private extension HomeViewController {
         // ViewModel ➡️ Output
         let output = homeViewModel.transform(input: input)
         
-        fetchTask = Task { [weak self] in
+        Task {
             for await element in output.musicListChunksRelay.asDriver(onErrorJustReturn: ([], [], [], [])).values {
                 let (top5MusicList, summerMusicList, fallMusicList, winterMusicList) = element
-                self?.configureSnapshot(top5MusicList: top5MusicList,
+                self.configureSnapshot(top5MusicList: top5MusicList,
                                        summerMusicList: summerMusicList,
                                        fallMusicList: fallMusicList,
-                                       winterMusicList: winterMusicList,
-                                       animatingDifferences: false)
+                                       winterMusicList: winterMusicList)
             }
         }
     }
@@ -177,9 +167,8 @@ private extension HomeViewController {
     func configureSnapshot(top5MusicList: [MusicResultModel],
                            summerMusicList: [MusicResultModel],
                            fallMusicList: [MusicResultModel],
-                           winterMusicList: [MusicResultModel],
-                           animatingDifferences: Bool) {
-        snapshot.deleteAllItems()
+                           winterMusicList: [MusicResultModel]) {
+        snapshot.deleteSections(HomeSection.allCases)
         snapshot.appendSections(HomeSection.allCases)
         
         snapshot.appendItems(top5MusicList.map { HomeItem.best($0) }, toSection: .springBest)
@@ -187,18 +176,40 @@ private extension HomeViewController {
         snapshot.appendItems(fallMusicList.map { HomeItem.season($0) }, toSection: .fall)
         snapshot.appendItems(winterMusicList.map { HomeItem.season($0) }, toSection: .winter)
         
-        dataSource.apply(snapshot, animatingDifferences: animatingDifferences)
+        dataSource.applySnapshotUsingReloadData(snapshot)
     }
 }
 
-extension HomeViewController: SearchResultViewControllerDelegate {
-    /// 키보드 내림
-    func willBeginDragging() {
-        self.searchController.searchBar.resignFirstResponder()
+// MARK: - Private Methods
+
+extension HomeViewController {
+    func dismissKeyboard() {
+        /// 키보드 내림
+        searchController.searchBar.resignFirstResponder()
     }
     
     /// 검색 취소
+    func cancelSearch() {
+        searchController.isActive = false
+    }
+}
+
+// MARK: - UICollectionViewDelegate
+
+extension HomeViewController: UICollectionViewDelegate {
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        cancelSearch()
+    }
+}
+
+// MARK: - SearchResultViewControllerDelegate
+
+extension HomeViewController: SearchResultViewControllerDelegate {
+    func willBeginDragging() {
+        dismissKeyboard()
+    }
+    
     func searchTextCellTapped() {
-        self.searchController.isActive = false
+        cancelSearch()
     }
 }

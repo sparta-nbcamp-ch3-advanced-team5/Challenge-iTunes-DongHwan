@@ -46,7 +46,7 @@ final class SearchResultView: UIView {
                                                    trailing: leadingTrailingInset)
         headerContentInset = NSDirectionalEdgeInsets(top: 0,
                                                      leading: leadingTrailingInset,
-                                                     bottom: 0,
+                                                     bottom: topBottomInset,
                                                      trailing: leadingTrailingInset)
         largeBannerItemHeight = 440 + topBottomInset * 2
         listItemHeight = 150 + topBottomInset * 2
@@ -105,7 +105,7 @@ private extension SearchResultView {
         let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
                                               heightDimension: .fractionalHeight(1.0))
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        item.contentInsets = NSDirectionalEdgeInsets(top: 20, leading: leadingTrailingInset, bottom: 0, trailing: leadingTrailingInset)
+        item.contentInsets = .init(top: 20, leading: leadingTrailingInset, bottom: 0, trailing: leadingTrailingInset)
         
         let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
                                                heightDimension: .absolute(60))
@@ -143,13 +143,14 @@ private extension SearchResultView {
         
         let headerView = createHeader()
         section.boundarySupplementaryItems = [headerView]
+        // TODO: - 섹션 배경 그림자 넣기
         
         return section
     }
     
     func createHeader() -> NSCollectionLayoutBoundarySupplementaryItem {
         let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-                                                heightDimension: .absolute(70))
+                                                heightDimension: .absolute(60))
         let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerSize,
                                                                         elementKind: UICollectionView.elementKindSectionHeader,
                                                                         alignment: .top)

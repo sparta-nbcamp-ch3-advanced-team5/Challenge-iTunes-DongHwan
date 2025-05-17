@@ -19,7 +19,7 @@ final class ThumbnailView: UIView {
     private let imageView = UIImageView().then {
         $0.alpha = 0.0
         $0.contentMode = .scaleAspectFill
-        $0.backgroundColor = .white
+        $0.backgroundColor = .clear
         $0.layer.masksToBounds = true
         $0.layer.cornerRadius = 10
     }
@@ -93,8 +93,9 @@ private extension ThumbnailView {
 // MARK: - Methods
 
 extension ThumbnailView {
-    /// 셀 재사용 시 이미지 초기화
+    /// 셀 재사용 시 초기화
     func prepareForReuse() {
+        imageView.image = nil
         activityIndicator.startAnimating()
         animator?.stopAnimation(true)
     }

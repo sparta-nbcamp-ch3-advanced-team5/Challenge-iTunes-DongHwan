@@ -8,5 +8,6 @@
 import Foundation
 
 struct SearchTextModel: Hashable {
+    let id = UUID()
     let searchText: String
 }

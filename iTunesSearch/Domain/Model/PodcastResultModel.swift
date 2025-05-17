@@ -8,6 +8,7 @@
 import Foundation
 
 struct PodcastResultModel: Hashable {
+    let id = UUID()
     /// 진행자 이름
     let artistName: String
     /// 시리즈 이름
