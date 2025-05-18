@@ -15,7 +15,7 @@ final class BackgroundImageView: UIImageView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        self.contentMode = .center
+        self.contentMode = .scaleAspectFill
         self.backgroundColor = .placeholderText
         self.layer.masksToBounds = true
         self.layer.cornerRadius = 10

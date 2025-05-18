@@ -20,7 +20,7 @@ final class ThumbnailView: UIView {
     // MARK: - UI Components
     
     /// 썸네일 `UIImageView`
-    private lazy var imageView = UIImageView().then {
+    private let imageView = UIImageView().then {
         $0.alpha = 0.0
         $0.contentMode = .scaleAspectFill
         $0.backgroundColor = .placeholderText
@@ -42,7 +42,7 @@ final class ThumbnailView: UIView {
     // MARK: - Getter
     
     /// 썸네일 `UIimageView` 반환
-    var getThumbnailImageView: UIImageView {
+    var getimageView: UIImageView {
         return imageView
     }
     
@@ -97,6 +97,7 @@ private extension ThumbnailView {
 // MARK: - Methods
 
 extension ThumbnailView {
+    /// 썸네일을 `placeholderImage` 로 변경
     func setPlaceholder() {
         imageView.image = placeholderImage
         imageView.contentMode = .center

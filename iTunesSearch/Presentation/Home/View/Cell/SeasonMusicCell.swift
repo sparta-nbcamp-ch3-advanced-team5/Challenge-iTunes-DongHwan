@@ -22,26 +22,21 @@ final class SeasonMusicCell: UICollectionViewCell {
     
     // MARK: - UI Componenets
     
-    /// 썸네일, LabelStackView 컨테이너 UIStackView
+    /// 썸네일, `labelStackView` 컨테이너 `UIStackView`
     private let containerStackView = ContainerStackView()
-    
-    /// 앨범 썸네일 UIImageView
+    /// 앨범 썸네일 `UIImageView`
     private let thumbnailView = ThumbnailView(frame: .zero)
-    
-    /// Label 컨테이너 UIStackView
+    /// `UILabel` 컨테이너 `UIStackView`
     private let labelStackView = LabelStackView()
-    
-    /// 노래 제목 UILabel
+    /// 노래 제목 `UILabel`
     private let titleLabel = TitleLabel()
-    
-    /// 가수 이름 UILabel
+    /// 가수 이름 `UILabel`
     private let artistLabel = TitleLabel().then {
         $0.font = .systemFont(ofSize: 17)
     }
-    
-    /// 앨범 이름 UILabel
+    /// 앨범 이름 `UILabel`
     private let collectionLabel = SubtitleLabel()
-    
+    /// 구분선 `UIView`
     private let separatorView = UIView().then {
         $0.backgroundColor = .separator
     }
@@ -82,7 +77,7 @@ final class SeasonMusicCell: UICollectionViewCell {
             do {
                 let imageData = try await ImageCacheManager.shared.fetchImage(from: thumbnailURL)
                 self?.thumbnailView.getActivityIndicator.stopAnimating()
-                self?.thumbnailView.getThumbnailImageView.image = UIImage(data: imageData)
+                self?.thumbnailView.getimageView.image = UIImage(data: imageData)
                 self?.thumbnailView.startFadeInAnimation()
             } catch {
                 self?.thumbnailView.setPlaceholder()

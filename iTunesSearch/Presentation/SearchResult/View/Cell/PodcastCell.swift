@@ -27,19 +27,23 @@ final class PodcastCell: UICollectionViewCell {
     }
     /// 팟캐스트 썸네일 `UIImageView`
     private let thumbnailView = ThumbnailView(frame: .zero).then {
-        $0.getThumbnailImageView.layer.maskedCorners = CACornerMask(arrayLiteral: .layerMinXMinYCorner, .layerMaxXMinYCorner)
+        $0.getimageView.layer.maskedCorners = CACornerMask(arrayLiteral: .layerMinXMinYCorner, .layerMaxXMinYCorner)
         $0.getActivityIndicator.style = .large
-        // TODO: 하단 marketingPhrasesLabel 부분 페이드 처리
+    }
+    /// 블러 효과 `UIView`
+    private let gradientContainerView = GradientContainerView().then {
+        $0.startPoint = .init(x: 0.0, y: 0.0)
+        $0.endPoint = .init(x: 0.0, y: 0.7)
     }
     /// 팟캐스트 마케팅 문구 `UILabel`
     private let marketingPhrasesLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 24, weight: .bold)
-        $0.textColor = .label
+        $0.textColor = .black
         $0.numberOfLines = 2
     }
-    /// `LabelStackView`, `goToButton` 컨테이너 `UIStackView`
+    /// `labelStackView`, `goToButton` 컨테이너 `UIStackView`
     private let containerStackView = ContainerStackView()
-    /// Label 컨테이너 `UIStackView`
+    /// `UILabel` 컨테이너 `UIStackView`
     private let labelStackView = LabelStackView()
     /// 팟캐스트 제목 `UILabel`
     private let titleLabel = TitleLabel()
@@ -88,7 +92,7 @@ final class PodcastCell: UICollectionViewCell {
             do {
                 let imageData = try await ImageCacheManager.shared.fetchImage(from: thumbnailURL)
                 self?.thumbnailView.getActivityIndicator.stopAnimating()
-                self?.thumbnailView.getThumbnailImageView.image = UIImage(data: imageData)
+                self?.thumbnailView.getimageView.image = UIImage(data: imageData)
                 self?.thumbnailView.startFadeInAnimation()
             } catch {
                 self?.thumbnailView.setPlaceholder()
@@ -110,11 +114,14 @@ private extension PodcastCell {
     }
     
     func setViewHierarchy() {
-        self.contentView.addSubviews(cornerRadiusView)
+        self.contentView.addSubview(cornerRadiusView)
         
         cornerRadiusView.addSubviews(thumbnailView,
-                                           marketingPhrasesLabel,
-                                           containerStackView)
+                                     containerStackView)
+        
+        thumbnailView.addSubview(gradientContainerView)
+        
+        gradientContainerView.addSubview(marketingPhrasesLabel)
         
         containerStackView.addArrangedSubviews(labelStackView, goToButton)
         
@@ -132,10 +139,15 @@ private extension PodcastCell {
             $0.height.equalTo(thumbnailView.snp.width)
         }
         
+        gradientContainerView.snp.makeConstraints {
+            $0.leading.trailing.bottom.equalToSuperview()
+            $0.height.equalTo(marketingPhrasesLabel.snp.height).multipliedBy(1.5).offset(35)
+        }
+        
         marketingPhrasesLabel.snp.makeConstraints {
             $0.leading.equalToSuperview().inset(15)
             $0.trailing.equalToSuperview().inset(45)
-            $0.bottom.equalTo(thumbnailView).offset(-15)
+            $0.bottom.equalToSuperview().inset(20)
         }
         
         containerStackView.snp.makeConstraints {

@@ -15,13 +15,13 @@ final class HomeHeaderView: UICollectionReusableView {
     
     // MARK: - UI Components
     
-    /// Label 컨테이너 StackView
+    /// `UILabel` 컨테이너 `UIStackView`
     private let labelStackView = LabelStackView()
-    /// Header 제목 UILabel
+    /// `Header` 제목 `UILabel`
     private let titleLabel = TitleLabel().then {
         $0.font = .systemFont(ofSize: 24, weight: .bold)
     }
-    /// Header 부제목 UILabel
+    /// Header 부제목 `UILabel`
     private let subtitleLabel = SubtitleLabel()
     
     // MARK: - Initializer

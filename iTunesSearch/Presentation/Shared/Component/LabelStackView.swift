@@ -7,7 +7,7 @@
 
 import UIKit
 
-/// Label 컨테이너 StackView
+/// `UILabel` 컨테이너 `UIStackView`
 final class LabelStackView: UIStackView {
     
     // MARK: - Initializer

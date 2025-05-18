@@ -22,30 +22,25 @@ final class MovieCell: UICollectionViewCell {
     
     // MARK: - UI Components
     
-    /// 썸네일, LabelStackView 컨테이너 StackView
+    /// 썸네일, `labelStackView` 컨테이너 `UIStackView`
     private let containerStackView = ContainerStackView().then {
         $0.alignment = .top
     }
-    
-    /// 영화 썸네일 UIImageView
+    /// 영화 썸네일 `UIImageView`
     private let thumbnailView = ThumbnailView(frame: .zero).then {
         $0.contentMode = .scaleAspectFit
     }
-    
-    /// Label 컨테이너 UIStackView
+    /// `UILabel` 컨테이너 `UIStackView`
     private let labelStackView = LabelStackView().then {
         $0.spacing = 5
     }
-    
-    /// 영화 제목 UILabel
+    /// 영화 제목 `UILabel`
     private let titleLabel = TitleLabel().then {
         $0.numberOfLines = 2
     }
-    
-    /// 영화 개봉 연도, 장르 UILabel
+    /// 영화 개봉 연도, 장르 `UILabel`
     private let yearGenreLabel = SubtitleLabel()
-    
-    /// 영화 설명 UILabel
+    /// 영화 설명 `UILabel`
     private let descriptionLabel = SubtitleLabel().then {
         $0.numberOfLines = 5
     }
@@ -86,7 +81,7 @@ final class MovieCell: UICollectionViewCell {
             do {
                 let imageData = try await ImageCacheManager.shared.fetchImage(from: thumbnailURL)
                 self?.thumbnailView.getActivityIndicator.stopAnimating()
-                self?.thumbnailView.getThumbnailImageView.image = UIImage(data: imageData)
+                self?.thumbnailView.getimageView.image = UIImage(data: imageData)
                 self?.thumbnailView.startFadeInAnimation()
             } catch {
                 self?.thumbnailView.setPlaceholder()
@@ -109,7 +104,7 @@ private extension MovieCell {
     }
     
     func setViewHierarchy() {
-        self.contentView.addSubviews(containerStackView)
+        self.contentView.addSubview(containerStackView)
         
         containerStackView.addArrangedSubviews(thumbnailView, labelStackView)
         
