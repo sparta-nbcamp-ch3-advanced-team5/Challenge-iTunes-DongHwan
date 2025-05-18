@@ -150,7 +150,7 @@ private extension SearchResultViewController {
                            description: item.longDescription)
         }
         
-        let headerRegistration = UICollectionView.SupplementaryRegistration<SearchResultHeaderView>(elementKind: UICollectionView.elementKindSectionHeader) { header, elementKind, indexPath in
+        let headerRegistration = UICollectionView.SupplementaryRegistration<ListSectionHeaderView>(elementKind: UICollectionView.elementKindSectionHeader) { header, elementKind, indexPath in
             let headerTitle = HeaderMarketingPhrases.allCases[indexPath.section].rawValue
             header.configure(title: headerTitle)
         }
@@ -173,7 +173,7 @@ private extension SearchResultViewController {
         })
         
         dataSource.supplementaryViewProvider = { (collectionView, kind, indexPath) -> UICollectionReusableView? in
-            let header: SearchResultHeaderView = collectionView.dequeueConfiguredReusableSupplementary(using: headerRegistration, for: indexPath)
+            let header: ListSectionHeaderView = collectionView.dequeueConfiguredReusableSupplementary(using: headerRegistration, for: indexPath)
             return header
         }
     }

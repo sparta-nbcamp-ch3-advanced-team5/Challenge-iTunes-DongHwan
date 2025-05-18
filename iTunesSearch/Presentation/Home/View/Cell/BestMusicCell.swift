@@ -93,9 +93,6 @@ final class BestMusicCell: UICollectionViewCell {
                 self?.thumbnailView.getActivityIndicator.stopAnimating()
                 self?.thumbnailView.getimageView.image = UIImage(data: imageData)
                 self?.thumbnailView.startFadeInAnimation()
-                
-                self?.backgroundArtistImageView.image = UIImage(data: imageData)
-                self?.backgroundArtistImageView.contentMode = .scaleAspectFill
             } catch {
                 self?.thumbnailView.setPlaceholder()
                 os_log(.error, log: log, "\(error.localizedDescription)")

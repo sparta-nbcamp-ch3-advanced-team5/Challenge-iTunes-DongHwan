@@ -23,7 +23,7 @@ final class PodcastCell: UICollectionViewCell {
     // MARK: - UI Components
     /// 코너값 표현을 위한 컨테이너 `UIView`
     private let cornerRadiusView = UIView().then {
-        $0.backgroundColor = .systemBackground
+        $0.backgroundColor = .secondarySystemGroupedBackground
     }
     /// 팟캐스트 썸네일 `UIImageView`
     private let thumbnailView = ThumbnailView(frame: .zero).then {

@@ -94,10 +94,12 @@ private extension SearchResultView {
             case .largeBanner:
                 return self.createLargeBannerSection()
             case .list:
+                
                 return self.createListSection()
             }
         }, configuration: config)
         
+        layout.register(ListSectionBackgroundView.self, forDecorationViewOfKind: ListSectionBackgroundView.identifier)
         return layout
     }
     
@@ -126,6 +128,7 @@ private extension SearchResultView {
         let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
         
         let section = NSCollectionLayoutSection(group: group)
+        
         return section
     }
     
@@ -143,14 +146,17 @@ private extension SearchResultView {
         
         let headerView = createHeader()
         section.boundarySupplementaryItems = [headerView]
-        // TODO: - 섹션 배경 그림자 넣기
+        
+        let sectionBackgroundDecoration = NSCollectionLayoutDecorationItem.background(elementKind: ListSectionBackgroundView.identifier)
+        sectionBackgroundDecoration.contentInsets = .init(top: 0, leading: leadingTrailingInset, bottom: 0, trailing: leadingTrailingInset)
+        section.decorationItems = [sectionBackgroundDecoration]
         
         return section
     }
     
     func createHeader() -> NSCollectionLayoutBoundarySupplementaryItem {
         let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-                                                heightDimension: .absolute(50))
+                                                heightDimension: .absolute(64))
         let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerSize,
                                                                         elementKind: UICollectionView.elementKindSectionHeader,
                                                                         alignment: .top)

@@ -1,5 +1,5 @@
 //
-//  SearchResultHeaderView.swift
+//  ListSectionHeaderView.swift
 //  iTunesSearch
 //
 //  Created by 서동환 on 5/16/25.
@@ -10,7 +10,7 @@ import UIKit
 import SnapKit
 import Then
 
-final class SearchResultHeaderView: UICollectionReusableView {
+final class ListSectionHeaderView: UICollectionReusableView {
     
     // MARK: - UI Components
     
@@ -39,7 +39,7 @@ final class SearchResultHeaderView: UICollectionReusableView {
 
 // MARK: - Setting Methods
 
-private extension SearchResultHeaderView {
+private extension ListSectionHeaderView {
     func setupUI() {
         setViewHierarchy()
         setConstraints()
@@ -51,8 +51,8 @@ private extension SearchResultHeaderView {
     
     func setConstraints() {
         titleLabel.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.top.equalToSuperview().inset(20)
+            $0.leading.trailing.equalToSuperview().inset(15)
         }
     }
 }
-
