@@ -25,7 +25,7 @@ final class BestMusicCell: UICollectionViewCell {
     /// 가수 사진 UIImageView(API에 가수 사진이 없으므로 배경색만 변경)
     private let backgroundArtistImageView = BackgroundImageView(frame: .zero).then {
         let config = UIImage.SymbolConfiguration(pointSize: 50)
-        $0.image = UIImage(systemName: "music.note", withConfiguration: config)?.withRenderingMode(.alwaysOriginal).withTintColor(.white)
+        $0.image = UIImage(systemName: "music.note", withConfiguration: config)?.withTintColor(.white, renderingMode: .alwaysOriginal)
     }
     
     /// 썸네일, LabelStackView 컨테이너 StackView
@@ -88,6 +88,7 @@ final class BestMusicCell: UICollectionViewCell {
                 self?.thumbnailView.getThumbnailImageView.image = UIImage(data: imageData)
                 self?.thumbnailView.startFadeInAnimation()
             } catch {
+                self?.thumbnailView.setPlaceholder()
                 os_log(.error, log: log, "\(error.localizedDescription)")
             }
         }

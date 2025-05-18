@@ -85,6 +85,7 @@ final class SeasonMusicCell: UICollectionViewCell {
                 self?.thumbnailView.getThumbnailImageView.image = UIImage(data: imageData)
                 self?.thumbnailView.startFadeInAnimation()
             } catch {
+                self?.thumbnailView.setPlaceholder()
                 os_log(.error, log: log, "\(error.localizedDescription)")
             }
         }

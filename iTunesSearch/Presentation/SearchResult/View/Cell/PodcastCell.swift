@@ -29,6 +29,7 @@ final class PodcastCell: UICollectionViewCell {
     private let thumbnailView = ThumbnailView(frame: .zero).then {
         $0.getThumbnailImageView.layer.maskedCorners = CACornerMask(arrayLiteral: .layerMinXMinYCorner, .layerMaxXMinYCorner)
         $0.getActivityIndicator.style = .large
+        // TODO: 하단 marketingPhrasesLabel 부분 페이드 처리
     }
     /// 팟캐스트 마케팅 문구 `UILabel`
     private let marketingPhrasesLabel = UILabel().then {
@@ -90,6 +91,7 @@ final class PodcastCell: UICollectionViewCell {
                 self?.thumbnailView.getThumbnailImageView.image = UIImage(data: imageData)
                 self?.thumbnailView.startFadeInAnimation()
             } catch {
+                self?.thumbnailView.setPlaceholder()
                 os_log(.error, log: log, "\(error.localizedDescription)")
             }
         }

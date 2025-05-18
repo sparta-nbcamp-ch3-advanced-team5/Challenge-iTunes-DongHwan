@@ -13,13 +13,17 @@ import Then
 /// 썸네일과 관련된 UI를 갖고있는 `UIView`
 final class ThumbnailView: UIView {
     
+    // MARK: - Properties
+    
+    private let placeholderImage = UIImage(systemName: "photo.badge.exclamationmark")?.withTintColor(.white, renderingMode: .alwaysOriginal)
+    
     // MARK: - UI Components
     
     /// 썸네일 `UIImageView`
-    private let imageView = UIImageView().then {
+    private lazy var imageView = UIImageView().then {
         $0.alpha = 0.0
         $0.contentMode = .scaleAspectFill
-        $0.backgroundColor = .clear
+        $0.backgroundColor = .placeholderText
         $0.layer.masksToBounds = true
         $0.layer.cornerRadius = 10
     }
@@ -93,6 +97,11 @@ private extension ThumbnailView {
 // MARK: - Methods
 
 extension ThumbnailView {
+    func setPlaceholder() {
+        imageView.image = placeholderImage
+        imageView.contentMode = .center
+    }
+    
     /// 셀 재사용 시 초기화
     func prepareForReuse() {
         imageView.image = nil
