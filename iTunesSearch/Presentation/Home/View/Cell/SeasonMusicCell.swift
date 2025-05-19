@@ -56,7 +56,6 @@ final class SeasonMusicCell: UICollectionViewCell {
     
     deinit {
         fetchTask?.cancel()
-        fetchTask = nil
     }
     
     // MARK: - Lifecycle

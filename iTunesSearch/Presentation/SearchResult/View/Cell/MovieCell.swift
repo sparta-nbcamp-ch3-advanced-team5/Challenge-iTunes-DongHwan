@@ -60,7 +60,6 @@ final class MovieCell: UICollectionViewCell {
     
     deinit {
         fetchTask?.cancel()
-        fetchTask = nil
     }
     
     // MARK: - Lifecycle

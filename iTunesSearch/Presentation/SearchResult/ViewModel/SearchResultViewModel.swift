@@ -52,7 +52,7 @@ final class SearchResultViewModel {
     
         fetchTask = Task { [iTunesSearchAPIUseCase] in
             for await searchText in input.searchText.debounce(.milliseconds(300), scheduler: MainScheduler.asyncInstance).distinctUntilChanged().values {
-//                loadingMoreTask?.cancel()
+                loadingMoreTask?.cancel()
                 
                 movieQueryLimit = 10
                 
@@ -127,8 +127,6 @@ final class SearchResultViewModel {
     deinit {
         // 네트워크 작업 취소
         fetchTask?.cancel()
-        fetchTask = nil
         loadingMoreTask?.cancel()
-        loadingMoreTask = nil
     }
 }

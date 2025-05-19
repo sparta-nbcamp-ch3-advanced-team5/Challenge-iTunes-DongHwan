@@ -69,7 +69,6 @@ final class BestMusicCell: UICollectionViewCell {
     
     deinit {
         fetchTask?.cancel()
-        fetchTask = nil
     }
     
     // MARK: - Lifecycle

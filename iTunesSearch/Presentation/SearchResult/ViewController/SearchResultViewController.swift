@@ -68,6 +68,13 @@ final class SearchResultViewController: UIViewController {
         configureDataSource()
         bind()
     }
+    
+    // MARK: - Methods
+    
+    func deleteSnapshot() {
+        snapshot.deleteAllItems()
+        dataSource.applySnapshotUsingReloadData(snapshot)
+    }
 }
 
 // MARK: - Setting Methods

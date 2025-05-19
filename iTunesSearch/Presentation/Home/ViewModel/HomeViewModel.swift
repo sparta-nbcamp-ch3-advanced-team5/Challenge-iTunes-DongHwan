@@ -83,6 +83,5 @@ final class HomeViewModel {
     deinit {
         // 네트워크 작업 취소
         fetchTask?.cancel()
-        fetchTask = nil
     }
 }

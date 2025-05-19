@@ -71,7 +71,6 @@ final class PodcastCell: UICollectionViewCell {
     
     deinit {
         fetchTask?.cancel()
-        fetchTask = nil
     }
     
     // MARK: - Lifecycle

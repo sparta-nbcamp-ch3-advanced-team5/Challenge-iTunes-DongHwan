@@ -204,6 +204,7 @@ extension HomeViewController {
     /// 검색 취소
     func cancelSearch() {
         searchController.isActive = false
+        searchResultVC.deleteSnapshot()
     }
 }
 
