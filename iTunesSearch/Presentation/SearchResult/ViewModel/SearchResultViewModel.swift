@@ -21,9 +21,6 @@ final class SearchResultViewModel {
     private let podcastQueryLimit = 5
     private var movieQueryLimit = 10
     
-    private var podcastList = [PodcastResultModel]()
-    private var movieList = [MovieResultModel]()
-    
     /// 네트워크 작업(검색) `Task` 저장(`deinit` 될 때 실행 중단용)
     private var fetchTask: Task<Void, Never>?
     /// 네트워크 작업(추가 로딩) `Task` 저장(`deinit` 될 때, 검색어 변경됐을 때 실행 중단용)
@@ -68,12 +65,9 @@ final class SearchResultViewModel {
 
                 do {
                     let searchResultChunks = try await ([searchText], podcastList, movieList)
-                    self.podcastList = searchResultChunks.1
-                    self.movieList = searchResultChunks.2
                     searchResultChunksRelay.accept(searchResultChunks)
                 } catch {
                     // TODO: - 에러 Alert 표시
-                    searchResultChunksRelay.accept(([searchText], self.podcastList, self.movieList))
                     os_log(.error, log: log, "\(error.localizedDescription)")
                 }
             }
@@ -85,6 +79,7 @@ final class SearchResultViewModel {
             for await searchText in infallible.values {
                 movieQueryLimit += 10
                 os_log(.debug, log: log, "loadingMoreTask: \(self.podcastQueryLimit), \(self.movieQueryLimit)")
+                
                 let podcastQueryDTO = iTunesQuery(term: searchText, mediaType: MediaType.podcast.rawValue, limit: podcastQueryLimit)
                 let movieQueryDTO = iTunesQuery(term: searchText, mediaType: MediaType.movie.rawValue, limit: movieQueryLimit)
                 
@@ -98,16 +93,10 @@ final class SearchResultViewModel {
                 
                 do {
                     let searchResultChunks = try await ([searchText], podcastList, movieList)
-                    if self.movieList.count == searchResultChunks.1.count {
-                        movieQueryLimit -= 10
-                    }
-                    self.podcastList = searchResultChunks.1
-                    self.movieList = searchResultChunks.2
                     searchResultChunksRelay.accept(searchResultChunks)
                 } catch {
                     // TODO: - 에러 Alert 표시
                     movieQueryLimit -= 10
-                    searchResultChunksRelay.accept(([searchText], self.podcastList, self.movieList))
                     os_log(.error, log: log, "\(error.localizedDescription)")
                 }
             }

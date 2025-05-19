@@ -196,15 +196,14 @@ private extension HomeViewController {
 // MARK: - Private Methods
 
 extension HomeViewController {
+    /// 키보드 내림
     func dismissKeyboard() {
-        /// 키보드 내림
         searchController.searchBar.resignFirstResponder()
     }
     
     /// 검색 취소
     func cancelSearch() {
         searchController.isActive = false
-        searchResultVC.deleteSnapshot()
     }
 }
 

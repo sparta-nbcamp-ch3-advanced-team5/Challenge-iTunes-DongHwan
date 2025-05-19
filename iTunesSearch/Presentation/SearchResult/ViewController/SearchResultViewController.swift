@@ -69,9 +69,9 @@ final class SearchResultViewController: UIViewController {
         bind()
     }
     
-    // MARK: - Methods
-    
-    func deleteSnapshot() {
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
         snapshot.deleteAllItems()
         dataSource.applySnapshotUsingReloadData(snapshot)
     }
