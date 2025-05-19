@@ -7,8 +7,8 @@
 
 import Foundation
 
-enum MediaType: String {
+enum MediaType: String, CaseIterable {
     case music
-    case movie
     case podcast
+    case movie
 }

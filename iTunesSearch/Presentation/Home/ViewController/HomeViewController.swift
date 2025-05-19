@@ -7,8 +7,8 @@
 
 import UIKit
 
-import RxSwift
 import RxCocoa
+import RxSwift
 import SnapKit
 import Then
 
@@ -17,27 +17,29 @@ final class HomeViewController: UIViewController {
     
     // MARK: - Properties
     
-    private var homeViewModel: HomeViewModel
-    private let disposeBag = DisposeBag()
+    private let homeViewModel: HomeViewModel
     
     // Diffable DataSource
-    typealias DataSource = UICollectionViewDiffableDataSource<HomeSection, HomeItem>
-    typealias Snapshot = NSDiffableDataSourceSnapshot<HomeSection, HomeItem>
-    private var dataSource: DataSource!
-    private var snapshot = Snapshot()
+    typealias HomeDataSource = UICollectionViewDiffableDataSource<HomeSection, HomeItem>
+    typealias HomeSnapshot = NSDiffableDataSourceSnapshot<HomeSection, HomeItem>
+    private var dataSource: HomeDataSource!
+    private var snapshot = HomeSnapshot()
     
     // MARK: - UI Components
     
     /// 홈 화면 네비게이션 바 SearchController
-    private let searchController = UISearchController(searchResultsController: SearchResultViewController())
-    
+    private let searchController: UISearchController
+    /// 검색 결과 ViewController
+    private var searchResultVC: SearchResultViewController
     /// 홈 화면 View
     private let homeView = HomeView()
     
     // MARK: - Initializer
     
-    init(homeViewModel: HomeViewModel) {
+    init(homeViewModel: HomeViewModel, searchResultViewController: SearchResultViewController) {
         self.homeViewModel = homeViewModel
+        self.searchResultVC = searchResultViewController
+        searchController = UISearchController(searchResultsController: searchResultViewController)
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -56,11 +58,12 @@ final class HomeViewController: UIViewController {
     }
 }
 
-// MARK: - UI Methods
+// MARK: - Setting Methods
 
 private extension HomeViewController {
     func setupUI() {
         setAppearance()
+        setDelegates()
         setViewHierarchy()
         setConstraints()
     }
@@ -77,6 +80,12 @@ private extension HomeViewController {
         searchController.hidesNavigationBarDuringPresentation = true
     }
     
+    func setDelegates() {
+        homeView.getMusicCollectionView.delegate = self
+        searchResultVC.delegate = self
+        searchController.searchBar.delegate = searchResultVC
+    }
+    
     func setViewHierarchy() {
         self.view.addSubview(homeView)
     }
@@ -89,21 +98,21 @@ private extension HomeViewController {
     
     func bind() {
         // Input ➡️ ViewModel
-        let input = HomeViewModel.Input(viewDidLoad: Observable.just(()))
+        let input = HomeViewModel.Input(viewDidLoad: Infallible.just(()))
         
         // ViewModel ➡️ Output
         let output = homeViewModel.transform(input: input)
         
-        output.musicListChunksRelay
-            .asDriver(onErrorJustReturn: ([], [], [], []))
-            .drive(with: self) { owner, element in
+        Task {
+            for await element in output.musicListChunksRelay.asDriver(onErrorJustReturn: ([], [], [], [])).values {
                 let (top5MusicList, summerMusicList, fallMusicList, winterMusicList) = element
-                owner.configureSnapshot(top5MusicList: top5MusicList,
-                                        summerMusicList: summerMusicList,
-                                        fallMusicList: fallMusicList,
-                                        winterMusicList: winterMusicList,
-                                        animatingDifferences: false)
-            }.disposed(by: disposeBag)
+                self.configureSnapshot(top5MusicList: top5MusicList,
+                                       summerMusicList: summerMusicList,
+                                       fallMusicList: fallMusicList,
+                                       winterMusicList: winterMusicList,
+                                       animatingDifferences: true)
+            }
+        }
     }
 }
 
@@ -112,16 +121,16 @@ private extension HomeViewController {
 private extension HomeViewController {
     /// Diffable DataSource 설정
     func configureDataSource() {
-        let bestCellRegistration = UICollectionView.CellRegistration<BestCell, MusicResultModel> { cell, indexPath, item in
-            let artistImageColor = UIColor.artistImageColors[item.artistImageColorIndex]
-            cell.configure(thumbnailImageURL: item.artworkUrl100,
-                           artistImageColor: artistImageColor,
+        let bestCellRegistration = UICollectionView.CellRegistration<BestMusicCell, MusicResultModel> { cell, indexPath, item in
+            let color = UIColor(hex: item.backgroundArtistImageColorHex)
+            cell.configure(thumbnailURL: item.artworkUrl100,
+                           backgroundArtistImageColor: color,
                            title: item.trackName,
                            artist: item.artistName)
         }
         
-        let seasonCellRegistration = UICollectionView.CellRegistration<SeasonCell, MusicResultModel> { cell, indexPath, item in
-            cell.configure(thumbnailImageURL: item.artworkUrl100,
+        let seasonCellRegistration = UICollectionView.CellRegistration<SeasonMusicCell, MusicResultModel> { cell, indexPath, item in
+            cell.configure(thumbnailURL: item.artworkUrl100,
                            title: item.trackName,
                            artist: item.artistName,
                            collection: item.collectionName ?? "",
@@ -134,7 +143,7 @@ private extension HomeViewController {
             header.configure(title: headerTitle, subtitle: headerSubtitle)
         }
         
-        dataSource = DataSource(collectionView: homeView.getCollectionView, cellProvider: { collectionView, indexPath, itemList in
+        dataSource = HomeDataSource(collectionView: homeView.getMusicCollectionView, cellProvider: { collectionView, indexPath, itemList in
             switch itemList {
             case .best(let top5Music):
                 let cell = collectionView.dequeueConfiguredReusableCell(using: bestCellRegistration,
@@ -161,14 +170,60 @@ private extension HomeViewController {
                            fallMusicList: [MusicResultModel],
                            winterMusicList: [MusicResultModel],
                            animatingDifferences: Bool) {
-        snapshot.deleteAllItems()
-        snapshot.appendSections(HomeSection.allCases)
+        snapshot.deleteSections(HomeSection.allCases)
         
-        snapshot.appendItems(top5MusicList.map { HomeItem.best($0) }, toSection: .springBest)
-        snapshot.appendItems(summerMusicList.map { HomeItem.season($0) }, toSection: .summer)
-        snapshot.appendItems(fallMusicList.map { HomeItem.season($0) }, toSection: .fall)
-        snapshot.appendItems(winterMusicList.map { HomeItem.season($0) }, toSection: .winter)
+        if !top5MusicList.isEmpty {
+            snapshot.appendSections([.springBest])
+            snapshot.appendItems(top5MusicList.map { HomeItem.best($0) }, toSection: .springBest)
+        }
+        if !summerMusicList.isEmpty {
+            snapshot.appendSections([.summer])
+            snapshot.appendItems(summerMusicList.map { HomeItem.season($0) }, toSection: .summer)
+        }
+        if !fallMusicList.isEmpty {
+            snapshot.appendSections([.fall])
+            snapshot.appendItems(fallMusicList.map { HomeItem.season($0) }, toSection: .fall)
+        }
+        if !winterMusicList.isEmpty {
+            snapshot.appendSections([.winter])
+            snapshot.appendItems(winterMusicList.map { HomeItem.season($0) }, toSection: .winter)
+        }
         
         dataSource.apply(snapshot, animatingDifferences: animatingDifferences)
+    }
+}
+
+// MARK: - Private Methods
+
+extension HomeViewController {
+    func dismissKeyboard() {
+        /// 키보드 내림
+        searchController.searchBar.resignFirstResponder()
+    }
+    
+    /// 검색 취소
+    func cancelSearch() {
+        searchController.isActive = false
+        searchResultVC.deleteSnapshot()
+    }
+}
+
+// MARK: - UICollectionViewDelegate
+
+extension HomeViewController: UICollectionViewDelegate {
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        cancelSearch()
+    }
+}
+
+// MARK: - SearchResultViewControllerDelegate
+
+extension HomeViewController: SearchResultViewControllerDelegate {
+    func willBeginDragging() {
+        dismissKeyboard()
+    }
+    
+    func searchTextCellTapped() {
+        cancelSearch()
     }
 }

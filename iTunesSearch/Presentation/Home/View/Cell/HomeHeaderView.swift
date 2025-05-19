@@ -13,23 +13,16 @@ import Then
 /// 홈 화면 CollectionView Header
 final class HomeHeaderView: UICollectionReusableView {
     
-    // MARK: - Properties
-    
-    static let identifier = String(describing: HomeHeaderView.self)
-    
     // MARK: - UI Components
     
-    private let titleLabel = UILabel().then {
-        $0.text = "봄 Best"
+    /// `UILabel` 컨테이너 `UIStackView`
+    private let labelStackView = LabelStackView()
+    /// `Header` 제목 `UILabel`
+    private let titleLabel = TitleLabel().then {
         $0.font = .systemFont(ofSize: 24, weight: .bold)
-        $0.textColor = .label
     }
-    
-    private let subtitleLabel = UILabel().then {
-        $0.text = "봄에 어울리는 음악 Best 5"
-        $0.font = .systemFont(ofSize: 14)
-        $0.textColor = .secondaryLabel
-    }
+    /// Header 부제목 `UILabel`
+    private let subtitleLabel = SubtitleLabel()
     
     // MARK: - Initializer
     
@@ -50,7 +43,7 @@ final class HomeHeaderView: UICollectionReusableView {
     }
 }
 
-// MARK: - UI Methods
+// MARK: - Setting Methods
 
 private extension HomeHeaderView {
     func setupUI() {
@@ -59,19 +52,15 @@ private extension HomeHeaderView {
     }
     
     func setViewHierarchy() {
-        self.addSubviews(titleLabel,
-                         subtitleLabel)
+        self.addSubview(labelStackView)
+        
+        labelStackView.addArrangedSubviews(titleLabel,
+                                           subtitleLabel)
     }
     
     func setConstraints() {
-        titleLabel.snp.makeConstraints {
-            $0.leading.trailing.equalToSuperview()
-            $0.bottom.equalTo(subtitleLabel.snp.top).offset(-2)
-        }
-        
-        subtitleLabel.snp.makeConstraints {
-            $0.leading.trailing.equalToSuperview()
-            $0.bottom.equalToSuperview()
+        labelStackView.snp.makeConstraints {
+            $0.leading.trailing.bottom.equalToSuperview()
         }
     }
 }

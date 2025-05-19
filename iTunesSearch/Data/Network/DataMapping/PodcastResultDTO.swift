@@ -49,3 +49,22 @@ struct PodcastResultDTO: Decodable {
         case genres
     }
 }
+
+extension PodcastResultDTO {
+    func toModel() -> PodcastResultModel {
+        return PodcastResultModel(artistName: artistName,
+                                  collectionName: collectionName,
+                                  trackName: trackName,
+                                  artistViewURL: artistViewURL,
+                                  collectionViewURL: collectionViewURL,
+                                  feedURL: feedURL,
+                                  trackViewURL: trackViewURL,
+                                  artworkUrl100: artworkUrl100,
+                                  releaseDate: releaseDate,
+                                  trackCount: trackCount,
+                                  trackTimeMillis: trackTimeMillis,
+                                  primaryGenreName: primaryGenreName,
+                                  artworkUrl600: artworkUrl600,
+                                  marketingPhrase: PodcastMarketingPhrases.allCases.randomElement()!.rawValue)
+    }
+}

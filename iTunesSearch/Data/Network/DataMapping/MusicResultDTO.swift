@@ -22,13 +22,13 @@ struct MusicResultDTO: Decodable {
     let artistViewURL: String
     let collectionViewURL: String?
     let trackViewURL: String
-    let previewURL: String
+    let previewURL: String?
     let artworkUrl30, artworkUrl60, artworkUrl100: String
     let collectionPrice, trackPrice: Double
     let releaseDate: String
     let collectionExplicitness, trackExplicitness: String
     let discCount, discNumber, trackCount, trackNumber: Int?
-    let trackTimeMillis: Int
+    let trackTimeMillis: Int?
     let country: String
     let currency: String
     let primaryGenreName: String
@@ -55,14 +55,13 @@ struct MusicResultDTO: Decodable {
 }
 
 extension MusicResultDTO {
-    func toMusicModel() -> MusicResultModel {
+    func toModel() -> MusicResultModel {
         return MusicResultModel(artistName: artistName,
                                 collectionName: collectionName,
                                 trackName: trackName,
                                 artistViewURL: artistViewURL,
                                 collectionViewURL: collectionViewURL,
                                 trackViewURL: trackViewURL,
-                                previewURL: previewURL,
                                 artworkUrl100: artworkUrl100,
                                 releaseDate: releaseDate,
                                 discCount: discCount,
@@ -73,6 +72,6 @@ extension MusicResultDTO {
                                 primaryGenreName: primaryGenreName,
                                 collectionArtistName: collectionArtistName,
                                 collectionArtistViewURL: collectionViewURL,
-                                artistImageColorIndex: .random(in: 0...6))
+                                backgroundArtistImageColorHex: BackgroundColorsHex.allCases.randomElement()!.rawValue)
     }
 }

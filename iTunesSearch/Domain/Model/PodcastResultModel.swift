@@ -34,4 +34,6 @@ struct PodcastResultModel: Hashable {
     let primaryGenreName: String
     /// 600x600 픽셀의 썸네일 URL
     let artworkUrl600: String
+    /// 마케팅 문구
+    let marketingPhrase: String
 }

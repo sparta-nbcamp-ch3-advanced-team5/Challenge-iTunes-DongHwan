@@ -16,18 +16,17 @@ final class HomeView: UIView {
     // MARK: - Properties
     
     private let groupFractionalWidth: CGFloat = 0.92
-    private let itemContentInsets = NSDirectionalEdgeInsets(top: 0, leading: 5, bottom: 0, trailing: 5)
     
     // MARK: - UI Components
     
-    /// 홈 화면 CollectionView
-    private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
+    /// 음악 CollectionView
+    private lazy var musicCollectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
     
     // MARK: - Getter
     
-    /// 홈 화면 CollectionView 반환
-    var getCollectionView: UICollectionView {
-        return collectionView
+    /// 음악 CollectionView 반환
+    var getMusicCollectionView: UICollectionView {
+        return musicCollectionView
     }
     
     // MARK: - Initializer
@@ -42,7 +41,7 @@ final class HomeView: UIView {
     }
 }
 
-// MARK: - UI Methods
+// MARK: - Setting Methods
 
 private extension HomeView {
     func setupUI() {
@@ -51,11 +50,11 @@ private extension HomeView {
     }
     
     func setViewHierarchy() {
-        self.addSubview(collectionView)
+        self.addSubview(musicCollectionView)
     }
     
     func setConstraints() {
-        collectionView.snp.makeConstraints {
+        musicCollectionView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
     }
@@ -69,7 +68,7 @@ private extension HomeView {
         config.interSectionSpacing = 20
         
         let layout = UICollectionViewCompositionalLayout(sectionProvider: { [weak self] sectionIndex, _ in
-            guard let self , let section = HomeSection(rawValue: sectionIndex) else { return nil }
+            guard let self, let section = HomeSection(rawValue: sectionIndex) else { return nil }
             switch section {
             case .springBest:
                 return self.createCarouselBannerSection()
@@ -83,12 +82,12 @@ private extension HomeView {
     
     func createCarouselBannerSection() -> NSCollectionLayoutSection {
         let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-                                              heightDimension: .fractionalHeight(1.0))
+                                              heightDimension: .fractionalWidth(0.66))
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        item.contentInsets = itemContentInsets
+        item.contentInsets = NSDirectionalEdgeInsets(top: 5, leading: 5, bottom: 0, trailing: 5)
         
         let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(groupFractionalWidth),
-                                               heightDimension: .absolute(240))
+                                               heightDimension: .estimated(260))
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
         
         let section = NSCollectionLayoutSection(group: group)
@@ -104,10 +103,10 @@ private extension HomeView {
         let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
                                               heightDimension: .fractionalHeight(0.33))
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        item.contentInsets = itemContentInsets
+        item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 5, bottom: 0, trailing: 5)
         
         let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(groupFractionalWidth),
-                                               heightDimension: .absolute(270))
+                                               heightDimension: .absolute(240))
         let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
         
         let section = NSCollectionLayoutSection(group: group)
@@ -119,12 +118,11 @@ private extension HomeView {
         return section
     }
     
-    
     func createHeader() -> NSCollectionLayoutBoundarySupplementaryItem {
         let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(groupFractionalWidth), heightDimension: .absolute(60))
         let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerSize,
-                                                                            elementKind: UICollectionView.elementKindSectionHeader,
-                                                                            alignment: .top)
+                                                                        elementKind: UICollectionView.elementKindSectionHeader,
+                                                                        alignment: .top)
         sectionHeader.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 5, bottom: 5, trailing: 5)
         
         return sectionHeader
