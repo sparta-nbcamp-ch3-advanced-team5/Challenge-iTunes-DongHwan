@@ -18,10 +18,9 @@ final class SearchResultViewModel {
     
     private let iTunesSearchAPIUseCase: iTunesSearchAPIUseCase
     
-    private var lastPodcastQueryLimit = 0
-    private var lastMovieQueryLimit = 0
+    private let podcastQueryLimit = 5
+    private var movieQueryLimit = 10
     
-    private var searchText = ""
     private var podcastList = [PodcastResultModel]()
     private var movieList = [MovieResultModel]()
     
@@ -39,7 +38,7 @@ final class SearchResultViewModel {
     
     // MARK: - Output (ViewModel ➡️ ViewController)
     /// searchText, podcastList, movieList
-    typealias SearchResultChunks = ([PodcastResultModel], [MovieResultModel])
+    typealias SearchResultChunks = ([SearchTextModel], [PodcastResultModel], [MovieResultModel])
     struct Output {
         let searchResultChunksRelay: BehaviorRelay<SearchResultChunks>
     }
@@ -49,19 +48,19 @@ final class SearchResultViewModel {
     func transform(input: Input) -> Output {
         let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
         
-        let searchResultChunksRelay = BehaviorRelay<SearchResultChunks>(value: ([], []))
+        let searchResultChunksRelay = BehaviorRelay<SearchResultChunks>(value: ([], [], []))
     
         fetchTask = Task { [iTunesSearchAPIUseCase] in
-            for await text in input.searchText.debounce(.milliseconds(300), scheduler: MainScheduler.asyncInstance).distinctUntilChanged().values {
+            for await searchText in input.searchText.debounce(.milliseconds(300), scheduler: MainScheduler.asyncInstance).distinctUntilChanged().values {
 //                loadingMoreTask?.cancel()
                 
-                searchText = text
-                let podcastQueryDTO = iTunesQuery(term: searchText, mediaType: MediaType.podcast.rawValue, limit: lastPodcastQueryLimit)
-                let movieQueryDTO = iTunesQuery(term: searchText, mediaType: MediaType.movie.rawValue, limit: lastMovieQueryLimit)
-                lastPodcastQueryLimit = 3
-                lastMovieQueryLimit = 5
-                os_log(.debug, log: log, "fetchTask: \(self.lastPodcastQueryLimit), \(self.lastMovieQueryLimit)")
+                movieQueryLimit = 10
                 
+                let podcastQueryDTO = iTunesQuery(term: searchText, mediaType: MediaType.podcast.rawValue, limit: podcastQueryLimit)
+                let movieQueryDTO = iTunesQuery(term: searchText, mediaType: MediaType.movie.rawValue, limit: movieQueryLimit)
+                os_log(.debug, log: log, "fetchTask: \(self.podcastQueryLimit), \(self.movieQueryLimit)")
+                
+                let searchText = SearchTextModel(searchText: searchText)
                 async let podcastList = iTunesSearchAPIUseCase.fetchSearchResultList(with: podcastQueryDTO,
                                                                                      dtoType: PodcastResultDTO.self,
                                                                                      transform: { $0.toModel() })
@@ -70,23 +69,28 @@ final class SearchResultViewModel {
                                                                                    transform: { $0.toModel() })
 
                 do {
-                    let searchResultChunks = try await (podcastList, movieList)
+                    let searchResultChunks = try await ([searchText], podcastList, movieList)
+                    self.podcastList = searchResultChunks.1
+                    self.movieList = searchResultChunks.2
                     searchResultChunksRelay.accept(searchResultChunks)
                 } catch {
                     // TODO: - 에러 Alert 표시
+                    searchResultChunksRelay.accept(([searchText], self.podcastList, self.movieList))
                     os_log(.error, log: log, "\(error.localizedDescription)")
                 }
             }
         }
         
         loadingMoreTask = Task { [iTunesSearchAPIUseCase] in
-            for await _ in input.didScrolledBottom.debounce(.milliseconds(500), scheduler: MainScheduler.asyncInstance).values {
-                lastPodcastQueryLimit += 3
-                lastMovieQueryLimit += 5
-                os_log(.debug, log: log, "loadingMoreTask: \(self.lastPodcastQueryLimit), \(self.lastMovieQueryLimit)")
-                let podcastQueryDTO = iTunesQuery(term: searchText, mediaType: MediaType.podcast.rawValue, limit: lastPodcastQueryLimit)
-                let movieQueryDTO = iTunesQuery(term: searchText, mediaType: MediaType.movie.rawValue, limit: lastMovieQueryLimit)
+            let infallible = input.didScrolledBottom.debounce(.milliseconds(500), scheduler: MainScheduler.asyncInstance)
+                .withLatestFrom(input.searchText.debounce(.milliseconds(300), scheduler: MainScheduler.asyncInstance).distinctUntilChanged())
+            for await searchText in infallible.values {
+                movieQueryLimit += 10
+                os_log(.debug, log: log, "loadingMoreTask: \(self.podcastQueryLimit), \(self.movieQueryLimit)")
+                let podcastQueryDTO = iTunesQuery(term: searchText, mediaType: MediaType.podcast.rawValue, limit: podcastQueryLimit)
+                let movieQueryDTO = iTunesQuery(term: searchText, mediaType: MediaType.movie.rawValue, limit: movieQueryLimit)
                 
+                let searchText = SearchTextModel(searchText: searchText)
                 async let podcastList = iTunesSearchAPIUseCase.fetchSearchResultList(with: podcastQueryDTO,
                                                                                      dtoType: PodcastResultDTO.self,
                                                                                      transform: { $0.toModel() })
@@ -95,10 +99,17 @@ final class SearchResultViewModel {
                                                                                    transform: { $0.toModel() })
                 
                 do {
-                    let searchResultChunks = try await (podcastList, movieList)
+                    let searchResultChunks = try await ([searchText], podcastList, movieList)
+                    if self.movieList.count == searchResultChunks.1.count {
+                        movieQueryLimit -= 10
+                    }
+                    self.podcastList = searchResultChunks.1
+                    self.movieList = searchResultChunks.2
                     searchResultChunksRelay.accept(searchResultChunks)
                 } catch {
                     // TODO: - 에러 Alert 표시
+                    movieQueryLimit -= 10
+                    searchResultChunksRelay.accept(([searchText], self.podcastList, self.movieList))
                     os_log(.error, log: log, "\(error.localizedDescription)")
                 }
             }

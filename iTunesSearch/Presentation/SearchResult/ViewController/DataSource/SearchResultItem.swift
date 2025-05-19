@@ -8,7 +8,7 @@
 import Foundation
 
 enum SearchResultItem: Hashable {
-    case searchText(String)
+    case searchText(SearchTextModel)
     case podcast(PodcastResultModel)
     case movieList(MovieResultModel)
     case loading

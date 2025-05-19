@@ -23,15 +23,6 @@ final class SearchResultView: UIView {
     private let itemContentInset: NSDirectionalEdgeInsets
     private let headerContentInset: NSDirectionalEdgeInsets
     
-    private var sectionList: [SearchResultSection] = [
-        .searchText,
-        .largeBanner(page: 0),
-        .list(page: 0),
-        .loading
-    ]
-    
-    var searchScope: MediaType = .music
-    
     // MARK: - UI Components
     
     /// 검색 결과 CollectionView
@@ -96,31 +87,17 @@ private extension SearchResultView {
         config.interSectionSpacing = 20
         
         let layout = UICollectionViewCompositionalLayout(sectionProvider: { sectionIndex, _ in
-            let index = sectionIndex % (self.sectionList.count - 1)
-            let section = self.sectionList[index]
-            
+            guard let section = SearchResultSection(rawValue: sectionIndex) else { return nil }
             switch section {
             case .searchText:
                 return self.createSearchTextSection()
-            case .largeBanner(_):
+            case .largeBanner:
                 return self.createLargeBannerSection()
-            case .list(_):
+            case .list:
                 return self.createListSection()
             case .loading:
                 return self.createLoadingSection()
             }
-            
-//            guard let section = SearchResultSection(rawValue: sectionIndex) else { return nil }
-//            switch section {
-//            case .searchText:
-//                return self.createSearchTextSection()
-//            case .largeBanner:
-//                return self.createLargeBannerSection()
-//            case .list:
-//                return self.createListSection()
-//            case .loading:
-//                return self.createLoadingSection()
-//            }
         }, configuration: config)
         
         layout.register(ListSectionBackgroundView.self, forDecorationViewOfKind: ListSectionBackgroundView.identifier)

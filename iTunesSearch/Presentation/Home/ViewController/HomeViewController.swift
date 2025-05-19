@@ -83,7 +83,7 @@ private extension HomeViewController {
     func setDelegates() {
         homeView.getMusicCollectionView.delegate = self
         searchResultVC.delegate = self
-        searchController.searchResultsUpdater = searchResultVC
+        searchController.searchBar.delegate = searchResultVC
     }
     
     func setViewHierarchy() {

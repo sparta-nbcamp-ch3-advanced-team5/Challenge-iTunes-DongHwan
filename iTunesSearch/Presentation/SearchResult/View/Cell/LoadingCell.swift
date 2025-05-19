@@ -40,6 +40,13 @@ final class LoadingCell: UICollectionViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    // MARK: - Lifecycle
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        activityIndicator.stopAnimating()
+    }
 }
 
 // MARK: - Setting Methods

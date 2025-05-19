@@ -8,7 +8,6 @@
 import Foundation
 
 struct MusicResultModel: Hashable {
-    let id = UUID()
     /// 아티스트 이름
     let artistName: String
     /// 앨범 이름

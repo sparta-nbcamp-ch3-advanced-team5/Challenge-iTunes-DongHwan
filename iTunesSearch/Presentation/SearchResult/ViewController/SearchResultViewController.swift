@@ -25,12 +25,8 @@ final class SearchResultViewController: UIViewController {
     private var dataSource: SearchResultDataSource!
     private var snapshot = SearchResultSnapshot()
     
-    private var largeBannerPage = 0
-    private var listPage = 0
-
     private var searchText = "" {
         didSet {
-            configureSearchTextSnapshot(searchText: [searchText])
             searchTextRelay.accept(searchText)
         }
     }
@@ -106,19 +102,20 @@ private extension SearchResultViewController {
         let output = searchResultViewModel.transform(input: input)
         
         Task {
-            for await element in output.searchResultChunksRelay.asDriver(onErrorJustReturn: ([], [])).values {
-                let (podcastList, movieList) = element
-                self.configureResultsSnapshot(podcastList: podcastList,
-                                              movieList: movieList,
-                                              animatingDifferences: false)
+            for await element in output.searchResultChunksRelay.asDriver(onErrorJustReturn: ([], [], [])).values {
+                let (searchText, podcastList, movieList) = element
+                self.configureSnapshot(searchText: searchText,
+                                       podcastList: podcastList,
+                                       movieList: movieList,
+                                       animatingDifferences: true)
                 
                 let collectionView = searchResultView.getSearchResultCollectionView
                 let lastSection = collectionView.numberOfSections - 1
                 let lastItem = collectionView.numberOfItems(inSection: lastSection) - 1
-                
                 if let loadingCell = collectionView.cellForItem(at: IndexPath(item: lastItem, section: lastSection)) as? LoadingCell {
-                    try await Task.sleep(nanoseconds: 1_000_000_000)
+                    try await Task.sleep(nanoseconds: 500_000_000)
                     loadingCell.getActivityIndicator.stopAnimating()
+                    print("activityIndicator stop")
                 }
             }
         }
@@ -127,11 +124,11 @@ private extension SearchResultViewController {
         // 맨 아래 LoadingCell 표시할 때
         Task {
             for await (cell, _) in searchResultView.getSearchResultCollectionView.rx.willDisplayCell.asInfallible().values {
-                if let loadingCell = cell as? LoadingCell, !loadingCell.getActivityIndicator.isAnimating {
+                if let loadingCell = cell as? LoadingCell, !searchText.isEmpty && !loadingCell.getActivityIndicator.isAnimating {
                     // 데이터 추가적으로 로드
-                    print("loading Data")
                     didScrolledBottom.accept(())
                     loadingCell.getActivityIndicator.startAnimating()
+                    print("activityIndicator start")
                 }
             }
         }
@@ -147,7 +144,7 @@ private extension SearchResultViewController {
         // 셀 터치했을 때
         Task {
             for await indexPath in searchResultView.getSearchResultCollectionView.rx.itemSelected.asInfallible().values {
-                dump(indexPath)
+                debugPrint(indexPath)
                 // SearchTextCell인 경우
                 if indexPath.section == 0 {
                     // 홈 화면으로 돌아감
@@ -163,8 +160,8 @@ private extension SearchResultViewController {
 private extension SearchResultViewController {
     /// Diffable DataSource 설정
     func configureDataSource() {
-        let searchTextCellRegistration = UICollectionView.CellRegistration<SearchTextCell, String> { cell, indexPath, _ in
-            cell.configure(searchText: self.searchText)
+        let searchTextCellRegistration = UICollectionView.CellRegistration<SearchTextCell, SearchTextModel> { cell, indexPath, item in
+            cell.configure(searchText: item.searchText)
         }
         
         let podCastCellRegistration = UICollectionView.CellRegistration<PodcastCell, PodcastResultModel> { cell, indexPath, item in
@@ -219,34 +216,22 @@ private extension SearchResultViewController {
         }
     }
     
-    func configureSearchTextSnapshot(searchText: [String]) {
+    func configureSnapshot(searchText: [SearchTextModel],
+                           podcastList: [PodcastResultModel],
+                           movieList: [MovieResultModel],
+                           animatingDifferences: Bool) {
         snapshot.deleteAllItems()
-        largeBannerPage = 0
-        listPage = 0
         
         snapshot.appendSections([.searchText])
         snapshot.appendItems(searchText.map { SearchResultItem.searchText($0) }, toSection: .searchText)
-        dataSource.applySnapshotUsingReloadData(snapshot)
-    }
-    
-    /// Diffable DataSource Snapshot 설정
-    func configureResultsSnapshot(podcastList: [PodcastResultModel],
-                                  movieList: [MovieResultModel],
-                                  animatingDifferences: Bool) {
-        
-        configureSearchTextSnapshot(searchText: [searchText])
-        
         if !podcastList.isEmpty {
-            snapshot.appendSections([.largeBanner(page: largeBannerPage)])
-            snapshot.appendItems(podcastList.map { SearchResultItem.podcast($0) }, toSection: .largeBanner(page: largeBannerPage))
-            largeBannerPage += 1
+            snapshot.appendSections([.largeBanner])
+            snapshot.appendItems(podcastList.map { SearchResultItem.podcast($0) }, toSection: .largeBanner)
         }
         if !movieList.isEmpty {
-            snapshot.appendSections([.list(page: listPage)])
-            snapshot.appendItems(movieList.map { SearchResultItem.movieList($0) }, toSection: .list(page: listPage))
-            listPage += 1
+            snapshot.appendSections([.list])
+            snapshot.appendItems(movieList.map { SearchResultItem.movieList($0) }, toSection: .list)
         }
-        
         snapshot.appendSections([.loading])
         snapshot.appendItems([SearchResultItem.loading], toSection: .loading)
         
@@ -254,11 +239,11 @@ private extension SearchResultViewController {
     }
 }
 
-// MARK: - UISearchResultsUpdating
+// MARK: - UISearchBarDelegate
 
-extension SearchResultViewController: UISearchResultsUpdating {
-    func updateSearchResults(for searchController: UISearchController) {
-        self.searchText = searchController.searchBar.text ?? ""
+extension SearchResultViewController: UISearchBarDelegate {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        self.searchText = searchText
         let collectionView = searchResultView.getSearchResultCollectionView
         // Section 생성 확인 후 이동하지 않으면 Crash 발생
         if collectionView.numberOfSections > 0 {
