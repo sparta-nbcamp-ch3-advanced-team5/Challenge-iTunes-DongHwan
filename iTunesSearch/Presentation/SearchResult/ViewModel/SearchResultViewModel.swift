@@ -52,8 +52,6 @@ final class SearchResultViewModel {
     
         fetchTask = Task { [iTunesSearchAPIUseCase] in
             for await searchText in input.searchText.debounce(.milliseconds(300), scheduler: MainScheduler.asyncInstance).distinctUntilChanged().values {
-                loadingMoreTask?.cancel()
-                
                 movieQueryLimit = 10
                 
                 let podcastQueryDTO = iTunesQuery(term: searchText, mediaType: MediaType.podcast.rawValue, limit: podcastQueryLimit)
