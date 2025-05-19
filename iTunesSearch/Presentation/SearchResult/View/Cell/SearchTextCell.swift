@@ -16,7 +16,7 @@ final class SearchTextCell: UICollectionViewCell {
     
     // MARK: - UI Components
     
-    /// 검색어 UILabel
+    /// 검색어 `UILabel`
     private let searchTextLabel = TitleLabel().then {
         $0.font = .systemFont(ofSize: 36, weight: .bold)
     }

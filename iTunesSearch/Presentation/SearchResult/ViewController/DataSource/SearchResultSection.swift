@@ -7,8 +7,9 @@
 
 import Foundation
 
-enum SearchResultSection: Int, CaseIterable {
+enum SearchResultSection: Hashable {
     case searchText
-    case largeBanner
-    case list
+    case largeBanner(page: Int)
+    case list(page: Int)
+    case loading
 }

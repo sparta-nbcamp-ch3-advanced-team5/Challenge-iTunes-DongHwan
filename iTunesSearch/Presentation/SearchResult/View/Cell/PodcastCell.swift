@@ -79,7 +79,6 @@ final class PodcastCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         fetchTask?.cancel()
-        fetchTask = nil
         thumbnailView.prepareForReuse()
     }
     

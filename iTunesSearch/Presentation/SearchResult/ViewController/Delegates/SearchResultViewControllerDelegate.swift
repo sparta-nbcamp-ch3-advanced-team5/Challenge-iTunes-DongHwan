@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// `SearchResultView` ➡️ `SearchResultViewController`
 protocol SearchResultViewControllerDelegate: AnyObject {
     /// 드래그 시작할 때 호출
     func willBeginDragging()

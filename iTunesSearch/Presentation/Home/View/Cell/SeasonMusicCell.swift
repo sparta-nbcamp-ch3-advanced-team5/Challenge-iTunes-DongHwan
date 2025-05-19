@@ -64,7 +64,6 @@ final class SeasonMusicCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         fetchTask?.cancel()
-        fetchTask = nil
         thumbnailView.prepareForReuse()
     }
     

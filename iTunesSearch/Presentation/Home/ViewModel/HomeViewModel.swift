@@ -43,10 +43,10 @@ final class HomeViewModel {
         
         fetchTask = Task { [iTunesSearchAPIUseCase] in
             for await _ in input.viewDidLoad.values {
-                let top5RequestDTO = iTunesQuery(term: MusicTerm.spring.rawValue, mediaType: .music, limit: 5)
-                let summerRequestDTO = iTunesQuery(term: MusicTerm.summer.rawValue, mediaType: .music, limit: 15)
-                let fallRequestDTO = iTunesQuery(term: MusicTerm.fall.rawValue, mediaType: .music, limit: 15)
-                let winterRequestDTO = iTunesQuery(term: MusicTerm.winter.rawValue, mediaType: .music, limit: 15)
+                let top5RequestDTO = iTunesQuery(term: MusicTerm.spring.rawValue, mediaType: MediaType.music.rawValue, limit: 5)
+                let summerRequestDTO = iTunesQuery(term: MusicTerm.summer.rawValue, mediaType: MediaType.music.rawValue, limit: 15)
+                let fallRequestDTO = iTunesQuery(term: MusicTerm.fall.rawValue, mediaType: MediaType.music.rawValue, limit: 15)
+                let winterRequestDTO = iTunesQuery(term: MusicTerm.winter.rawValue, mediaType: MediaType.music.rawValue, limit: 15)
 
                 async let top5MusicList = iTunesSearchAPIUseCase.fetchSearchResultList(with: top5RequestDTO,
                                                                                        dtoType: MusicResultDTO.self,

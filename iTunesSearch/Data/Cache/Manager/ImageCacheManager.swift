@@ -32,32 +32,26 @@ final class ImageCacheManager {
     /// - Returns: 캐시 또는 네트워크로부터 가져온 이미지 데이터.
     /// - Throws: URL 생성 실패 또는 네트워크 오류 발생 시 에러를 던집니다.
     func fetchImage(from urlString: String) async throws -> Data {
-        let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
-        
         // 1. 메모리에 캐시된 이미지 확인
         if let memoryCachedImageData = await memoryCacher.requestImage(key: urlString) {
-            os_log(.debug, log: log, "메모리에 캐시된 이미지 반환")
             return memoryCachedImageData
         }
         
         // 2. 디스크에 캐시된 이미지 확인
         if let diskCachedImage = await diskCacher.requestImage(key: urlString) {
             await memoryCacher.cacheImage(key: urlString, imageData: diskCachedImage)
-            os_log(.debug, log: log, "디스크에 캐시된 이미지 반환")
             return diskCachedImage
-        }
-        
-        // URL 생성
-        guard let url = URL(string: urlString) else {
-            throw NetworkError.invalidURL
         }
         
         // 3. 네트워크에서 이미지 fetch
         // URLSessionConfiguration.ephemeral: NSCache를 따로 사용하므로 URLSession의 캐시를 사용하지 않음
+        guard let url = URL(string: urlString) else {
+            throw NetworkError.invalidURL
+        }
+        
         let (imageData, _) = try await URLSession(configuration: URLSessionConfiguration.ephemeral).data(from: url)
         await memoryCacher.cacheImage(key: urlString, imageData: imageData)
         await diskCacher.cacheImage(key: urlString, imageData: imageData)
-        os_log(.debug, log: log, "이미지 캐싱 성공")
         
         return imageData
     }

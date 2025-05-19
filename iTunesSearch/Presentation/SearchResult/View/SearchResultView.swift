@@ -23,6 +23,15 @@ final class SearchResultView: UIView {
     private let itemContentInset: NSDirectionalEdgeInsets
     private let headerContentInset: NSDirectionalEdgeInsets
     
+    private var sectionList: [SearchResultSection] = [
+        .searchText,
+        .largeBanner(page: 0),
+        .list(page: 0),
+        .loading
+    ]
+    
+    var searchScope: MediaType = .music
+    
     // MARK: - UI Components
     
     /// 검색 결과 CollectionView
@@ -87,16 +96,31 @@ private extension SearchResultView {
         config.interSectionSpacing = 20
         
         let layout = UICollectionViewCompositionalLayout(sectionProvider: { sectionIndex, _ in
-            guard let section = SearchResultSection(rawValue: sectionIndex) else { return nil }
+            let index = sectionIndex % (self.sectionList.count - 1)
+            let section = self.sectionList[index]
+            
             switch section {
             case .searchText:
                 return self.createSearchTextSection()
-            case .largeBanner:
+            case .largeBanner(_):
                 return self.createLargeBannerSection()
-            case .list:
-                
+            case .list(_):
                 return self.createListSection()
+            case .loading:
+                return self.createLoadingSection()
             }
+            
+//            guard let section = SearchResultSection(rawValue: sectionIndex) else { return nil }
+//            switch section {
+//            case .searchText:
+//                return self.createSearchTextSection()
+//            case .largeBanner:
+//                return self.createLargeBannerSection()
+//            case .list:
+//                return self.createListSection()
+//            case .loading:
+//                return self.createLoadingSection()
+//            }
         }, configuration: config)
         
         layout.register(ListSectionBackgroundView.self, forDecorationViewOfKind: ListSectionBackgroundView.identifier)
@@ -151,6 +175,20 @@ private extension SearchResultView {
         sectionBackgroundDecoration.contentInsets = .init(top: 0, leading: leadingTrailingInset, bottom: 0, trailing: leadingTrailingInset)
         section.decorationItems = [sectionBackgroundDecoration]
         
+        return section
+    }
+    
+    func createLoadingSection() -> NSCollectionLayoutSection {
+        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                              heightDimension: .fractionalHeight(1.0))
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        item.contentInsets = itemContentInset
+        
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                               heightDimension: .absolute(40))
+        let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
+        
+        let section = NSCollectionLayoutSection(group: group)
         return section
     }
     

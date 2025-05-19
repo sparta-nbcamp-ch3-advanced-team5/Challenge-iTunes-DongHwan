@@ -9,6 +9,6 @@ import Foundation
 
 struct iTunesQuery {
     let term: String
-    let mediaType: MediaType
+    let mediaType: String
     let limit: Int
 }
