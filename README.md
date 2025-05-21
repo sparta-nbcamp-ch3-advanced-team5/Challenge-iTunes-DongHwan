@@ -93,5 +93,5 @@ Xcode의 Profile 기능을 통해 Instruments를 활용하여 메모리 누수 �
 |    구현 내용    |   스크린샷   |    구현 내용    |   스크린샷   |
 | :-------------: | :----------: | :-------------: | :----------: |
 | 홈 화면 | <img src = "https://github.com/user-attachments/assets/87af962b-dee4-45df-869a-e0983691c39c" width ="250"> | 검색 화면 | <img src = "https://github.com/user-attachments/assets/b7acb944-78ac-4b29-9753-b1cf263d53bc" width ="250"> |
-| 팟캐스트, 영화<br/>섹션 | <img src = "https://github.com/user-attachments/assets/25f95669-311f-439d-b88a-3c1f54edb5b2" width ="250"> | 무한 스크롤 | <img src = "https://github.com/user-attachments/assets/a3aa7190-c679-4c6a-a0ac-206f220e0605" width ="250"> |
-| 다크 모드 | <img src = "https://github.com/user-attachments/assets/18edf39e-52a3-4187-aa1a-b4ca85d649d5" width ="250"> |
+| 팟캐스트,<br/>영화 섹션 | <img src = "https://github.com/user-attachments/assets/25f95669-311f-439d-b88a-3c1f54edb5b2" width ="250"> | 홈 화면<br/>페이징 | <img src = "https://github.com/user-attachments/assets/e5ed07c3-f1fa-4211-ae52-512811587b00" width ="250"> |
+| 검색 화면<br/>무한 스크롤 | <img src = "https://github.com/user-attachments/assets/a3aa7190-c679-4c6a-a0ac-206f220e0605" width ="250"> | 다크 모드 | <img src = "https://github.com/user-attachments/assets/18edf39e-52a3-4187-aa1a-b4ca85d649d5" width ="250"> |
