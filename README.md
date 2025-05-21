@@ -5,7 +5,7 @@
 
 ## 📋 프로젝트 개요
 
-Autolayout과 View 간의 제약 관계를 익히고, 가변적인 데이터에 유연하게 대응하는 UI를 구성하는 것을 목표로 해리포터 책 시리즈 앱을 개발하였습니다.
+MVVM 패턴과 RxSwift의 비동기 처리를 통해 iTunes Search API 호출 결과를 보여주는 앱입니다.
 <br/>
 
 ## ⏰ 프로젝트 일정
@@ -17,19 +17,24 @@ Autolayout과 View 간의 제약 관계를 익히고, 가변적인 데이터에 
 ## 🛠️ 기술 스택
 
 ### 아키텍처
+
 - MVVM
 
 ### 비동기 처리
+
 - RxSwift
 - Swift Concurrency
 
 ### API 통신
+
 - URLSession
 
 ### 활용 API
+
 - iTunes Search API
 
 ### UI Frameworks
+
 - UIKit
 - SnapKit(AutoLayout)
 <br/>
