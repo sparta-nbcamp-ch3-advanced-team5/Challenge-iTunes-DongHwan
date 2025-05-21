@@ -47,7 +47,7 @@ MVVM 패턴과 RxSwift의 비동기 처리를 통해 iTunes Search API 호출 �
 2. **팟캐스트 및 영화 검색 기능 제공**  
    검색 키워드와 연관된 팟캐스트와 영화를 보여줍니다.
 
-3. **이미지 메모리, 디스크 캐싱**
+3. **이미지 메모리, 디스크 캐싱**  
    네트워크 요청을 통해 로드한 이미지를 메모리, 디스크에 캐싱합니다.
 
 5. **검색 결과 무한 스크롤**  
@@ -94,3 +94,4 @@ Xcode의 Profile 기능을 통해 Instruments를 활용하여 메모리 누수 �
 | :-------------: | :----------: | :-------------: | :----------: |
 | 홈 화면 | <img src = "https://github.com/user-attachments/assets/87af962b-dee4-45df-869a-e0983691c39c" width ="250"> | 검색 화면 | <img src = "https://github.com/user-attachments/assets/b7acb944-78ac-4b29-9753-b1cf263d53bc" width ="250"> |
 | 팟캐스트, 영화<br/>섹션 | <img src = "https://github.com/user-attachments/assets/25f95669-311f-439d-b88a-3c1f54edb5b2" width ="250"> | 무한 스크롤 | <img src = "https://github.com/user-attachments/assets/a3aa7190-c679-4c6a-a0ac-206f220e0605" width ="250"> |
+| 다크 모드 | <img src = "https://github.com/user-attachments/assets/18edf39e-52a3-4187-aa1a-b4ca85d649d5" width ="250"> |
