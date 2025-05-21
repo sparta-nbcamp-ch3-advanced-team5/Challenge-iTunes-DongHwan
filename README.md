@@ -99,7 +99,7 @@ Xcode의 Profile 기능을 통해 Instruments를 활용하여 메모리 누수 �
 
 ## 참고 이미지
 
-|    구현 내용    |   스크린샷   |    구현 내용    |   스크린샷   |
+|    참고 내용    |   스크린샷   |    참고 내용    |   스크린샷   |
 | :-------------: | :----------: | :-------------: | :----------: |
 | 앱스토어<br/>투데이1 | <img src = "https://github.com/user-attachments/assets/b643e51e-0150-4707-acae-9e15f3895e9e" width ="250"> | 앱스토어<br/>투데이2 | <img src = "https://github.com/user-attachments/assets/07b2ce58-7437-477c-ab7c-7c3f20f46983" width ="250"> |
 | 앱스토어<br/>앱1 | <img src = "https://github.com/user-attachments/assets/89b018ab-fa86-4d80-8978-7d0bec2fed8e" width ="250"> | 앱스토어<br/>앱2 | <img src = "https://github.com/user-attachments/assets/6e536127-ec25-4699-8259-013af91a33f3" width ="250"> |
