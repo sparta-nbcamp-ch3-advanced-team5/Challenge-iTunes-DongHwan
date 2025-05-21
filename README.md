@@ -95,3 +95,11 @@ Xcode의 Profile 기능을 통해 Instruments를 활용하여 메모리 누수 �
 | 홈 화면 | <img src = "https://github.com/user-attachments/assets/87af962b-dee4-45df-869a-e0983691c39c" width ="250"> | 검색 화면 | <img src = "https://github.com/user-attachments/assets/b7acb944-78ac-4b29-9753-b1cf263d53bc" width ="250"> |
 | 팟캐스트,<br/>영화 섹션 | <img src = "https://github.com/user-attachments/assets/25f95669-311f-439d-b88a-3c1f54edb5b2" width ="250"> | 홈 화면<br/>페이징 | <img src = "https://github.com/user-attachments/assets/e5ed07c3-f1fa-4211-ae52-512811587b00" width ="250"> |
 | 검색 화면<br/>무한 스크롤 | <img src = "https://github.com/user-attachments/assets/a3aa7190-c679-4c6a-a0ac-206f220e0605" width ="250"> | 다크 모드 | <img src = "https://github.com/user-attachments/assets/18edf39e-52a3-4187-aa1a-b4ca85d649d5" width ="250"> |
+<br/>
+
+## 참고 이미지
+
+|    구현 내용    |   스크린샷   |    구현 내용    |   스크린샷   |
+| :-------------: | :----------: | :-------------: | :----------: |
+| 앱스토어<br/>투데이1 | <img src = "https://github.com/user-attachments/assets/b643e51e-0150-4707-acae-9e15f3895e9e" width ="250"> | 앱스토어<br/>투데이2 | <img src = "https://github.com/user-attachments/assets/07b2ce58-7437-477c-ab7c-7c3f20f46983" width ="250"> |
+| 앱스토어<br/>앱1 | <img src = "https://github.com/user-attachments/assets/89b018ab-fa86-4d80-8978-7d0bec2fed8e" width ="250"> | 앱스토어<br/>앱2 | <img src = "https://github.com/user-attachments/assets/6e536127-ec25-4699-8259-013af91a33f3" width ="250"> |
