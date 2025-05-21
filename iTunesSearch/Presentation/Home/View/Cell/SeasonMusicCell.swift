@@ -71,14 +71,14 @@ final class SeasonMusicCell: UICollectionViewCell {
     func configure(thumbnailURL: String, title: String, artist: String, collection: String, isBottom: Bool) {
         let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
         
-        fetchTask = Task { [weak self] in
+        fetchTask = Task {
             do {
                 let imageData = try await ImageCacheManager.shared.fetchImage(from: thumbnailURL)
-                self?.thumbnailView.getActivityIndicator.stopAnimating()
-                self?.thumbnailView.getimageView.image = UIImage(data: imageData)
-                self?.thumbnailView.startFadeInAnimation()
+                thumbnailView.getActivityIndicator.stopAnimating()
+                thumbnailView.getimageView.image = UIImage(data: imageData)
+                thumbnailView.startFadeInAnimation()
             } catch {
-                self?.thumbnailView.setPlaceholder()
+                thumbnailView.setPlaceholder()
                 os_log(.error, log: log, "\(error.localizedDescription)")
             }
         }

@@ -41,16 +41,12 @@ final class PodcastCell: UICollectionViewCell {
         $0.textColor = .black
         $0.numberOfLines = 2
     }
-    /// `labelStackView`, `goToButton` 컨테이너 `UIStackView`
-    private let containerStackView = ContainerStackView()
     /// `UILabel` 컨테이너 `UIStackView`
     private let labelStackView = LabelStackView()
     /// 팟캐스트 제목 `UILabel`
     private let titleLabel = TitleLabel()
     /// 팟캐스트 진행자 `UILabel`
     private let artistLabel = SubtitleLabel()
-    /// 아이튠즈 링크 이동 `UIButton`
-    private let goToButton = GoToButton()
     
     // MARK: - Initializer
     
@@ -86,14 +82,14 @@ final class PodcastCell: UICollectionViewCell {
     func configure(thumbnailURL: String, marketingPhrases: String, title: String, artist: String) {
         let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
         
-        fetchTask = Task { [weak self] in
+        fetchTask = Task {
             do {
                 let imageData = try await ImageCacheManager.shared.fetchImage(from: thumbnailURL)
-                self?.thumbnailView.getActivityIndicator.stopAnimating()
-                self?.thumbnailView.getimageView.image = UIImage(data: imageData)
-                self?.thumbnailView.startFadeInAnimation()
+                thumbnailView.getActivityIndicator.stopAnimating()
+                thumbnailView.getimageView.image = UIImage(data: imageData)
+                thumbnailView.startFadeInAnimation()
             } catch {
-                self?.thumbnailView.setPlaceholder()
+                thumbnailView.setPlaceholder()
                 os_log(.error, log: log, "\(error.localizedDescription)")
             }
         }
@@ -115,13 +111,11 @@ private extension PodcastCell {
         self.contentView.addSubview(cornerRadiusView)
         
         cornerRadiusView.addSubviews(thumbnailView,
-                                     containerStackView)
+                                     labelStackView)
         
         thumbnailView.addSubview(gradientContainerView)
         
         gradientContainerView.addSubview(marketingPhrasesLabel)
-        
-        containerStackView.addArrangedSubviews(labelStackView, goToButton)
         
         labelStackView.addArrangedSubviews(titleLabel,
                                            artistLabel)
@@ -148,15 +142,9 @@ private extension PodcastCell {
             $0.bottom.equalToSuperview().inset(20)
         }
         
-        containerStackView.snp.makeConstraints {
+        labelStackView.snp.makeConstraints {
             $0.top.equalTo(thumbnailView.snp.bottom).offset(10)
             $0.leading.trailing.equalToSuperview().inset(15)
-            $0.bottom.equalToSuperview().inset(10)
-        }
-        
-        goToButton.snp.makeConstraints {
-            $0.width.equalTo(70)
-            $0.height.equalTo(34)
         }
     }
 }
